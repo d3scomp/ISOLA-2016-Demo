@@ -2,35 +2,37 @@ package cz.cuni.mff.d3s.isola2016.demo;
 
 import java.util.List;
 
+import cz.cuni.mff.d3s.deeco.annotations.Component;
 import cz.cuni.mff.d3s.deeco.annotations.PeriodicScheduling;
 import cz.cuni.mff.d3s.deeco.annotations.Process;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
+@Component
 public class AntComponent {
 	/// Knowledge
 	static class Food {
 		Position poition;
 		Integer portions;
 	}
-	String id;
-	Position position;
-	List<Food> food;
+	public String id;
+	public Position position;
+	public List<Food> food;
 	
 	/// Initial knowledge
-	public AntComponent() {
-		
+	public AntComponent(int id) {
+		this.id = String.valueOf(id);
 	}
 	
 	/// Processes
 	@Process
 	@PeriodicScheduling(period = 5000)
-	static void printStatus() {
+	public static void printStatus() {
 		System.out.format("Ant status%n");
 	}
 	
 	@Process
 	@PeriodicScheduling(period = 1000)
-	static void move() {
+	public static void move() {
 		
 	}
 }
