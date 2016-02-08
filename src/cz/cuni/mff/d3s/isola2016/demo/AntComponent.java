@@ -9,19 +9,15 @@ import cz.cuni.mff.d3s.deeco.annotations.PeriodicScheduling;
 import cz.cuni.mff.d3s.deeco.annotations.Process;
 import cz.cuni.mff.d3s.deeco.runners.DEECoSimulation;
 import cz.cuni.mff.d3s.deeco.timer.CurrentTimeProvider;
+import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
 import cz.cuni.mff.d3s.jdeeco.network.omnet.OMNeTSimulation.Timer;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 @Component
 public class AntComponent {
-	/// Knowledge
-	static class Food {
-		Position poition;
-		Integer portions;
-	}
 	public String id;
 	public Position position;
-	public List<Food> food;
+	public List<FoodSource> food;
 	
 	@Local
 	public CurrentTimeProvider clock;
@@ -37,7 +33,7 @@ public class AntComponent {
 	@Process
 	@PeriodicScheduling(period = 5000)
 	public static void printStatus(@In("clock") CurrentTimeProvider clock, @In("id") String id) {
-		System.out.format("%d: Ant %s, status%n", clock.getCurrentMilliseconds(), id);
+		System.out.format("%06d: Ant %s, status%n", clock.getCurrentMilliseconds(), id);
 	}
 	
 	@Process
