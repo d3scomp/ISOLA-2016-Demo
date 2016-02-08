@@ -30,7 +30,7 @@ public class DemoLauncher {
 			OMNeTBroadcastDevice netDev = new OMNeTBroadcastDevice();
 			PositionPlugin posPlug = new PositionPlugin(rand.nextDouble() * 100, rand.nextDouble() * 100);
 			DEECoNode node = realm.createNode(i, netDev, posPlug);
-			node.deployComponent(new AntComponent(i));
+			node.deployComponent(new AntComponent(i, omnetSim.getTimer(), realm));
 		}
 		
 		
