@@ -6,7 +6,7 @@ public class FoodSource {
 	public Position position;
 	public Integer portions;
 	
-	FoodSource(Position position, Integer portions) {
+	public FoodSource(Position position, Integer portions) {
 		this.position = position;
 		this.portions = portions;
 	}

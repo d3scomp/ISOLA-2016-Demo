@@ -7,4 +7,10 @@ import cz.cuni.mff.d3s.jdeeco.position.Position;
 public class FoodPiece {
 	Position position;
 	Collection<AntPlugin> pullers;
+	
+	public FoodPiece(Position position, AntPlugin pullerA, AntPlugin pullerB) {
+		this.position = position;
+		this.pullers.add(pullerA);
+		this.pullers.add(pullerB);
+	}
 }

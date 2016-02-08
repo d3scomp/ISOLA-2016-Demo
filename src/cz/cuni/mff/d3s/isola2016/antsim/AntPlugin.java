@@ -27,7 +27,7 @@ public class AntPlugin implements DEECoPlugin, PositionProvider {
 	}
 
 	public static double SENSE_RANGE_M = 1.5;
-	public static double SPEED_M_PER_S = 0.03;
+	public static double SPEED_M_PER_S = 0.05;
 
 	private AntWorldPlugin world;
 
@@ -67,12 +67,11 @@ public class AntPlugin implements DEECoPlugin, PositionProvider {
 		currentTarget = target;
 	}
 
-	public boolean grab() {
-		if (world.getFoodSourceAt(currentPosition) == null) {
-			return false;
-		} else {
+	public void grab() {
+		FoodSource source = world.getFoodSourceAt(currentPosition);
+		if (source != null) {
 			state = State.Locked;
-			return true;
+			world.lockedAtSource.get(source).add(this);
 		}
 	}
 
@@ -84,34 +83,5 @@ public class AntPlugin implements DEECoPlugin, PositionProvider {
 
 	public State getState() {
 		return state;
-	}
-
-	void update() {
-		if (state == State.Free || state == State.Pulling) {
-			move();
-		}
-	}
-
-	private void move() {
-		if(currentTarget == null) {
-			return;
-		}
-		
-		// Get vector
-		double dx = currentTarget.x - currentPosition.x;
-		double dy = currentTarget.y - currentPosition.y;
-
-		// Normalize
-		double length = Math.sqrt(dx * dx + dy * dy);
-		dx /= length;
-		dy /= length;
-
-		// Apply speed
-		double multiplier = (SPEED_M_PER_S * AntWorldPlugin.SIM_STEP_MS) / 1000;
-		dx *= multiplier;
-		dy *= multiplier;
-
-		// Apply movement
-		currentPosition = new Position(currentPosition.x + dx, currentPosition.y + dy);
 	}
 }
