@@ -17,10 +17,10 @@ import cz.cuni.mff.d3s.jdeeco.publishing.DefaultKnowledgePublisher;
 
 public class DemoLauncher {
 	public static final int NUM_ANTS = 8;
-	public static final int NUM_FOOD_SOURCES = 3;
+	public static final int NUM_FOOD_SOURCES = 10;
 	public static final int FOOD_SOURCE_CAPACITY = 5;
 	public static final double ANT_SPAWN_DIAMETER_M = 15;
-	public static final double FOOD_SOURCE_SPAWN_DIAMETER_M = 30;
+	public static final double FOOD_SOURCE_SPAWN_DIAMETER_M = 20;
 
 	public static void main(String[] args) throws Exception {
 		System.out.println("Ant food picking simulation demo");
@@ -29,11 +29,10 @@ public class DemoLauncher {
 		DEECoSimulation realm = new DEECoSimulation(omnetSim.getTimer());
 		AntWorldPlugin antWorld = new AntWorldPlugin(0, 0); // Ant hill at 0,0
 		Random rand = new Random(42);
-		
+
 		// Add food sources
-		for(int i = 0; i < NUM_FOOD_SOURCES; ++i) {
-			Position pos = new Position((rand.nextDouble() - 0.5) * FOOD_SOURCE_SPAWN_DIAMETER_M,
-					(rand.nextDouble() - 0.5) * FOOD_SOURCE_SPAWN_DIAMETER_M);
+		for (int i = 0; i < NUM_FOOD_SOURCES; ++i) {
+			Position pos = getRandomPosition(rand, 0, 0, FOOD_SOURCE_SPAWN_DIAMETER_M);
 			antWorld.addFoodSource(new FoodSource(pos, FOOD_SOURCE_CAPACITY));
 		}
 
@@ -47,8 +46,7 @@ public class DemoLauncher {
 		// Create nodes
 		for (int i = 0; i < NUM_ANTS; ++i) {
 			OMNeTBroadcastDevice netDev = new OMNeTBroadcastDevice();
-			PositionPlugin posPlug = new PositionPlugin((rand.nextDouble() - 0.5) * ANT_SPAWN_DIAMETER_M,
-					(rand.nextDouble() - 0.5) * ANT_SPAWN_DIAMETER_M);
+			PositionPlugin posPlug = new PositionPlugin(getRandomPosition(rand, 0, 0, ANT_SPAWN_DIAMETER_M));
 			AntPlugin antPlug = new AntPlugin();
 			DEECoNode node = realm.createNode(i, netDev, posPlug, antPlug);
 			node.deployComponent(new AntComponent(i, omnetSim.getTimer(), antPlug));
@@ -60,4 +58,22 @@ public class DemoLauncher {
 		System.out.println("All done.");
 	}
 
+	/**
+	 * Generates random position in circle around base
+	 * 
+	 * @param rand
+	 *            Random data source
+	 * @param x
+	 *            Base x coordinate
+	 * @param y
+	 *            Base y coordinate
+	 * @param diameter
+	 *            Max distance from base
+	 * @return Generated position
+	 */
+	private static Position getRandomPosition(Random rand, double x, double y, double diameter) {
+		double px = x + ((rand.nextDouble() - 0.5) * diameter);
+		double py = y + ((rand.nextDouble() - 0.5) * diameter);
+		return new Position(px, py);
+	}
 }

@@ -22,7 +22,7 @@ import cz.cuni.mff.d3s.jdeeco.position.PositionProvider;
  *
  */
 public class AntPlugin implements DEECoPlugin, PositionProvider {
-	static enum State {
+	public static enum State {
 		Free, Locked, Pulling
 	}
 
@@ -55,7 +55,7 @@ public class AntPlugin implements DEECoPlugin, PositionProvider {
 		positionPlugin.setProvider(this);
 	}
 
-	Collection<FoodSource> getSensedFood() {
+	public Collection<FoodSource> getSensedFood() {
 		return world.getSensedFood(currentPosition, SENSE_RANGE_M);
 	}
 
