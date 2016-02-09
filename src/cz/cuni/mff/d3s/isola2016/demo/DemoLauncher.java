@@ -51,6 +51,7 @@ public class DemoLauncher {
 			AntPlugin antPlug = new AntPlugin();
 			DEECoNode node = realm.createNode(i, netDev, posPlug, antPlug);
 			node.deployComponent(new AntComponent(i, rand, omnetSim.getTimer(), antPlug));
+			node.deployEnsemble(FoodSourceExchangeEnsemble.class);
 		}
 
 		// Run the simulation

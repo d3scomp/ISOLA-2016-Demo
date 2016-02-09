@@ -33,10 +33,10 @@ public class AntComponent {
 		
 		public FoodSourceEx(FoodSource source, long age) {
 			super(source.position, source.portions);
-			this.age = age;
+			this.timestamp = age;
 		}
 		
-		public long age;
+		public long timestamp;
 	}
 	
 	static enum Mode {
@@ -99,7 +99,7 @@ public class AntComponent {
 		// Remove old food
 		Set<FoodSourceEx> toRemove = new HashSet<>();
 		for(FoodSourceEx source: foods.value) {
-			if(clock.getCurrentMilliseconds() - source.age > MAX_FOOD_AGE_MS) {
+			if(clock.getCurrentMilliseconds() - source.timestamp > MAX_FOOD_AGE_MS) {
 				toRemove.add(source);
 			}
 		}
@@ -111,7 +111,7 @@ public class AntComponent {
 			boolean updated = false;
 			for(FoodSourceEx oldSource: foods.value) {
 				if(PosUtils.isSame(oldSource.position, newSource.position)) {
-					oldSource.age = clock.getCurrentMilliseconds();
+					oldSource.timestamp = clock.getCurrentMilliseconds();
 					updated = true;
 				}
 			}
