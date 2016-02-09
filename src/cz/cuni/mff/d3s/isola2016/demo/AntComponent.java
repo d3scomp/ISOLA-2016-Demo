@@ -26,7 +26,7 @@ import cz.cuni.mff.d3s.jdeeco.position.Position;
 @Component
 public class AntComponent {
 	@SuppressWarnings("serial")
-	static class FoodSourceEx extends FoodSource implements Serializable {
+	public static class FoodSourceEx extends FoodSource implements Serializable {
 		public FoodSourceEx(Position position, Integer portions) {
 			super(position, portions);
 		}

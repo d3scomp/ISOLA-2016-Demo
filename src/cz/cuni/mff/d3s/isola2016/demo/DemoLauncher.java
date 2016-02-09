@@ -7,6 +7,7 @@ import cz.cuni.mff.d3s.deeco.runtime.DEECoNode;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.AntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
+import cz.cuni.mff.d3s.isola2016.antsim.IntelligentAntPlanning;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.network.Network;
 import cz.cuni.mff.d3s.jdeeco.network.l2.strategy.KnowledgeInsertingStrategy;
@@ -43,7 +44,8 @@ public class DemoLauncher {
 		realm.addPlugin(DefaultKnowledgePublisher.class);
 		realm.addPlugin(KnowledgeInsertingStrategy.class);
 		realm.addPlugin(antWorld);
-
+		realm.addPlugin(IntelligentAntPlanning.class);
+		
 		// Create nodes
 		for (int i = 0; i < NUM_ANTS; ++i) {
 			OMNeTBroadcastDevice netDev = new OMNeTBroadcastDevice();
