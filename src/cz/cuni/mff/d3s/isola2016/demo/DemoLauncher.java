@@ -7,6 +7,7 @@ import cz.cuni.mff.d3s.deeco.runtime.DEECoNode;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.AntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
+import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.network.Network;
 import cz.cuni.mff.d3s.jdeeco.network.l2.strategy.KnowledgeInsertingStrategy;
 import cz.cuni.mff.d3s.jdeeco.network.omnet.OMNeTBroadcastDevice;
@@ -32,7 +33,7 @@ public class DemoLauncher {
 
 		// Add food sources
 		for (int i = 0; i < NUM_FOOD_SOURCES; ++i) {
-			Position pos = getRandomPosition(rand, 0, 0, FOOD_SOURCE_SPAWN_DIAMETER_M);
+			Position pos = PosUtils.getRandomPosition(rand, 0, 0, FOOD_SOURCE_SPAWN_DIAMETER_M);
 			antWorld.addFoodSource(new FoodSource(pos, FOOD_SOURCE_CAPACITY));
 		}
 
@@ -46,10 +47,10 @@ public class DemoLauncher {
 		// Create nodes
 		for (int i = 0; i < NUM_ANTS; ++i) {
 			OMNeTBroadcastDevice netDev = new OMNeTBroadcastDevice();
-			PositionPlugin posPlug = new PositionPlugin(getRandomPosition(rand, 0, 0, ANT_SPAWN_DIAMETER_M));
+			PositionPlugin posPlug = new PositionPlugin(PosUtils.getRandomPosition(rand, 0, 0, ANT_SPAWN_DIAMETER_M));
 			AntPlugin antPlug = new AntPlugin();
 			DEECoNode node = realm.createNode(i, netDev, posPlug, antPlug);
-			node.deployComponent(new AntComponent(i, omnetSim.getTimer(), antPlug));
+			node.deployComponent(new AntComponent(i, rand, omnetSim.getTimer(), antPlug));
 		}
 
 		// Run the simulation
@@ -58,22 +59,5 @@ public class DemoLauncher {
 		System.out.println("All done.");
 	}
 
-	/**
-	 * Generates random position in circle around base
-	 * 
-	 * @param rand
-	 *            Random data source
-	 * @param x
-	 *            Base x coordinate
-	 * @param y
-	 *            Base y coordinate
-	 * @param diameter
-	 *            Max distance from base
-	 * @return Generated position
-	 */
-	private static Position getRandomPosition(Random rand, double x, double y, double diameter) {
-		double px = x + ((rand.nextDouble() - 0.5) * diameter);
-		double py = y + ((rand.nextDouble() - 0.5) * diameter);
-		return new Position(px, py);
-	}
+	
 }

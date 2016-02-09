@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import cz.cuni.mff.d3s.deeco.annotations.Component;
@@ -38,7 +39,12 @@ public class AntComponent {
 		public long age;
 	}
 	
+	static enum Mode {
+		Searching, Pulling
+	}
+	
 	public static final long MAX_FOOD_AGE_MS = 30000;
+	public static final double RANDOM_WALK_DIAMETER = 20;
 
 	public String id;
 	public Position position;
@@ -48,17 +54,26 @@ public class AntComponent {
 	public State state;
 	
 	@Local
+	public Mode mode;
+	
+	@Local
 	public CurrentTimeProvider clock;
 
 	@Local
 	public AntPlugin ant;
+	
+	@Local
+	public Random rand;
 
 	/// Initial knowledge
-	public AntComponent(int id, Timer timer, AntPlugin ant) {
+	public AntComponent(int id, Random rand, Timer timer, AntPlugin ant) {
 		this.id = String.valueOf(id);
+		this.rand = rand;
 		this.clock = timer;
 		this.ant = ant;
 		this.foods = new LinkedList<>();
+		this.state = State.Free;
+		this.mode = Mode.Searching;
 	}
 
 	/// Processes
@@ -127,7 +142,7 @@ public class AntComponent {
 
 	@Process
 	@PeriodicScheduling(period = 1000)
-	public static void move(@In("ant") AntPlugin ant) {
+	public static void searchByRandomWalk(@In("ant") AntPlugin ant) {
 		ant.setTarget(new Position(3, 4));
 	}
 }
