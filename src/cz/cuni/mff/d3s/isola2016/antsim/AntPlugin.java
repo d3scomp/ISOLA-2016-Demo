@@ -68,7 +68,15 @@ public class AntPlugin implements DEECoPlugin, PositionProvider {
 		currentTarget = target;
 	}
 	
+	public Position getTarget() {
+		return currentTarget;
+	}
+	
 	public boolean isAtTarget() {
+		if(currentTarget == null) {
+			return true;
+		}
+		
 		return PosUtils.isSame(currentTarget, currentPosition);
 	}
 

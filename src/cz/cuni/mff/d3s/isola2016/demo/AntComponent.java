@@ -19,7 +19,6 @@ import cz.cuni.mff.d3s.deeco.timer.CurrentTimeProvider;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin.State;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
-import cz.cuni.mff.d3s.isola2016.antsim.AntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
 import cz.cuni.mff.d3s.jdeeco.network.omnet.OMNeTSimulation.Timer;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
@@ -65,6 +64,9 @@ public class AntComponent {
 	
 	@Local
 	public Random rand;
+	
+	@Local
+	public Position curTarget;
 
 	/// Initial knowledge
 	public AntComponent(int id, Random rand, Timer timer, AntPlugin ant) {
@@ -143,10 +145,13 @@ public class AntComponent {
 
 	@Process
 	@PeriodicScheduling(period = 1000)
-	public static void searchByRandomWalk(@In("ant") AntPlugin ant, @In("mode") Mode mode) {
+	public static void searchByRandomWalk(@In("ant") AntPlugin ant, @In("mode") Mode mode, @In("rand") Random rand) {
 		if(mode != Mode.Searching) {
 			return;
 		}
-		ant.setTarget(new Position(3, 4));
+		
+		if(ant.isAtTarget()) {
+			ant.setTarget(PosUtils.getRandomPosition(rand, 0, 0, RANDOM_WALK_DIAMETER));
+		}
 	}
 }
