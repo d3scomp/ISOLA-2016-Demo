@@ -18,6 +18,7 @@ import cz.cuni.mff.d3s.deeco.task.ParamHolder;
 import cz.cuni.mff.d3s.deeco.timer.CurrentTimeProvider;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin.State;
+import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.isola2016.antsim.AntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
 import cz.cuni.mff.d3s.jdeeco.network.omnet.OMNeTSimulation.Timer;
@@ -107,7 +108,7 @@ public class AntComponent {
 			// Try to update existing one
 			boolean updated = false;
 			for(FoodSourceEx oldSource: foods.value) {
-				if(oldSource.position.euclidDistanceTo(newSource.position) < AntWorldPlugin.SAME_POS_DIST_M) {
+				if(PosUtils.isSame(oldSource.position, newSource.position)) {
 					oldSource.age = clock.getCurrentMilliseconds();
 					updated = true;
 				}
@@ -142,7 +143,10 @@ public class AntComponent {
 
 	@Process
 	@PeriodicScheduling(period = 1000)
-	public static void searchByRandomWalk(@In("ant") AntPlugin ant) {
+	public static void searchByRandomWalk(@In("ant") AntPlugin ant, @In("mode") Mode mode) {
+		if(mode != Mode.Searching) {
+			return;
+		}
 		ant.setTarget(new Position(3, 4));
 	}
 }

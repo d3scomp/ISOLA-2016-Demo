@@ -16,10 +16,10 @@ import cz.cuni.mff.d3s.deeco.scheduler.Scheduler;
 import cz.cuni.mff.d3s.deeco.task.TimerTask;
 import cz.cuni.mff.d3s.deeco.task.TimerTaskListener;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin.State;
+import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
-	public static double SAME_POS_DIST_M = 0.01;
 	public static long SIM_STEP_MS = 100;
 
 	public Position antHill;
@@ -80,7 +80,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 	 */
 	FoodSource getFoodSourceAt(Position position) {
 		for (FoodSource source : foodSources) {
-			if (source.position.euclidDistanceTo(position) <= SAME_POS_DIST_M) {
+			if (PosUtils.isSame(source.position, position)) {
 				return source;
 			}
 		}
@@ -94,7 +94,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 	public AntPlugin getHelper(AntPlugin ant) {
 		for (AntPlugin helper : ants) {
 			if (helper != ant && helper.state == State.Locked
-					&& helper.currentPosition.euclidDistanceTo(ant.currentPosition) < SAME_POS_DIST_M) {
+					&& PosUtils.isSame(helper.currentPosition, ant.currentPosition)) {
 				return helper;
 			}
 		}
@@ -158,7 +158,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 		// Remove food at hill
 		Collection<FoodPiece> toRemove = new HashSet<>();
 		for(FoodPiece piece: foodPieces) {
-			if(piece.position.euclidDistanceTo(antHill) < SAME_POS_DIST_M) {
+			if(PosUtils.isSame(piece.position, antHill)) {
 				for(AntPlugin puller: piece.pullers) {
 					puller.state = State.Free;
 					puller.pulledFoodPiece = null;

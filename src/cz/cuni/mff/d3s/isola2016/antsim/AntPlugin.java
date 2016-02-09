@@ -7,6 +7,7 @@ import java.util.List;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoContainer;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoPlugin;
 import cz.cuni.mff.d3s.deeco.runtime.PluginInitFailedException;
+import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 import cz.cuni.mff.d3s.jdeeco.position.PositionPlugin;
 import cz.cuni.mff.d3s.jdeeco.position.PositionProvider;
@@ -65,6 +66,10 @@ public class AntPlugin implements DEECoPlugin, PositionProvider {
 
 	public void setTarget(Position target) {
 		currentTarget = target;
+	}
+	
+	public boolean isAtTarget() {
+		return PosUtils.isSame(currentTarget, currentPosition);
 	}
 
 	public void grab() {

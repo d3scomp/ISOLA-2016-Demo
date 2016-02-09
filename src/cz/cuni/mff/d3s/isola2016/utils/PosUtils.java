@@ -23,4 +23,13 @@ public class PosUtils {
 		double py = y + ((rand.nextDouble() - 0.5) * diameter);
 		return new Position(px, py);
 	}
+	
+	/**
+	 * Distance at which the positions are considered same
+	 */
+	public static double SAME_POS_DIST_M = 0.01;
+	
+	public static boolean isSame(Position a, Position b) {
+		return a.euclidDistanceTo(b) < SAME_POS_DIST_M;
+	}
 }
