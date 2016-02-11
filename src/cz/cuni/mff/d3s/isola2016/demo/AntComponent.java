@@ -49,6 +49,7 @@ public class AntComponent {
 	public String id;
 	public Position position;
 	public List<FoodSourceEx> foods;
+	public Position assignedFoodPosition;
 	
 	@Local
 	public State state;

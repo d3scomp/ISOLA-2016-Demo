@@ -19,7 +19,7 @@ public class AntInfo {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append(String.format("id: %s, Pos: %s, Foods: [", id, position.toString()));
+		builder.append(String.format("id: %s, Pos: %s, Foods: [", id, position!=null?position.toString():"null"));
 		boolean first = true;
 		for (FoodSourceEx food : foods) {
 			if (first) {

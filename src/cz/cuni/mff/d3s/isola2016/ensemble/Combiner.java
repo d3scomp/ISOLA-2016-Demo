@@ -131,8 +131,8 @@ public class Combiner {
 			}
 		}
 		
-		System.out.println("Triplets:");
-		/*for(C c: done) {
+		/*System.out.println("Triplets:");
+		for(C c: done) {
 			System.out.println("Comb:");
 			c.printTriplets();
 		}

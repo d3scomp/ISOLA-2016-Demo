@@ -57,11 +57,24 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 	private double getBadnessAntAntFood(AntInfo a, AntInfo b, FoodSource f) {
 		return a.position.euclidDistanceTo(f.position) + b.position.euclidDistanceTo(f.position);
 	}
+	
+	private double getSolutionBadness(Collection<Triplet> triplets) {
+		double badness = 0;
+		for(Triplet t: triplets) {
+			badness += getBadnessAntAntFood(t.a, t.b, t.c);
+		}
+		return badness;
+	}
 
 	@Override
 	public void at(long time, Object triger) {
-		System.out.println("Fake intelligence being performed");
-		
+		evaluateEnsemble();
+	}
+	
+	/**
+	 * This simulates evaluation of intelligent ensemble
+	 */
+	private void evaluateEnsemble() {
 		// Get local knowledge
 		AntInfo localAnt = getKnowledge(container.getRuntimeFramework().getContainer().getLocals().iterator().next());
 			
@@ -70,13 +83,13 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 		for(ReadOnlyKnowledgeManager remote: container.getRuntimeFramework().getContainer().getReplicas()) {
 			remoteAnts.add(getKnowledge(remote));
 		}
-		
+		/*
 		System.out.println("Local: ");
 		System.out.println(localAnt);
 		System.out.println("Remote:");
 		for(AntInfo info: remoteAnts) {
 			System.out.println(info);
-		}
+		}*/
 		
 		// Collect all ants
 		Collection<AntInfo> ants = new HashSet<>();
@@ -89,7 +102,35 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 			foods.addAll(ant.foods);
 		}
 		
+		// Generate all possible solutions
 		Collection<Collection<Triplet>> combined = Combiner.combine(ants, foods);
 		
+		System.out.println("Fake intelligence: Ants: " + ants.size() + " foods: " + foods.size() + " => " + combined.size() + " alternatives");
+			
+		// Get best solution
+		double bestBadness = Double.POSITIVE_INFINITY;
+		Collection<Triplet> bestSolution = null; 
+		for(Collection<Triplet> solution: combined) {
+			double badness = getSolutionBadness(solution);
+			if(badness <= bestBadness) {
+				bestBadness = badness;
+				bestSolution = solution;
+			}
+		}
+		
+		// Get food assigned to local ant
+		FoodSource sourceAssignedToLocalAnt = null;
+		for(Triplet t: bestSolution) {
+			if(t.a == localAnt || t.b == localAnt) {
+				sourceAssignedToLocalAnt = t.c;
+			}
+		}
+		
+		System.out.print("Ant " + localAnt.id + " assigned to food: ");
+		if(sourceAssignedToLocalAnt != null) {
+			System.out.println(sourceAssignedToLocalAnt.position);
+		} else {
+			System.out.println();
+		}
 	}
 }
