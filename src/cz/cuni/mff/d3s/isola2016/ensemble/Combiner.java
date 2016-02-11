@@ -1,4 +1,4 @@
-package cz.cuni.mff.d3s.isola201665.ensemble;
+package cz.cuni.mff.d3s.isola2016.ensemble;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -135,8 +135,8 @@ public class Combiner {
 		/*for(C c: done) {
 			System.out.println("Comb:");
 			c.printTriplets();
-		}*/
-		System.out.println("Total: " + done.size() + " triplets");
+		}
+		System.out.println("Total: " + done.size() + " triplets");*/
 		
 		Collection<Collection<Triplet>> ret = new HashSet<>();
 		

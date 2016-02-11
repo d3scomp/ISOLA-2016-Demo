@@ -1,4 +1,4 @@
-package cz.cuni.mff.d3s.isola201665.ensemble;
+package cz.cuni.mff.d3s.isola2016.ensemble;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,6 +20,7 @@ import cz.cuni.mff.d3s.deeco.task.TimerTask;
 import cz.cuni.mff.d3s.deeco.task.TimerTaskListener;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
 import cz.cuni.mff.d3s.isola2016.demo.AntComponent.FoodSourceEx;
+import cz.cuni.mff.d3s.isola2016.ensemble.Combiner.Triplet;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
@@ -87,6 +88,8 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 		for(AntInfo ant: ants) {
 			foods.addAll(ant.foods);
 		}
+		
+		Collection<Collection<Triplet>> combined = Combiner.combine(ants, foods);
 		
 	}
 }

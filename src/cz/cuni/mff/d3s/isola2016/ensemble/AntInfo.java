@@ -1,4 +1,4 @@
-package cz.cuni.mff.d3s.isola201665.ensemble;
+package cz.cuni.mff.d3s.isola2016.ensemble;
 
 import java.util.List;
 
