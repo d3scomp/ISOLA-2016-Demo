@@ -40,7 +40,7 @@ public class AntComponent {
 	}
 
 	static enum Mode {
-		Searching, ToFood, Grip, Griped, Pulling
+		Searching, ToFood, Grip, Pulling
 	}
 
 	public static final long MAX_FOOD_AGE_MS = 30000;
@@ -140,7 +140,8 @@ public class AntComponent {
 			return;
 		}
 
-		System.out.format("%06d: Ant %s, %s, %s, %s, foods: ", clock.getCurrentMilliseconds(), id, position, state, mode);
+		System.out.format("%06d: Ant %s, %s, %s, %s, foods: ", clock.getCurrentMilliseconds(), id, position, state,
+				mode);
 
 		for (FoodSourceEx source : foods) {
 			System.out.format("%f, ", source.position.euclidDistanceTo(position));
@@ -175,43 +176,40 @@ public class AntComponent {
 			}
 			break;
 		case Grip:
-			// TODO
-			break;
-		case Griped:
-			mode.value = Mode.Pulling;
-			break;
+			if(ant.getState() == State.Locked || ant.getState() == State.Pulling) {
+				mode.value = Mode.Pulling;
+			}
+		break;
 		case Pulling:
-			// TODO: At anthill -> release
+			if(ant.getState() == State.Free) {
+				mode.value = Mode.Searching;
+			}
 			break;
 		}
-
-		if (assignedFood != null) {
-			mode.value = Mode.ToFood;
-		}
 	}
 
 	@Process
 	@PeriodicScheduling(period = 1000)
-	public static void searchByRandomWalk(@In("ant") AntPlugin ant, @In("mode") Mode mode, @In("rand") Random rand) {
-		if (mode != Mode.Searching) {
-			return;
-		}
-
-		if (ant.isAtTarget()) {
-			ant.setTarget(PosUtils.getRandomPosition(rand, 0, 0, RANDOM_WALK_DIAMETER));
-		}
-	}
-
-	@Process
-	@PeriodicScheduling(period = 1000)
-	public static void goToFood(@In("ant") AntPlugin ant, @In("mode") Mode mode,
+	public static void move(@In("ant") AntPlugin ant, @In("mode") Mode mode, @In("rand") Random rand,
 			@In("assignedFood") Position assignedFood) {
-		if (mode != Mode.ToFood) {
-			return;
-		}
-
-		if (assignedFood != null) {
-			ant.setTarget(assignedFood);
+		switch (mode) {
+		case Searching:
+			if (ant.isAtTarget()) {
+				ant.setTarget(PosUtils.getRandomPosition(rand, 0, 0, RANDOM_WALK_DIAMETER));
+			}
+			break;
+		case ToFood:
+			if (assignedFood != null) {
+				ant.setTarget(assignedFood);
+			}
+			break;
+		case Grip:
+			ant.grab();
+		break;
+		case Pulling:
+			// TODO: use ant hill position
+			ant.setTarget(new Position(0, 0));
 		}
 	}
+
 }
