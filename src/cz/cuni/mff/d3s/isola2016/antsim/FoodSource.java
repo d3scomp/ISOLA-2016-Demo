@@ -15,7 +15,7 @@ public class FoodSource {
 	public boolean equals(Object obj) {
 		if(obj instanceof FoodSource) {
 			FoodSource other = (FoodSource)obj;
-			return position == other.position;
+			return position.equals(other.position);
 		} else { 
 			return false;
 		}
