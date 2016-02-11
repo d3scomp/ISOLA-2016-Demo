@@ -30,19 +30,19 @@ public class AntComponent {
 		public FoodSourceEx(Position position, Integer portions) {
 			super(position, portions);
 		}
-		
+
 		public FoodSourceEx(FoodSource source, long age) {
 			super(source.position, source.portions);
 			this.timestamp = age;
 		}
-		
+
 		public long timestamp;
 	}
-	
+
 	static enum Mode {
-		Searching, Pulling
+		Searching, ToFood, Grip, Griped, Pulling
 	}
-	
+
 	public static final long MAX_FOOD_AGE_MS = 30000;
 	public static final double RANDOM_WALK_DIAMETER = 20;
 
@@ -50,25 +50,25 @@ public class AntComponent {
 	public Position position;
 	public List<FoodSourceEx> foods;
 	public Position assignedFood;
-	
+
 	@Local
 	public State state;
-	
+
 	@Local
 	public Mode mode;
-	
+
 	@Local
 	public CurrentTimeProvider clock;
 
 	@Local
 	public AntPlugin ant;
-	
+
 	@Local
 	public Random rand;
-	
+
 	@Local
 	public Position curTarget;
-	
+
 	@Local
 	public Position antHill;
 
@@ -90,7 +90,7 @@ public class AntComponent {
 	public static void sensePosition(@In("ant") AntPlugin ant, @Out("position") ParamHolder<Position> position) {
 		position.value = ant.getPosition();
 	}
-	
+
 	@Process
 	@PeriodicScheduling(period = 500)
 	public static void senseState(@In("ant") AntPlugin ant, @Out("state") ParamHolder<State> state) {
@@ -103,29 +103,29 @@ public class AntComponent {
 			@InOut("foods") ParamHolder<List<FoodSourceEx>> foods) {
 		// Remove old food
 		Set<FoodSourceEx> toRemove = new HashSet<>();
-		for(FoodSourceEx source: foods.value) {
-			if(clock.getCurrentMilliseconds() - source.timestamp > MAX_FOOD_AGE_MS) {
+		for (FoodSourceEx source : foods.value) {
+			if (clock.getCurrentMilliseconds() - source.timestamp > MAX_FOOD_AGE_MS) {
 				toRemove.add(source);
 			}
 		}
 		foods.value.removeAll(toRemove);
-		
+
 		// Add new sensed food
-		for(FoodSource newSource: ant.getSensedFood()) {
+		for (FoodSource newSource : ant.getSensedFood()) {
 			// Try to update existing one
 			boolean updated = false;
-			for(FoodSourceEx oldSource: foods.value) {
-				if(PosUtils.isSame(oldSource.position, newSource.position)) {
+			for (FoodSourceEx oldSource : foods.value) {
+				if (PosUtils.isSame(oldSource.position, newSource.position)) {
 					oldSource.timestamp = clock.getCurrentMilliseconds();
 					updated = true;
 				}
 			}
-			
+
 			// Skip adding if update was performed
-			if(updated) {
+			if (updated) {
 				continue;
 			}
-			
+
 			// Add new source
 			foods.value.add(new FoodSourceEx(newSource, clock.getCurrentMilliseconds()));
 		}
@@ -134,36 +134,84 @@ public class AntComponent {
 	@Process
 	@PeriodicScheduling(period = 5000)
 	public static void printStatus(@In("clock") CurrentTimeProvider clock, @In("id") String id,
-			@In("position") Position position, @In("state") State state, @In("foods") List<FoodSourceEx> foods, @In("assignedFood") Position assignedFood) {
-		if(position == null) {
+			@In("position") Position position, @In("state") State state, @In("mode") Mode mode,
+			@In("foods") List<FoodSourceEx> foods, @In("assignedFood") Position assignedFood) {
+		if (position == null) {
 			return;
 		}
-		
-		System.out.format("%06d: Ant %s, %s, %s, foods: ", clock.getCurrentMilliseconds(), id, position, state);
-		
-		for(FoodSourceEx source: foods) {
+
+		System.out.format("%06d: Ant %s, %s, %s, %s, foods: ", clock.getCurrentMilliseconds(), id, position, state, mode);
+
+		for (FoodSourceEx source : foods) {
 			System.out.format("%f, ", source.position.euclidDistanceTo(position));
 		}
-		
+
 		System.out.print("assigned food: ");
-		if(assignedFood != null) {
+		if (assignedFood != null) {
 			System.out.print(assignedFood);
 		} else {
 			System.out.print("null");
 		}
-		
+
 		System.out.println();
 	}
 
 	@Process
 	@PeriodicScheduling(period = 1000)
+	public static void modeSwitch(@In("ant") AntPlugin ant, @InOut("mode") ParamHolder<Mode> mode,
+			@In("assignedFood") Position assignedFood, @In("position") Position position) {
+		switch (mode.value) {
+		case Searching:
+			if (assignedFood != null) {
+				mode.value = Mode.ToFood;
+			}
+			break;
+		case ToFood:
+			if (assignedFood == null) {
+				mode.value = Mode.Searching;
+			}
+			if (PosUtils.isSame(assignedFood, position)) {
+				mode.value = Mode.Grip;
+			}
+			break;
+		case Grip:
+			// TODO
+			break;
+		case Griped:
+			mode.value = Mode.Pulling;
+			break;
+		case Pulling:
+			// TODO: At anthill -> release
+			break;
+		}
+
+		if (assignedFood != null) {
+			mode.value = Mode.ToFood;
+		}
+	}
+
+	@Process
+	@PeriodicScheduling(period = 1000)
 	public static void searchByRandomWalk(@In("ant") AntPlugin ant, @In("mode") Mode mode, @In("rand") Random rand) {
-		if(mode != Mode.Searching) {
+		if (mode != Mode.Searching) {
 			return;
 		}
-		
-		if(ant.isAtTarget()) {
+
+		if (ant.isAtTarget()) {
 			ant.setTarget(PosUtils.getRandomPosition(rand, 0, 0, RANDOM_WALK_DIAMETER));
+		}
+	}
+
+	@Process
+	@PeriodicScheduling(period = 1000)
+	public static void goToFood(@In("ant") AntPlugin ant, @In("mode") Mode mode,
+			@In("assignedFood") Position assignedFood) {
+		if (mode != Mode.ToFood) {
+			return;
+		}
+
+		if (assignedFood != null) {
+			ant.setTarget(assignedFood);
 		}
 	}
 }
