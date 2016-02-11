@@ -49,7 +49,7 @@ public class AntComponent {
 	public String id;
 	public Position position;
 	public List<FoodSourceEx> foods;
-	public Position assignedFoodPosition;
+	public Position assignedFood;
 	
 	@Local
 	public State state;
@@ -134,7 +134,7 @@ public class AntComponent {
 	@Process
 	@PeriodicScheduling(period = 5000)
 	public static void printStatus(@In("clock") CurrentTimeProvider clock, @In("id") String id,
-			@In("position") Position position, @In("state") State state, @In("foods") List<FoodSourceEx> foods) {
+			@In("position") Position position, @In("state") State state, @In("foods") List<FoodSourceEx> foods, @In("assignedFood") Position assignedFood) {
 		if(position == null) {
 			return;
 		}
@@ -143,6 +143,13 @@ public class AntComponent {
 		
 		for(FoodSourceEx source: foods) {
 			System.out.format("%f, ", source.position.euclidDistanceTo(position));
+		}
+		
+		System.out.print("assigned food: ");
+		if(assignedFood != null) {
+			System.out.print(assignedFood);
+		} else {
+			System.out.print("null");
 		}
 		
 		System.out.println();
