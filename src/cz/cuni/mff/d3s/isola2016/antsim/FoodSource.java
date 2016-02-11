@@ -10,4 +10,19 @@ public class FoodSource {
 		this.position = position;
 		this.portions = portions;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof FoodSource) {
+			FoodSource other = (FoodSource)obj;
+			return position == other.position;
+		} else { 
+			return false;
+		}
+	}
+	
+	@Override
+	public int hashCode() {
+		return position.hashCode();
+	}
 }

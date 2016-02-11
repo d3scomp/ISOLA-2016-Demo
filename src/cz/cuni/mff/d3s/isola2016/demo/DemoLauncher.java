@@ -7,8 +7,8 @@ import cz.cuni.mff.d3s.deeco.runtime.DEECoNode;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.AntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
-import cz.cuni.mff.d3s.isola2016.antsim.IntelligentAntPlanning;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
+import cz.cuni.mff.d3s.isola201665.ensemble.IntelligentAntPlanning;
 import cz.cuni.mff.d3s.jdeeco.network.Network;
 import cz.cuni.mff.d3s.jdeeco.network.l2.strategy.KnowledgeInsertingStrategy;
 import cz.cuni.mff.d3s.jdeeco.network.omnet.OMNeTBroadcastDevice;
@@ -23,13 +23,15 @@ public class DemoLauncher {
 	public static final int FOOD_SOURCE_CAPACITY = 5;
 	public static final double ANT_SPAWN_DIAMETER_M = 15;
 	public static final double FOOD_SOURCE_SPAWN_DIAMETER_M = 20;
+	public static final Position ANT_HILL_POS = new Position(0, 0);
 
 	public static void main(String[] args) throws Exception {
 		System.out.println("Ant food picking simulation demo");
 
 		OMNeTSimulation omnetSim = new OMNeTSimulation();
 		DEECoSimulation realm = new DEECoSimulation(omnetSim.getTimer());
-		AntWorldPlugin antWorld = new AntWorldPlugin(0, 0); // Ant hill at 0,0
+		
+		AntWorldPlugin antWorld = new AntWorldPlugin(ANT_HILL_POS);
 		Random rand = new Random(42);
 
 		// Add food sources
@@ -52,7 +54,7 @@ public class DemoLauncher {
 			PositionPlugin posPlug = new PositionPlugin(PosUtils.getRandomPosition(rand, 0, 0, ANT_SPAWN_DIAMETER_M));
 			AntPlugin antPlug = new AntPlugin();
 			DEECoNode node = realm.createNode(i, netDev, posPlug, antPlug);
-			node.deployComponent(new AntComponent(i, rand, omnetSim.getTimer(), antPlug));
+			node.deployComponent(new AntComponent(i, rand, omnetSim.getTimer(), antPlug, ANT_HILL_POS));
 			node.deployEnsemble(FoodSourceExchangeEnsemble.class);
 		}
 

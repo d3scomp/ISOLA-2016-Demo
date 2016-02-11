@@ -67,9 +67,12 @@ public class AntComponent {
 	
 	@Local
 	public Position curTarget;
+	
+	@Local
+	public Position antHill;
 
 	/// Initial knowledge
-	public AntComponent(int id, Random rand, Timer timer, AntPlugin ant) {
+	public AntComponent(int id, Random rand, Timer timer, AntPlugin ant, Position antHill) {
 		this.id = String.valueOf(id);
 		this.rand = rand;
 		this.clock = timer;
@@ -77,6 +80,7 @@ public class AntComponent {
 		this.foods = new LinkedList<>();
 		this.state = State.Free;
 		this.mode = Mode.Searching;
+		this.antHill = antHill;
 	}
 
 	/// Processes

@@ -32,8 +32,8 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 
 	private boolean initialized = false;
 
-	public AntWorldPlugin(double x, double y) {
-		antHill = new Position(x, y);
+	public AntWorldPlugin(Position antHill) {
+		this.antHill = antHill;
 	}
 
 	@Override
