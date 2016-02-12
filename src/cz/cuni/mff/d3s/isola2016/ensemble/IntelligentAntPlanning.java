@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 
 import cz.cuni.mff.d3s.deeco.knowledge.ChangeSet;
@@ -23,6 +24,7 @@ import cz.cuni.mff.d3s.deeco.task.TimerTask;
 import cz.cuni.mff.d3s.deeco.task.TimerTaskListener;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
 import cz.cuni.mff.d3s.isola2016.demo.AntComponent.FoodSourceEx;
+import cz.cuni.mff.d3s.isola2016.demo.AntComponent.Mode;
 import cz.cuni.mff.d3s.isola2016.ensemble.Combiner.Triplet;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
@@ -47,10 +49,11 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 			KnowledgePath idPath = RuntimeModelHelper.createKnowledgePath("id");
 			KnowledgePath positionPath = RuntimeModelHelper.createKnowledgePath("position");
 			KnowledgePath foodsPath = RuntimeModelHelper.createKnowledgePath("foods");
-			ValueSet set = knowledgeManager.get(Arrays.asList(idPath, foodsPath, positionPath));
+			KnowledgePath modePath = RuntimeModelHelper.createKnowledgePath("mode");
+			ValueSet set = knowledgeManager.get(Arrays.asList(idPath, foodsPath, positionPath, modePath));
 
 			return new AntInfo((String) set.getValue(idPath), (Position) set.getValue(positionPath),
-					(List<FoodSourceEx>) set.getValue(foodsPath));
+					(List<FoodSourceEx>) set.getValue(foodsPath), (Mode) set.getValue(modePath));
 
 		} catch (KnowledgeNotFoundException e) {
 			throw new DEECoRuntimeException("Knowledge extraction failed", e);
@@ -63,7 +66,7 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 			ChangeSet changes = new ChangeSet();
 			changes.setValue(knowledgePath, foodSourcePosition);
 			knowledgeManager.update(changes);
-			
+
 		} catch (KnowledgeUpdateException e) {
 			throw new DEECoRuntimeException("Knowledge insertion failed", e);
 		}
@@ -113,6 +116,24 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 		for (AntInfo ant : ants) {
 			foods.addAll(ant.foods);
 		}
+
+		// Filter out pulling ants
+		List<AntInfo> antsToRemove = new LinkedList<>();
+		for (AntInfo ant : ants) {
+			if (ant.mode != null && ant.mode == Mode.Pulling) {
+				antsToRemove.add(ant);
+			}
+		}
+		ants.removeAll(antsToRemove);
+
+		// Filter out empty food sources
+		List<FoodSource> foodsToRemove = new LinkedList<>();
+		for (FoodSource source : foods) {
+			if (source.portions == 0) {
+				foodsToRemove.add(source);
+			}
+		}
+		foods.removeAll(foodsToRemove);
 
 		// Generate all possible solutions
 		Collection<Collection<Triplet>> combined = Combiner.combine(ants, foods);
