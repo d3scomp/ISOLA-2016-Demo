@@ -33,8 +33,8 @@ public class AntPlugin implements DEECoPlugin, PositionProvider {
 	private AntWorldPlugin world;
 
 	State state;
-	Position currentPosition;
-	Position currentTarget;
+	Position position;
+	private Position target;
 	FoodPiece pulledFoodPiece;
 
 	@Override
@@ -52,36 +52,36 @@ public class AntPlugin implements DEECoPlugin, PositionProvider {
 
 		// Set initial position and provide current position
 		PositionPlugin positionPlugin = container.getPluginInstance(PositionPlugin.class);
-		currentPosition = positionPlugin.getStaticPosition();
+		position = positionPlugin.getStaticPosition();
 		positionPlugin.setProvider(this);
 	}
 
 	public Collection<FoodSource> getSensedFood() {
-		return world.getSensedFood(currentPosition, SENSE_RANGE_M);
+		return world.getSensedFood(position, SENSE_RANGE_M);
 	}
 
 	public Position getPosition() {
-		return currentPosition;
+		return position;
 	}
 
 	public void setTarget(Position target) {
-		currentTarget = target;
+		this.target = target;
 	}
 	
 	public Position getTarget() {
-		return currentTarget;
+		return target;
 	}
 	
 	public boolean isAtTarget() {
-		if(currentTarget == null) {
+		if(target == null) {
 			return true;
 		}
 		
-		return PosUtils.isSame(currentTarget, currentPosition);
+		return PosUtils.isSame(target, position);
 	}
 
 	public void grab() {
-		FoodSource source = world.getFoodSourceAt(currentPosition);
+		FoodSource source = world.getFoodSourceAt(position);
 		if (source != null) {
 			state = State.Locked;
 			world.lockedAtSource.get(source).add(this);

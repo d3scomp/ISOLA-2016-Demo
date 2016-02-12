@@ -27,6 +27,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 	public Collection<AntPlugin> ants = new HashSet<>();
 	public Collection<FoodSource> foodSources = new HashSet<>();
 	public Collection<FoodPiece> foodPieces = new HashSet<>();
+	public double totalTraveledDistance = 0;
 
 	Map<FoodSource, Set<AntPlugin>> lockedAtSource = new HashMap<>();
 
@@ -94,7 +95,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 	public AntPlugin getHelper(AntPlugin ant) {
 		for (AntPlugin helper : ants) {
 			if (helper != ant && helper.state == State.Locked
-					&& PosUtils.isSame(helper.currentPosition, ant.currentPosition)) {
+					&& PosUtils.isSame(helper.position, ant.position)) {
 				return helper;
 			}
 		}
@@ -130,7 +131,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 			}
 			
 			// Get locked source
-			FoodSource source = getFoodSourceAt(ant.currentPosition);
+			FoodSource source = getFoodSourceAt(ant.position);
 			if(source == null) {
 				ant.state = State.Free;
 			}
@@ -145,7 +146,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 			if(--source.portions == 0) {
 				removeFoodSource(source);
 			}
-			FoodPiece piece = new FoodPiece(ant.currentPosition, ant, helper);
+			FoodPiece piece = new FoodPiece(ant.position, ant, helper);
 			foodPieces.add(piece);
 			ant.state = State.Pulling;
 			ant.pulledFoodPiece = piece;
@@ -172,13 +173,13 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 	}
 	
 	private void moveAnt(AntPlugin ant) {
-		if(ant.currentTarget == null) {
+		if(ant.getTarget() == null) {
 			return;
 		}
 		
 		// Get vector
-		double dx = ant.currentTarget.x - ant.currentPosition.x;
-		double dy = ant.currentTarget.y - ant.currentPosition.y;
+		double dx = ant.getTarget().x - ant.position.x;
+		double dy = ant.getTarget().y - ant.position.y;
 
 		// Normalize
 		double length = Math.sqrt(dx * dx + dy * dy);
@@ -191,7 +192,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 		dy *= multiplier;
 
 		// Apply movement
-		ant.currentPosition = new Position(ant.currentPosition.x + dx, ant.currentPosition.y + dy);
+		ant.position = new Position(ant.position.x + dx, ant.position.y + dy);
 	}
 	
 	private void moveFood(FoodPiece piece) {
@@ -200,8 +201,8 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 
 		// Get vector
 		for(AntPlugin puller: piece.pullers) {
-			dx += puller.currentTarget.x - puller.currentPosition.x;
-			dy += puller.currentTarget.y - puller.currentPosition.y;
+			dx += puller.getTarget().x - puller.position.x;
+			dy += puller.getTarget().y - puller.position.y;
 		}
 
 		// Normalize
@@ -218,8 +219,8 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 		double x = piece.position.x;
 		double y = piece.position.y;
 		for(AntPlugin puller: piece.pullers) {
-			x += puller.currentPosition.x;
-			y += puller.currentPosition.y;
+			x += puller.position.x;
+			y += puller.position.y;
 		}
 		x /= 1 + piece.pullers.size();
 		y /= 1 + piece.pullers.size();
@@ -227,7 +228,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 		// Move pulleys and piece
 		Position newPos = new Position(x + dx, y + dy);
 		for(AntPlugin puller: piece.pullers) {
-			puller.currentPosition = newPos;
+			puller.position = newPos;
 		}
 		piece.position = newPos;
 	}
