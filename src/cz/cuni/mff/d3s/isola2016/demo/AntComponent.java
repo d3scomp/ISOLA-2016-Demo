@@ -44,7 +44,7 @@ public class AntComponent {
 	}
 
 	public static final long MAX_FOOD_AGE_MS = 30000;
-	public static final double RANDOM_WALK_DIAMETER = 20;
+	public static final double RANDOM_WALK_DIAMETER = 15;
 
 	public String id;
 	public Position position;
@@ -100,12 +100,32 @@ public class AntComponent {
 	@Process
 	@PeriodicScheduling(period = 500)
 	public static void senseFood(@In("ant") AntPlugin ant, @In("clock") CurrentTimeProvider clock,
-			@InOut("foods") ParamHolder<List<FoodSourceEx>> foods) {
+			@InOut("foods") ParamHolder<List<FoodSourceEx>> foods, @In("position") Position position) {
 		// Remove old food
 		Set<FoodSourceEx> toRemove = new HashSet<>();
 		for (FoodSourceEx source : foods.value) {
+			// Remove too old source data
 			if (clock.getCurrentMilliseconds() - source.timestamp > MAX_FOOD_AGE_MS) {
 				toRemove.add(source);
+			}
+			
+			// Remove empty sources
+			if(source.portions == 0) {
+				toRemove.add(source);
+			}
+			
+			// Remove sources in range but not sensed (already collected sources)
+			if(source.position.euclidDistanceTo(position) < AntPlugin.SENSE_RANGE_M) {
+				boolean found = false;
+				for(FoodSource sensed: ant.getSensedFood()) {
+					if(PosUtils.isSame(sensed.position, source.position)) {
+						found = true;
+						break;
+					}
+				}
+				if(!found) {
+					toRemove.add(source);
+				}
 			}
 		}
 		foods.value.removeAll(toRemove);
@@ -117,6 +137,7 @@ public class AntComponent {
 			for (FoodSourceEx oldSource : foods.value) {
 				if (PosUtils.isSame(oldSource.position, newSource.position)) {
 					oldSource.timestamp = clock.getCurrentMilliseconds();
+					oldSource.portions = newSource.portions;
 					updated = true;
 				}
 			}
@@ -127,7 +148,9 @@ public class AntComponent {
 			}
 
 			// Add new source
-			foods.value.add(new FoodSourceEx(newSource, clock.getCurrentMilliseconds()));
+			if(newSource.portions > 0) {
+				foods.value.add(new FoodSourceEx(newSource, clock.getCurrentMilliseconds()));
+			}
 		}
 	}
 

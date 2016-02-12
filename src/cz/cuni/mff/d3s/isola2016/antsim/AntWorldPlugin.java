@@ -159,6 +159,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 		Collection<FoodPiece> toRemove = new HashSet<>();
 		for(FoodPiece piece: foodPieces) {
 			if(PosUtils.isSame(piece.position, antHill)) {
+				System.err.println("Food piece delivered");
 				for(AntPlugin puller: piece.pullers) {
 					puller.state = State.Free;
 					puller.pulledFoodPiece = null;
