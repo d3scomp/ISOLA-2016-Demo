@@ -63,7 +63,10 @@ public class DemoLauncher {
 		realm.start(3000_000);
 		System.out.println("All done.");
 		
-		System.out.println("Total food pieced delivered: " + antWorld.collectedFoodPieces);
+		System.out.println("Total food pieced delivered: " + antWorld.collectedFoodPieces + " out of " + NUM_FOOD_SOURCES * FOOD_SOURCE_CAPACITY);
+		for(AntPlugin ant: antWorld.ants) {
+			System.out.println("Ant traveled distance: " + ant.totalTraveledDistance + " meters");
+		}
 	}
 
 	

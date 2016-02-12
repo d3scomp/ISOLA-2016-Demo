@@ -33,9 +33,11 @@ public class AntPlugin implements DEECoPlugin, PositionProvider {
 	private AntWorldPlugin world;
 
 	State state;
-	Position position;
+	private Position position;
 	private Position target;
 	FoodPiece pulledFoodPiece;
+	
+	public double totalTraveledDistance = 0;
 
 	@Override
 	public List<Class<? extends DEECoPlugin>> getDependencies() {
@@ -62,6 +64,11 @@ public class AntPlugin implements DEECoPlugin, PositionProvider {
 
 	public Position getPosition() {
 		return position;
+	}
+	
+	void setPosition(Position position) {
+		totalTraveledDistance += position.euclidDistanceTo(this.position);
+		this.position = position;
 	}
 
 	public void setTarget(Position target) {
