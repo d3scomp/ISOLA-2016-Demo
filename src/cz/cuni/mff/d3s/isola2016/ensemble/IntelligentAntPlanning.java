@@ -154,9 +154,11 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 
 		// Get food assigned to local ant
 		FoodSource sourceAssignedToLocalAnt = null;
-		for (Triplet t : bestSolution) {
-			if (t.a == localAnt || t.b == localAnt) {
-				sourceAssignedToLocalAnt = t.c;
+		if(bestSolution != null) {
+			for (Triplet t : bestSolution) {
+				if (t.a == localAnt || t.b == localAnt) {
+					sourceAssignedToLocalAnt = t.c;
+				}
 			}
 		}
 
