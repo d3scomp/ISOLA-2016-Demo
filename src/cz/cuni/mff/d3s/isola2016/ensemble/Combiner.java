@@ -2,7 +2,6 @@ package cz.cuni.mff.d3s.isola2016.ensemble;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
@@ -43,8 +42,8 @@ public class Combiner {
 	}
 	
 	static class C {
-		Collection<Pair> pairs = new HashSet<>();
-		Collection<Triplet> triplets = new HashSet<>();
+		Stack<Pair> pairs = new Stack<>();
+		Stack<Triplet> triplets = new Stack<>();
 		Stack<AntInfo> toPair = new Stack<>();
 		Stack<FoodSource> toTriplet = new Stack<>();
 		
@@ -110,6 +109,9 @@ public class Combiner {
 			System.out.println("Comb:");
 			c.printPairs();
 		}*/
+		System.out.println("Total: " + toTriple.size() + " pair configurations");
+		
+		int totalPairs = toTriple.size();
 		
 		// Generate all possible pairs of ant pair and food
 		while(!toTriple.isEmpty()) {
@@ -120,14 +122,23 @@ public class Combiner {
 				continue;
 			}
 			
-			FoodSource i = c.toTriplet.pop();
-			
-			for(Pair j: c.pairs) {
-				C n = new C(c.triplets, c.pairs, c.toPair, c.toTriplet);
-				n.triplets.add(new Triplet(j, i));
-				n.pairs.remove(j);
-				
-				toTriple.push(n);
+			// TODO: Check if this is valid algorithm
+			if(foods.size() < totalPairs) {
+				FoodSource i = c.toTriplet.pop();
+				for(Pair j: c.pairs) {
+					C n = new C(c.triplets, c.pairs, c.toPair, c.toTriplet);
+					n.triplets.add(new Triplet(j, i));
+					n.pairs.remove(j);
+					toTriple.push(n);
+				}
+			} else {
+				Pair i = c.pairs.pop();
+				for(FoodSource j: c.toTriplet) {
+					C n = new C(c.triplets, c.pairs, c.toPair, c.toTriplet);
+					n.triplets.add(new Triplet(i, j));
+					n.toTriplet.remove(j);
+					toTriple.push(n);
+				}
 			}
 		}
 		
@@ -135,10 +146,10 @@ public class Combiner {
 		for(C c: done) {
 			System.out.println("Comb:");
 			c.printTriplets();
-		}
-		System.out.println("Total: " + done.size() + " triplets");*/
+		}*/
+		System.out.println("Total: " + done.size() + " triplet configurations");
 		
-		Collection<Collection<Triplet>> ret = new HashSet<>();
+		Collection<Collection<Triplet>> ret = new LinkedList<>();
 		
 		for(C c: done) {
 			if(!c.triplets.isEmpty()) {

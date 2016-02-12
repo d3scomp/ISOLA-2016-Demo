@@ -112,7 +112,7 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 		ants.addAll(remoteAnts);
 
 		// Collect all foods
-		Collection<FoodSource> foods = new HashSet<>();
+		Collection<FoodSource> foods = new LinkedList<>();
 		for (AntInfo ant : ants) {
 			foods.addAll(ant.foods);
 		}
@@ -134,6 +134,15 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 			}
 		}
 		foods.removeAll(foodsToRemove);
+		
+		List<FoodSource> foodsToAdd = new LinkedList<>();
+		// Multiply food sources according to capacity
+		for(FoodSource source: foods) {
+			for(int i = 0; i < source.portions - 1;++i) {
+				foodsToAdd.add(source);
+			}
+		}
+		foods.addAll(foodsToAdd);
 
 		// Generate all possible solutions
 		Collection<Collection<Triplet>> combined = Combiner.combine(ants, foods);
