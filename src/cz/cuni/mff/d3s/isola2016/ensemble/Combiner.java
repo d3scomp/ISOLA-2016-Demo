@@ -141,7 +141,9 @@ public class Combiner {
 		Collection<Collection<Triplet>> ret = new HashSet<>();
 		
 		for(C c: done) {
-			ret.add(c.triplets);
+			if(!c.triplets.isEmpty()) {
+				ret.add(c.triplets);
+			}
 		}
 		
 		return ret;

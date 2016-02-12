@@ -140,7 +140,7 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 
 		System.out.print("Fake intelligence: Ants: " + ants.size() + " foods: " + foods.size() + " => "
 				+ combined.size() + " alternatives --- ");
-
+		
 		// Get best solution
 		double bestBadness = Double.POSITIVE_INFINITY;
 		Collection<Triplet> bestSolution = null;
