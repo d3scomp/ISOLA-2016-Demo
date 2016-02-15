@@ -18,8 +18,8 @@ import cz.cuni.mff.d3s.jdeeco.position.PositionPlugin;
 import cz.cuni.mff.d3s.jdeeco.publishing.DefaultKnowledgePublisher;
 
 public class DemoLauncher {
-	public static final int NUM_ANTS = 8;
-	public static final int NUM_FOOD_SOURCES = 8;
+	public static final int NUM_ANTS = 6;
+	public static final int NUM_FOOD_SOURCES = 4;
 	public static final int FOOD_SOURCE_CAPACITY = 3;
 	public static final double ANT_SPAWN_DIAMETER_M = 5;
 	public static final double FOOD_SOURCE_SPAWN_DIAMETER_M = 15;
@@ -60,7 +60,7 @@ public class DemoLauncher {
 
 		// Run the simulation
 		System.out.println("Running the simulation.");
-		realm.start(2000_000);
+		realm.start(1500_000);
 		System.out.println("All done.");
 		
 		System.out.println("Total food pieced delivered: " + antWorld.collectedFoodPieces + " out of " + NUM_FOOD_SOURCES * FOOD_SOURCE_CAPACITY);
