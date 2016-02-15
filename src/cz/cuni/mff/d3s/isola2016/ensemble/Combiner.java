@@ -111,8 +111,6 @@ public class Combiner {
 		}*/
 		System.out.println("Total: " + toTriple.size() + " pair configurations");
 		
-		int totalPairs = toTriple.size();
-		
 		// Generate all possible pairs of ant pair and food
 		while(!toTriple.isEmpty()) {
 			C c = toTriple.pop();
@@ -122,23 +120,11 @@ public class Combiner {
 				continue;
 			}
 			
-			// TODO: Check if this is valid algorithm
-			if(foods.size() < totalPairs) {
-				FoodSource i = c.toTriplet.pop();
-				for(Pair j: c.pairs) {
-					C n = new C(c.triplets, c.pairs, c.toPair, c.toTriplet);
-					n.triplets.add(new Triplet(j, i));
-					n.pairs.remove(j);
-					toTriple.push(n);
-				}
-			} else {
-				Pair i = c.pairs.pop();
-				for(FoodSource j: c.toTriplet) {
-					C n = new C(c.triplets, c.pairs, c.toPair, c.toTriplet);
-					n.triplets.add(new Triplet(i, j));
-					n.toTriplet.remove(j);
-					toTriple.push(n);
-				}
+			Pair i = c.pairs.pop();
+			for(FoodSource j: c.toTriplet) {
+				C n = new C(c.triplets, c.pairs, c.toPair, c.toTriplet);
+				n.triplets.add(new Triplet(i, j));
+				toTriple.push(n);
 			}
 		}
 		
