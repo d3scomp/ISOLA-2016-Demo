@@ -47,7 +47,7 @@ public class DemoLauncher {
 		realm.addPlugin(KnowledgeInsertingStrategy.class);
 		realm.addPlugin(antWorld);
 		realm.addPlugin(IntelligentAntPlanning.class);
-		
+
 		// Create nodes
 		for (int i = 0; i < NUM_ANTS; ++i) {
 			OMNeTBroadcastDevice netDev = new OMNeTBroadcastDevice();

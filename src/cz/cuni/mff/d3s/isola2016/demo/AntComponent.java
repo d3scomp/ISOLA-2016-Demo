@@ -1,7 +1,7 @@
 package cz.cuni.mff.d3s.isola2016.demo;
 
 import java.io.Serializable;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -18,8 +18,8 @@ import cz.cuni.mff.d3s.deeco.task.ParamHolder;
 import cz.cuni.mff.d3s.deeco.timer.CurrentTimeProvider;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin.State;
-import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
+import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.network.omnet.OMNeTSimulation.Timer;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
@@ -105,7 +105,7 @@ public class AntComponent {
 	public static void senseFood(@In("ant") AntPlugin ant, @In("clock") CurrentTimeProvider clock,
 			@InOut("foods") ParamHolder<List<FoodSourceEx>> foods, @In("position") Position position) {
 		// Remove old food
-		Set<FoodSourceEx> toRemove = new HashSet<>();
+		Set<FoodSourceEx> toRemove = new LinkedHashSet<>();
 		for (FoodSourceEx source : foods.value) {
 			// Remove too old source data
 			if (clock.getCurrentMilliseconds() - source.timestamp > MAX_FOOD_AGE_MS) {

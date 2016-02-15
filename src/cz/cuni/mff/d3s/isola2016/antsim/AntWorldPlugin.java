@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -24,9 +25,9 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 
 	public Position antHill;
 	public int collectedFoodPieces = 0;
-	public Collection<AntPlugin> ants = new HashSet<>();
-	public Collection<FoodSource> foodSources = new HashSet<>();
-	public Collection<FoodPiece> foodPieces = new HashSet<>();
+	public Collection<AntPlugin> ants = new LinkedHashSet<>();
+	public Collection<FoodSource> foodSources = new LinkedHashSet<>();
+	public Collection<FoodPiece> foodPieces = new LinkedHashSet<>();
 
 	Map<FoodSource, Set<AntPlugin>> lockedAtSource = new HashMap<>();
 
@@ -55,7 +56,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 	}
 
 	public void addFoodSource(FoodSource source) {
-		lockedAtSource.put(source, new HashSet<>());
+		lockedAtSource.put(source, new LinkedHashSet<>());
 		foodSources.add(source);
 	}
 

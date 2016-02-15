@@ -3,7 +3,7 @@ package cz.cuni.mff.d3s.isola2016.ensemble;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -97,7 +97,7 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 		AntInfo localAnt = getKnowledge(container.getRuntimeFramework().getContainer().getLocals().iterator().next());
 
 		// Get remote knowledge
-		Collection<AntInfo> remoteAnts = new HashSet<>();
+		Collection<AntInfo> remoteAnts = new LinkedHashSet<>();
 		for (ReadOnlyKnowledgeManager remote : container.getRuntimeFramework().getContainer().getReplicas()) {
 			remoteAnts.add(getKnowledge(remote));
 		}
@@ -107,7 +107,7 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 		 */
 
 		// Collect all ants
-		Collection<AntInfo> ants = new HashSet<>();
+		Collection<AntInfo> ants = new LinkedHashSet<>();
 		ants.add(localAnt);
 		ants.addAll(remoteAnts);
 
