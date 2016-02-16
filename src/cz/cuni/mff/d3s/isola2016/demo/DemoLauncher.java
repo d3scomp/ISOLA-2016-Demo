@@ -66,7 +66,7 @@ public class DemoLauncher {
 
 		// Run the simulation
 		System.out.println("Running the simulation.");
-		realm.start(150_000);
+		realm.start(1500_000);
 		System.out.println("All done.");
 		
 		System.out.println("Total food pieced delivered: " + antWorld.collectedFoodPieces + " out of " + NUM_FOOD_SOURCES * FOOD_SOURCE_CAPACITY);
@@ -81,6 +81,4 @@ public class DemoLauncher {
 		
 		SimpleLogger.close();
 	}
-
-	
 }
