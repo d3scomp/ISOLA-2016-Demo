@@ -23,7 +23,7 @@ import cz.cuni.mff.d3s.deeco.scheduler.Scheduler;
 import cz.cuni.mff.d3s.deeco.task.TimerTask;
 import cz.cuni.mff.d3s.deeco.task.TimerTaskListener;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
-import cz.cuni.mff.d3s.isola2016.demo.AntComponent.Mode;
+import cz.cuni.mff.d3s.isola2016.demo.Mode;
 import cz.cuni.mff.d3s.isola2016.demo.TimestampedFoodSource;
 import cz.cuni.mff.d3s.isola2016.ensemble.Combiner.Triplet;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
@@ -40,7 +40,7 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 	public void init(DEECoContainer container) throws PluginInitFailedException {
 		this.container = container;
 		Scheduler scheduler = container.getRuntimeFramework().getScheduler();
-		new TimerTask(scheduler, this, "FakeIntellignetEnsemble", 0, 3000).schedule();
+		new TimerTask(scheduler, this, "FakeIntellignetEnsemble", 0, 10000).schedule();
 	}
 
 	@SuppressWarnings("unchecked")

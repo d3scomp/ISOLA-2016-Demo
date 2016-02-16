@@ -22,14 +22,11 @@ import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin.State;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
+import cz.cuni.mff.d3s.isola2016.utils.SimpleLogger;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 @Component
 public class AntComponent {
-	public static enum Mode {
-		Searching, ToFood, Grip, Pulling
-	}
-
 	public static final long MAX_FOOD_AGE_MS = 300000;
 	public static final double RANDOM_WALK_DIAMETER = 15;
 	public static final long GRIP_PATIENCE_MS = 5000;
@@ -151,7 +148,7 @@ public class AntComponent {
 		}
 		
 		try {
-			logger.log(new AntLogRecord(id, position));
+			SimpleLogger.log(new AntLogRecord(id, position));
 		} catch (Exception e) {
 			throw new DEECoRuntimeException("Ant log failed with exception", e);
 		}

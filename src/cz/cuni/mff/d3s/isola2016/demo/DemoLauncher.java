@@ -11,6 +11,7 @@ import cz.cuni.mff.d3s.isola2016.antsim.AntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
 import cz.cuni.mff.d3s.isola2016.ensemble.IntelligentAntPlanning;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
+import cz.cuni.mff.d3s.isola2016.utils.SimpleLogger;
 import cz.cuni.mff.d3s.jdeeco.network.Network;
 import cz.cuni.mff.d3s.jdeeco.network.l2.strategy.KnowledgeInsertingStrategy;
 import cz.cuni.mff.d3s.jdeeco.network.omnet.OMNeTBroadcastDevice;
@@ -35,6 +36,9 @@ public class DemoLauncher {
 		
 		AntWorldPlugin antWorld = new AntWorldPlugin(ANT_HILL_POS);
 		Random rand = new Random(42);
+		
+		// TODO: Do this properly
+		SimpleLogger.clock = omnetSim.getTimer();
 
 		// Add food sources
 		for (int i = 0; i < NUM_FOOD_SOURCES; ++i) {
@@ -62,7 +66,7 @@ public class DemoLauncher {
 
 		// Run the simulation
 		System.out.println("Running the simulation.");
-		realm.start(1500_000);
+		realm.start(150_000);
 		System.out.println("All done.");
 		
 		System.out.println("Total food pieced delivered: " + antWorld.collectedFoodPieces + " out of " + NUM_FOOD_SOURCES * FOOD_SOURCE_CAPACITY);
@@ -74,6 +78,8 @@ public class DemoLauncher {
 		for(DEECoNode node: nodes) {
 			node.getRuntimeLogger().flush();
 		}
+		
+		SimpleLogger.close();
 	}
 
 	

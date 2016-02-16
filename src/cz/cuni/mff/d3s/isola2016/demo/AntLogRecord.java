@@ -1,12 +1,13 @@
 package cz.cuni.mff.d3s.isola2016.demo;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 import cz.cuni.mff.d3s.deeco.runtimelog.RuntimeLogRecord;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 public final class AntLogRecord extends RuntimeLogRecord {
-	static final class XMLPosition {
+	public static final class XMLPosition {
 		private Position position;
 		
 		public XMLPosition(Position position) {
@@ -15,7 +16,7 @@ public final class AntLogRecord extends RuntimeLogRecord {
 		
 		@Override
 		public String toString() {
-			return String.format("<position x=\"%f\" y=\"%f\" z=\"%f\"/>", position.x, position.y, position.z);
+			return String.format(Locale.US, "<x>%f</x><y>%f</y><z>%f</z>", position.x, position.y, position.z);
 		}
 	}
 	
@@ -26,7 +27,10 @@ public final class AntLogRecord extends RuntimeLogRecord {
 		}
 	}
 	
+	public XMLPosition xmlPos;
+	
 	public AntLogRecord(String id, Position position) {
-		super(AntComponent.class.getSimpleName(), new AntLogMap(position));
+		super(id, new AntLogMap(position));
+		xmlPos = new XMLPosition(position);
 	}
 }
