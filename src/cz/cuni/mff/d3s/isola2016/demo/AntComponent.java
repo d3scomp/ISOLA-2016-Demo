@@ -1,6 +1,5 @@
 package cz.cuni.mff.d3s.isola2016.demo;
 
-import java.io.Serializable;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,6 +14,8 @@ import cz.cuni.mff.d3s.deeco.annotations.Out;
 import cz.cuni.mff.d3s.deeco.annotations.PeriodicScheduling;
 import cz.cuni.mff.d3s.deeco.annotations.Process;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoNode;
+import cz.cuni.mff.d3s.deeco.runtime.DEECoRuntimeException;
+import cz.cuni.mff.d3s.deeco.runtimelog.RuntimeLogger;
 import cz.cuni.mff.d3s.deeco.task.ParamHolder;
 import cz.cuni.mff.d3s.deeco.timer.CurrentTimeProvider;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin;
@@ -25,20 +26,6 @@ import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 @Component
 public class AntComponent {
-	@SuppressWarnings("serial")
-	public static class FoodSourceEx extends FoodSource implements Serializable {
-		public FoodSourceEx(Position position, Integer portions) {
-			super(position, portions);
-		}
-
-		public FoodSourceEx(FoodSource source, long age) {
-			super(source.position, source.portions);
-			this.timestamp = age;
-		}
-
-		public long timestamp;
-	}
-
 	public static enum Mode {
 		Searching, ToFood, Grip, Pulling
 	}
@@ -49,7 +36,7 @@ public class AntComponent {
 
 	public String id;
 	public Position position;
-	public List<FoodSourceEx> foods;
+	public List<TimestampedFoodSource> foods;
 	public Position assignedFood;
 
 	@Local
@@ -74,6 +61,9 @@ public class AntComponent {
 	
 	@Local
 	public Long gripTimestamp;
+	
+	@Local
+	public RuntimeLogger logger;
 
 	/// Initial knowledge
 	public AntComponent(int id, Random rand, DEECoNode node, Position antHill) {
@@ -85,6 +75,7 @@ public class AntComponent {
 		this.state = State.Free;
 		this.mode = Mode.Searching;
 		this.antHill = antHill;
+		this.logger = node.getRuntimeLogger();
 	}
 
 	/// Processes
@@ -103,10 +94,10 @@ public class AntComponent {
 	@Process
 	@PeriodicScheduling(period = 500)
 	public static void senseFood(@In("ant") AntPlugin ant, @In("clock") CurrentTimeProvider clock,
-			@InOut("foods") ParamHolder<List<FoodSourceEx>> foods, @In("position") Position position) {
+			@InOut("foods") ParamHolder<List<TimestampedFoodSource>> foods, @In("position") Position position) {
 		// Remove old food
-		Set<FoodSourceEx> toRemove = new LinkedHashSet<>();
-		for (FoodSourceEx source : foods.value) {
+		Set<TimestampedFoodSource> toRemove = new LinkedHashSet<>();
+		for (TimestampedFoodSource source : foods.value) {
 			// Remove too old source data
 			if (clock.getCurrentMilliseconds() - source.timestamp > MAX_FOOD_AGE_MS) {
 				toRemove.add(source);
@@ -132,7 +123,7 @@ public class AntComponent {
 		for (FoodSource newSource : ant.getSensedFood()) {
 			// Try to update existing one
 			boolean updated = false;
-			for (FoodSourceEx oldSource : foods.value) {
+			for (TimestampedFoodSource oldSource : foods.value) {
 				if (PosUtils.isSame(oldSource.position, newSource.position)) {
 					oldSource.timestamp = clock.getCurrentMilliseconds();
 					oldSource.portions = newSource.portions;
@@ -147,8 +138,22 @@ public class AntComponent {
 
 			// Add new source
 			if(newSource.portions > 0) {
-				foods.value.add(new FoodSourceEx(newSource, clock.getCurrentMilliseconds()));
+				foods.value.add(new TimestampedFoodSource(newSource, clock.getCurrentMilliseconds()));
 			}
+		}
+	}
+	
+	@Process
+	@PeriodicScheduling(period = 1000)
+	public static void log(@In("logger") RuntimeLogger logger, @In("id") String id, @In("position") Position position) {
+		if(position == null) {
+			return;
+		}
+		
+		try {
+			logger.log(new AntLogRecord(id, position));
+		} catch (Exception e) {
+			throw new DEECoRuntimeException("Ant log failed with exception", e);
 		}
 	}
 
@@ -156,7 +161,7 @@ public class AntComponent {
 	@PeriodicScheduling(period = 5000)
 	public static void printStatus(@In("clock") CurrentTimeProvider clock, @In("id") String id,
 			@In("position") Position position, @In("state") State state, @In("mode") Mode mode,
-			@In("foods") List<FoodSourceEx> foods, @In("assignedFood") Position assignedFood) {
+			@In("foods") List<TimestampedFoodSource> foods, @In("assignedFood") Position assignedFood) {
 		if (position == null) {
 			return;
 		}
@@ -164,7 +169,7 @@ public class AntComponent {
 		System.out.format("%06d: Ant %s, %s, %s, %s, foods: ", clock.getCurrentMilliseconds(), id, position, state,
 				mode);
 
-		for (FoodSourceEx source : foods) {
+		for (TimestampedFoodSource source : foods) {
 			System.out.format("%f, ", source.position.euclidDistanceTo(position));
 		}
 

@@ -1,5 +1,7 @@
 package cz.cuni.mff.d3s.isola2016.demo;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import cz.cuni.mff.d3s.deeco.runners.DEECoSimulation;
@@ -51,9 +53,11 @@ public class DemoLauncher {
 		realm.addPlugin(IntelligentAntPlanning.class);
 
 		// Create nodes
+		List<DEECoNode> nodes = new ArrayList<>();
 		for (int i = 0; i < NUM_ANTS; ++i) {
 			DEECoNode node = realm.createNode(i, new PositionPlugin(PosUtils.getRandomPosition(rand, 0, 0, ANT_SPAWN_DIAMETER_M)));
 			node.deployComponent(new AntComponent(i, rand, node, ANT_HILL_POS));
+			nodes.add(node);
 		}
 
 		// Run the simulation
@@ -64,6 +68,11 @@ public class DemoLauncher {
 		System.out.println("Total food pieced delivered: " + antWorld.collectedFoodPieces + " out of " + NUM_FOOD_SOURCES * FOOD_SOURCE_CAPACITY);
 		for(AntPlugin ant: antWorld.ants) {
 			System.out.println("Ant traveled distance: " + ant.totalTraveledDistance + " meters");
+		}	
+		
+		// Finalize log, this should be fixed in log
+		for(DEECoNode node: nodes) {
+			node.getRuntimeLogger().flush();
 		}
 	}
 

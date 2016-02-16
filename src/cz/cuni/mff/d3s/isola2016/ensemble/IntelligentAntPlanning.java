@@ -23,8 +23,8 @@ import cz.cuni.mff.d3s.deeco.scheduler.Scheduler;
 import cz.cuni.mff.d3s.deeco.task.TimerTask;
 import cz.cuni.mff.d3s.deeco.task.TimerTaskListener;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
-import cz.cuni.mff.d3s.isola2016.demo.AntComponent.FoodSourceEx;
 import cz.cuni.mff.d3s.isola2016.demo.AntComponent.Mode;
+import cz.cuni.mff.d3s.isola2016.demo.TimestampedFoodSource;
 import cz.cuni.mff.d3s.isola2016.ensemble.Combiner.Triplet;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
@@ -53,7 +53,7 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 			ValueSet set = knowledgeManager.get(Arrays.asList(idPath, foodsPath, positionPath, modePath));
 
 			return new AntInfo((String) set.getValue(idPath), (Position) set.getValue(positionPath),
-					(List<FoodSourceEx>) set.getValue(foodsPath), (Mode) set.getValue(modePath));
+					(List<TimestampedFoodSource>) set.getValue(foodsPath), (Mode) set.getValue(modePath));
 
 		} catch (KnowledgeNotFoundException e) {
 			throw new DEECoRuntimeException("Knowledge extraction failed", e);
