@@ -80,5 +80,21 @@ for key in antdata:
     plot.scatter(ant.x, ant.y, c=ant.color, alpha=0.5, linewidths=0)
 
 plot.savefig('all.pdf')
+plot.close()
 
 print("Crating time sets")
+times = {}
+for rec in log:
+    if rec.time not in times:
+        times[rec.time] = []
+    times[rec.time].append(rec)
+    
+print("Rendering time sets")
+for time in times:
+    print(time)
+#    print(len(times[time]))
+    for rec in times[time]:
+ #       print("X")
+        plot.scatter(rec.pos.x, rec.pos.y, c=colors[int(rec.id)], alpha=0.5, linewidths=0)
+    plot.savefig("out/" + str(time) + ".png")
+    plot.close()
