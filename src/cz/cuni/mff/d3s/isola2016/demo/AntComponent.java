@@ -14,13 +14,13 @@ import cz.cuni.mff.d3s.deeco.annotations.Local;
 import cz.cuni.mff.d3s.deeco.annotations.Out;
 import cz.cuni.mff.d3s.deeco.annotations.PeriodicScheduling;
 import cz.cuni.mff.d3s.deeco.annotations.Process;
+import cz.cuni.mff.d3s.deeco.runtime.DEECoNode;
 import cz.cuni.mff.d3s.deeco.task.ParamHolder;
 import cz.cuni.mff.d3s.deeco.timer.CurrentTimeProvider;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin.State;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
-import cz.cuni.mff.d3s.jdeeco.network.omnet.OMNeTSimulation.Timer;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 @Component
@@ -76,11 +76,11 @@ public class AntComponent {
 	public Long gripTimestamp;
 
 	/// Initial knowledge
-	public AntComponent(int id, Random rand, Timer timer, AntPlugin ant, Position antHill) {
+	public AntComponent(int id, Random rand, DEECoNode node, Position antHill) {
 		this.id = String.valueOf(id);
 		this.rand = rand;
-		this.clock = timer;
-		this.ant = ant;
+		this.clock = node.getRuntimeFramework().getScheduler().getTimer();
+		this.ant = node.getPluginInstance(AntPlugin.class);
 		this.foods = new LinkedList<>();
 		this.state = State.Free;
 		this.mode = Mode.Searching;

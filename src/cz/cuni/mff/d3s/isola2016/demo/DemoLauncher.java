@@ -46,16 +46,14 @@ public class DemoLauncher {
 		realm.addPlugin(DefaultKnowledgePublisher.class);
 		realm.addPlugin(KnowledgeInsertingStrategy.class);
 		realm.addPlugin(antWorld);
+		realm.addPlugin(AntPlugin.class);
+		realm.addPlugin(OMNeTBroadcastDevice.class);
 		realm.addPlugin(IntelligentAntPlanning.class);
 
 		// Create nodes
 		for (int i = 0; i < NUM_ANTS; ++i) {
-			OMNeTBroadcastDevice netDev = new OMNeTBroadcastDevice();
-			PositionPlugin posPlug = new PositionPlugin(PosUtils.getRandomPosition(rand, 0, 0, ANT_SPAWN_DIAMETER_M));
-			AntPlugin antPlug = new AntPlugin();
-			DEECoNode node = realm.createNode(i, netDev, posPlug, antPlug);
-			node.deployComponent(new AntComponent(i, rand, omnetSim.getTimer(), antPlug, ANT_HILL_POS));
-	//		node.deployEnsemble(FoodSourceExchangeEnsemble.class);
+			DEECoNode node = realm.createNode(i, new PositionPlugin(PosUtils.getRandomPosition(rand, 0, 0, ANT_SPAWN_DIAMETER_M)));
+			node.deployComponent(new AntComponent(i, rand, node, ANT_HILL_POS));
 		}
 
 		// Run the simulation
