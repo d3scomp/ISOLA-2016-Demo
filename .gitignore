@@ -4,3 +4,7 @@
 .settings/
 /logs/
 omnet/
+/scripts/out/
+/scripts/*.pdf
+/scripts/__pycache__/
+/scripts/*.pyc
