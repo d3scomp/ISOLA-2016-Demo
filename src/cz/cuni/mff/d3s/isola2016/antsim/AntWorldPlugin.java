@@ -236,6 +236,11 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 	// Ant world simulation step
 	@Override
 	public void at(long time, Object triger) {
+		if(foodSources.isEmpty() && foodPieces.isEmpty()) {
+			System.err.println("No foods no pieces -> no move");
+			return;
+		}
+		
 		// System.out.println("Ant world simulation step: " + time);
 		resolveLocked();
 		

@@ -55,10 +55,10 @@ public class AntComponent {
 
 	@Local
 	public Position antHill;
-	
+
 	@Local
 	public Long gripTimestamp;
-	
+
 	@Local
 	public RuntimeLogger logger;
 
@@ -77,19 +77,19 @@ public class AntComponent {
 
 	/// Processes
 	@Process
-	@PeriodicScheduling(period = 500)
+	@PeriodicScheduling(period = 500, order = 1)
 	public static void sensePosition(@In("ant") AntPlugin ant, @Out("position") ParamHolder<Position> position) {
 		position.value = ant.getPosition();
 	}
 
 	@Process
-	@PeriodicScheduling(period = 500)
+	@PeriodicScheduling(period = 500, order = 2)
 	public static void senseState(@In("ant") AntPlugin ant, @Out("state") ParamHolder<State> state) {
 		state.value = ant.getState();
 	}
 
 	@Process
-	@PeriodicScheduling(period = 500)
+	@PeriodicScheduling(period = 500, order = 3)
 	public static void senseFood(@In("ant") AntPlugin ant, @In("clock") CurrentTimeProvider clock,
 			@InOut("foods") ParamHolder<List<TimestampedFoodSource>> foods, @In("position") Position position) {
 		// Remove old food
@@ -99,17 +99,17 @@ public class AntComponent {
 			if (clock.getCurrentMilliseconds() - source.timestamp > MAX_FOOD_AGE_MS) {
 				toRemove.add(source);
 			}
-			
+
 			// Remove sources in range but not sensed (already collected sources)
-			if(source.position.euclidDistanceTo(position) < AntPlugin.SENSE_RANGE_M) {
+			if (source.position.euclidDistanceTo(position) < AntPlugin.SENSE_RANGE_M) {
 				boolean found = false;
-				for(FoodSource sensed: ant.getSensedFood()) {
-					if(PosUtils.isSame(sensed.position, source.position)) {
+				for (FoodSource sensed : ant.getSensedFood()) {
+					if (PosUtils.isSame(sensed.position, source.position)) {
 						found = true;
 						break;
 					}
 				}
-				if(!found) {
+				if (!found) {
 					toRemove.add(source);
 				}
 			}
@@ -134,19 +134,19 @@ public class AntComponent {
 			}
 
 			// Add new source
-			if(newSource.portions > 0) {
+			if (newSource.portions > 0) {
 				foods.value.add(new TimestampedFoodSource(newSource, clock.getCurrentMilliseconds()));
 			}
 		}
 	}
-	
+
 	@Process
-	@PeriodicScheduling(period = 1000)
+	@PeriodicScheduling(period = 1000, order = 4)
 	public static void log(@In("logger") RuntimeLogger logger, @In("id") String id, @In("position") Position position) {
-		if(position == null) {
+		if (position == null) {
 			return;
 		}
-		
+
 		try {
 			SimpleLogger.log(new AntLogRecord(id, position));
 		} catch (Exception e) {
@@ -155,7 +155,7 @@ public class AntComponent {
 	}
 
 	@Process
-	@PeriodicScheduling(period = 5000)
+	@PeriodicScheduling(period = 5000, order = 5)
 	public static void printStatus(@In("clock") CurrentTimeProvider clock, @In("id") String id,
 			@In("position") Position position, @In("state") State state, @In("mode") Mode mode,
 			@In("foods") List<TimestampedFoodSource> foods, @In("assignedFood") Position assignedFood) {
@@ -181,9 +181,10 @@ public class AntComponent {
 	}
 
 	@Process
-	@PeriodicScheduling(period = 1000)
+	@PeriodicScheduling(period = 1000, order = 6)
 	public static void modeSwitch(@In("ant") AntPlugin ant, @InOut("mode") ParamHolder<Mode> mode,
-			@In("assignedFood") Position assignedFood, @In("position") Position position, @In("clock") CurrentTimeProvider clock, @In("gripTimestamp") Long gripTimestamp) {
+			@In("assignedFood") Position assignedFood, @In("position") Position position,
+			@In("clock") CurrentTimeProvider clock, @In("gripTimestamp") Long gripTimestamp) {
 		switch (mode.value) {
 		case Searching:
 			if (assignedFood != null) {
@@ -198,8 +199,8 @@ public class AntComponent {
 			// Grip the food
 			// Needs to be sure, use sensed data instead of accumulated knowledge
 			if (PosUtils.isSame(assignedFood, position)) {
-				for(FoodSource source: ant.getSensedFood()) {
-					if(PosUtils.isSame(source.position, assignedFood) && source.portions > 0) {
+				for (FoodSource source : ant.getSensedFood()) {
+					if (PosUtils.isSame(source.position, assignedFood) && source.portions > 0) {
 						mode.value = Mode.Grip;
 					}
 				}
@@ -207,14 +208,14 @@ public class AntComponent {
 			break;
 		case Grip:
 			// Advance
-			if(ant.getState() == State.Locked || ant.getState() == State.Pulling) {
+			if (ant.getState() == State.Locked || ant.getState() == State.Pulling) {
 				mode.value = Mode.Pulling;
-			} else if(clock.getCurrentMilliseconds() - gripTimestamp > GRIP_PATIENCE_MS) {
+			} else if (clock.getCurrentMilliseconds() - gripTimestamp > GRIP_PATIENCE_MS) {
 				mode.value = Mode.Searching;
 			}
-		break;
+			break;
 		case Pulling:
-			if(ant.getState() == State.Free) {
+			if (ant.getState() == State.Free) {
 				mode.value = Mode.Searching;
 			}
 			break;
@@ -222,9 +223,10 @@ public class AntComponent {
 	}
 
 	@Process
-	@PeriodicScheduling(period = 1000)
+	@PeriodicScheduling(period = 1000, order = 7)
 	public static void move(@In("ant") AntPlugin ant, @In("mode") Mode mode, @In("rand") Random rand,
-			@In("assignedFood") Position assignedFood, @Out("gripTimestamp") ParamHolder<Long> gripTimestamp, @In("clock") CurrentTimeProvider clock) {
+			@In("assignedFood") Position assignedFood, @Out("gripTimestamp") ParamHolder<Long> gripTimestamp,
+			@In("clock") CurrentTimeProvider clock) {
 		switch (mode) {
 		case Searching:
 			if (ant.isAtTarget()) {
@@ -239,11 +241,10 @@ public class AntComponent {
 		case Grip:
 			ant.grab();
 			gripTimestamp.value = clock.getCurrentMilliseconds();
-		break;
+			break;
 		case Pulling:
 			// TODO: use ant hill position
 			ant.setTarget(new Position(0, 0));
 		}
 	}
-
 }
