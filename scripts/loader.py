@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-
+import sys
 from logging import root
 from xml.etree.ElementTree import Element
 
@@ -9,7 +9,10 @@ RAW_LOG_FILENAME = "../logs/simple.xml";
 #### Process logs XML into object structure
 def load():
     print("Loading logs")
-    rawLogFile = open(RAW_LOG_FILENAME);
+    if len(sys.argv) == 2: 
+        rawLogFile = open(sys.argv[1]);
+    else:
+        rawLogFile = open(RAW_LOG_FILENAME);
     logText = rawLogFile.read()
     rawLogFile.close() 
     #logText = "<log>" + logText + "</log>"
