@@ -41,9 +41,8 @@ for rec in log:
 print("Rendering time sets")
 for time in times:
     print(time)
-#    print(len(times[time]))
     for rec in times[time]:
- #       print("X")
+        plot.title("Time: " + str(time) + " ms")
         plot.scatter(rec.pos.x, rec.pos.y, c=colors[int(rec.id)], alpha=0.5, linewidths=0)
     plot.xlim(-15, 15)
     plot.ylim(-15, 15)
