@@ -17,12 +17,12 @@ import cz.cuni.mff.d3s.deeco.runtime.DEECoNode;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoRuntimeException;
 import cz.cuni.mff.d3s.deeco.runtimelog.RuntimeLogger;
 import cz.cuni.mff.d3s.deeco.task.ParamHolder;
+import cz.cuni.mff.d3s.deeco.task.ProcessContext;
 import cz.cuni.mff.d3s.deeco.timer.CurrentTimeProvider;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin.State;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
-import cz.cuni.mff.d3s.isola2016.utils.SimpleLogger;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 @Component
@@ -142,13 +142,13 @@ public class AntComponent {
 
 	@Process
 	@PeriodicScheduling(period = 1000, order = 4)
-	public static void log(@In("logger") RuntimeLogger logger, @In("id") String id, @In("position") Position position) {
+	public static void log(@In("id") String id, @In("position") Position position) {
 		if (position == null) {
 			return;
 		}
 
 		try {
-			SimpleLogger.log(new AntLogRecord(id, position));
+			ProcessContext.getRuntimeLogger().log(new AntLogRecord(id, position));
 		} catch (Exception e) {
 			throw new DEECoRuntimeException("Ant log failed with exception", e);
 		}

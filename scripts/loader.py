@@ -3,8 +3,7 @@ import sys
 from logging import root
 from xml.etree.ElementTree import Element
 
-#RAW_LOG_FILENAME = "../logs/runtimeData.xml";
-RAW_LOG_FILENAME = "../logs/simple.xml";
+RAW_LOG_FILENAME = "../logs/runtime/runtimeData.xml";
 
 #### Process logs XML into object structure
 def load():
@@ -14,8 +13,7 @@ def load():
     else:
         rawLogFile = open(RAW_LOG_FILENAME);
     logText = rawLogFile.read()
-    rawLogFile.close() 
-    #logText = "<log>" + logText + "</log>"
+    rawLogFile.close()
 
     print("Parsing logs")
     root = ET.fromstring(logText)
