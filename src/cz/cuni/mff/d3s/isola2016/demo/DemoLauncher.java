@@ -56,7 +56,7 @@ public class DemoLauncher {
 		// Create nodes
 		for (int i = 0; i < NUM_ANTS; ++i) {
 			DEECoNode node = realm.createNode(i, new PositionPlugin(PosUtils.getRandomPosition(rand, 0, 0, ANT_SPAWN_DIAMETER_M)));
-			node.deployComponent(new AntComponent(i, rand, node, ANT_HILL_POS));
+			node.deployComponent(new AntComponent(i, new Random(rand.nextLong()), node, ANT_HILL_POS));
 		}
 
 		// Run the simulation
