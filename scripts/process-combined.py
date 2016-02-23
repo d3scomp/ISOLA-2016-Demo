@@ -28,4 +28,4 @@ for key in antdata:
     plot.plot(ant.x, ant.y, c=ant.color, alpha=0.5)
 
 plot.show()
-plot.savefig('all.pdf')
+plot.savefig(loader.getDatasetName() + '-all.pdf')

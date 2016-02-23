@@ -5,10 +5,17 @@ from xml.etree.ElementTree import Element
 
 RAW_LOG_FILENAME = "../logs/runtime/runtimeData.xml";
 
+#### Grab dataset name
+def getDatasetName():
+    if len(sys.argv) == 3: 
+        return sys.argv[2];
+    else:
+        return "default"
+
 #### Process logs XML into object structure
 def load():
     print("Loading logs")
-    if len(sys.argv) == 2: 
+    if len(sys.argv) > 2: 
         rawLogFile = open(sys.argv[1]);
     else:
         rawLogFile = open(RAW_LOG_FILENAME);

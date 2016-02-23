@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plot
 from matplotlib import pyplot, colors
 import numpy as np
+import os
 import loader
 
 log = loader.load()
@@ -16,6 +17,9 @@ for rec in log:
         times[rec.time] = []
     times[rec.time].append(rec)
     
+outDir = "out-" + loader.getDatasetName()
+os.mkdir(outDir)
+    
 print("Rendering time sets")
 for time in times:
     print(time)
@@ -24,5 +28,5 @@ for time in times:
         plot.scatter(rec.pos.x, rec.pos.y, c=colors[int(rec.id)], alpha=0.5, linewidths=0)
     plot.xlim(-15, 15)
     plot.ylim(-15, 15)
-    plot.savefig("out/" + str(time) + ".png")
+    plot.savefig(outDir + "/" + str(time) + ".png")
     plot.close()
