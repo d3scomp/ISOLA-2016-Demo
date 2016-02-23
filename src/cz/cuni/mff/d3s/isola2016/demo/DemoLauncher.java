@@ -4,6 +4,7 @@ import java.util.Random;
 
 import cz.cuni.mff.d3s.deeco.runners.DEECoSimulation;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoNode;
+import cz.cuni.mff.d3s.deeco.simulation.omnet.OMNeTUtils;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.AntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
@@ -29,7 +30,7 @@ public class DemoLauncher {
 		System.out.println("Ant food picking simulation demo");
 
 		OMNeTSimulation omnetSim = new OMNeTSimulation();
-		omnetSim.set80154txPower(1);
+		omnetSim.set80154txPower(OMNeTUtils.RangeToPower_802_15_4(250));
 		
 		DEECoSimulation realm = new DEECoSimulation(omnetSim.getTimer());
 		
@@ -64,8 +65,11 @@ public class DemoLauncher {
 		System.out.println("All done.");
 		
 		System.out.println("Total food pieced delivered: " + antWorld.collectedFoodPieces + " out of " + NUM_FOOD_SOURCES * FOOD_SOURCE_CAPACITY);
+		double totalDistance = 0;
 		for(AntPlugin ant: antWorld.ants) {
 			System.out.println("Ant traveled distance: " + ant.totalTraveledDistance + " meters");
+			totalDistance += ant.totalTraveledDistance;
 		}
+		System.out.println("Total distance traveled: " + totalDistance);
 	}
 }
