@@ -19,8 +19,8 @@ public class PosUtils {
 	 * @return Generated position
 	 */
 	public static Position getRandomPosition(Random rand, double x, double y, double diameter) {
-		double px = x + ((rand.nextDouble() - 0.5) * diameter);
-		double py = y + ((rand.nextDouble() - 0.5) * diameter);
+		double px = x + ((rand.nextDouble() - 0.5) * diameter * 2);
+		double py = y + ((rand.nextDouble() - 0.5) * diameter * 2);
 		return new Position(px, py);
 	}
 	
