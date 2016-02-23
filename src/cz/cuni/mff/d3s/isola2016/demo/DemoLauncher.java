@@ -19,6 +19,7 @@ import cz.cuni.mff.d3s.jdeeco.position.PositionPlugin;
 import cz.cuni.mff.d3s.jdeeco.publishing.DefaultKnowledgePublisher;
 
 public class DemoLauncher {
+	public static final double RADIO_RANGE_M = 250; 
 	public static final int NUM_ANTS = 6;
 	public static final int NUM_FOOD_SOURCES = 4;
 	public static final int FOOD_SOURCE_CAPACITY = 3;
@@ -27,10 +28,14 @@ public class DemoLauncher {
 	public static final Position ANT_HILL_POS = new Position(0, 0);
 
 	public static void main(String[] args) throws Exception {
+		run();
+	}
+	
+	public static void run() throws Exception {
 		System.out.println("Ant food picking simulation demo");
 
 		OMNeTSimulation omnetSim = new OMNeTSimulation();
-		omnetSim.set80154txPower(OMNeTUtils.RangeToPower_802_15_4(250));
+		omnetSim.set80154txPower(OMNeTUtils.RangeToPower_802_15_4(RADIO_RANGE_M));
 		
 		DEECoSimulation realm = new DEECoSimulation(omnetSim.getTimer());
 		
