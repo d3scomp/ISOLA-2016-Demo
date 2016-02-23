@@ -10,7 +10,7 @@ log = loader.load()
 colors = ["red", "green", "blue", "yellow", "black", "lime", "cyan", "orange"]
 antdata = {}
 
-print("Crating time sets")
+print("Creating time sets")
 times = {}
 for rec in log:
     if rec.time not in times:
