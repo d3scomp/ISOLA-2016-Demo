@@ -23,7 +23,7 @@ import cz.cuni.mff.d3s.jdeeco.publishing.DefaultKnowledgePublisher;
 
 public class DemoLauncher {
 	public static final double RADIO_RANGE_M = 250;
-	public static final int SEED = 43;
+	public static final int SEED = 42;
 	public static final int NUM_ANTS = 6;
 	public static final int NUM_FOOD_SOURCES = 4;
 	public static final int FOOD_SOURCE_CAPACITY = 3;

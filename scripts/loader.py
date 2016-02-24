@@ -48,14 +48,17 @@ def load():
     log = []
     
     for event in root:
-        id = event.get("id")
-        time = int(event.get("time"))
-        positionElement = event[0]
-        x = float(positionElement[0].text)
-        y = float(positionElement[1].text)
-        z = float(positionElement[2].text)
+        if event.get("eventType") ==  "cz.cuni.mff.d3s.isola2016.utils.FoodLogRecord":
+            print("Food log record not implemented")
+        elif event.get("eventType") ==  "cz.cuni.mff.d3s.isola2016.utils.AntLogRecord":
+            id = event.get("id")
+            time = int(event.get("time"))
+            positionElement = event[0]
+            x = float(positionElement[0].text)
+            y = float(positionElement[1].text)
+            z = float(positionElement[2].text)
         
-        log.append(LogRecord(time, id, Position(x, y, z)))
+            log.append(LogRecord(time, id, Position(x, y, z)))
         
     return log
     
