@@ -6,12 +6,12 @@ import java.util.Random;
 import cz.cuni.mff.d3s.deeco.runners.DEECoSimulation;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoNode;
 import cz.cuni.mff.d3s.deeco.runtimelog.RuntimeLogWriters;
-import cz.cuni.mff.d3s.deeco.runtimelog.RuntimeLogger;
 import cz.cuni.mff.d3s.deeco.simulation.omnet.OMNeTUtils;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.AntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
 import cz.cuni.mff.d3s.isola2016.ensemble.IntelligentAntPlanning;
+import cz.cuni.mff.d3s.isola2016.utils.FoodLogRecord;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.network.Network;
 import cz.cuni.mff.d3s.jdeeco.network.l2.strategy.KnowledgeInsertingStrategy;
@@ -23,7 +23,7 @@ import cz.cuni.mff.d3s.jdeeco.publishing.DefaultKnowledgePublisher;
 
 public class DemoLauncher {
 	public static final double RADIO_RANGE_M = 250;
-	public static final int SEED = 42;
+	public static final int SEED = 43;
 	public static final int NUM_ANTS = 6;
 	public static final int NUM_FOOD_SOURCES = 4;
 	public static final int FOOD_SOURCE_CAPACITY = 3;
@@ -37,13 +37,13 @@ public class DemoLauncher {
 		run(SEED, LIMIT_MS, NUM_ANTS, NUM_FOOD_SOURCES, FOOD_SOURCE_CAPACITY, RADIO_RANGE_M);
 	}
 
-	public static void run(int seed, long limitMs, int numAnts, int numFoodSources, int foodSourceCapacity, double radioRangeM)
-			throws Exception {
+	public static void run(int seed, long limitMs, int numAnts, int numFoodSources, int foodSourceCapacity,
+			double radioRangeM) throws Exception {
 		System.out.println("Ant food picking simulation demo");
 
 		// Setup logging directory
-		final String logPath = String.format(Locale.US, "%s_seed-%d_ants-%d_foods-%d_capacity-%d_range-%02f", LOG_PATH, seed, numAnts,
-				numFoodSources, foodSourceCapacity, radioRangeM);
+		final String logPath = String.format(Locale.US, "%s_seed-%d_ants-%d_foods-%d_capacity-%d_range-%02f", LOG_PATH,
+				seed, numAnts, numFoodSources, foodSourceCapacity, radioRangeM);
 		final RuntimeLogWriters logWriters = new RuntimeLogWriters(logPath);
 
 		OMNeTSimulation omnetSim = new OMNeTSimulation();
@@ -75,6 +75,7 @@ public class DemoLauncher {
 			DEECoNode node = realm.createNode(i, logWriters,
 					new PositionPlugin(PosUtils.getRandomPosition(rand, 0, 0, ANT_SPAWN_DIAMETER_M)));
 			node.deployComponent(new AntComponent(i, new Random(rand.nextLong()), node, ANT_HILL_POS));
+			FoodLogRecord.logAll(node.getRuntimeLogger(), antWorld.foodSources);
 		}
 
 		// Run the simulation

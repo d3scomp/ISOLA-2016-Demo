@@ -22,6 +22,7 @@ import cz.cuni.mff.d3s.deeco.timer.CurrentTimeProvider;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin.State;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
+import cz.cuni.mff.d3s.isola2016.utils.AntLogRecord;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
