@@ -1,5 +1,6 @@
 package cz.cuni.mff.d3s.isola2016.ensemble;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -74,6 +75,10 @@ public class Combiner {
 	}
 
 	public static Collection<Collection<Triplet>> combine(Collection<AntInfo> ants, Collection<FoodSource> foods) {
+		if(foods.isEmpty()) {
+			return new ArrayList<>();
+		}
+		
 		Stack<C> toPair = new Stack<>();
 		Stack<C> toTriple = new Stack<>();
 		toPair.add(new C(Collections.emptyList(), Collections.emptyList(), ants, foods));

@@ -145,10 +145,10 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 		foods.addAll(foodsToAdd);
 
 		// Generate all possible solutions
+		System.out.print("Fake intelligence: Ants: " + ants.size() + " foods: " + foods.size() + " >>> ");
+		System.out.flush();
 		Collection<Collection<Triplet>> combined = Combiner.combine(ants, foods);
-
-		System.out.print("Fake intelligence: Ants: " + ants.size() + " foods: " + foods.size() + " => "
-				+ combined.size() + " alternatives --- ");
+		System.out.print(combined.size() + " alternatives --- ");
 		
 		// Get best solution
 		double bestBadness = Double.POSITIVE_INFINITY;
