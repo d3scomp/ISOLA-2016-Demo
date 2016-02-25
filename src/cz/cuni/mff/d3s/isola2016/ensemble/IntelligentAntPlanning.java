@@ -25,7 +25,6 @@ import cz.cuni.mff.d3s.deeco.task.TimerTaskListener;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
 import cz.cuni.mff.d3s.isola2016.demo.Mode;
 import cz.cuni.mff.d3s.isola2016.demo.TimestampedFoodSource;
-import cz.cuni.mff.d3s.isola2016.ensemble.Combiner.Triplet;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
@@ -70,18 +69,6 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 		} catch (KnowledgeUpdateException e) {
 			throw new DEECoRuntimeException("Knowledge insertion failed", e);
 		}
-	}
-
-	private double getBadnessAntAntFood(AntInfo a, AntInfo b, FoodSource f) {
-		return a.position.euclidDistanceTo(f.position) + b.position.euclidDistanceTo(f.position);
-	}
-
-	private double getSolutionBadness(Collection<Triplet> triplets) {
-		double badness = 0;
-		for (Triplet t : triplets) {
-			badness += getBadnessAntAntFood(t.a, t.b, t.c);
-		}
-		return badness;
 	}
 
 	@Override
@@ -144,45 +131,7 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 		}
 		foods.addAll(foodsToAdd);
 
-		// Generate all possible solutions
-		System.out.print("Fake intelligence: Ants: " + ants.size() + " foods: " + foods.size() + " >>> ");
-		System.out.flush();
-		Collection<Collection<Triplet>> combined = Combiner.combine(ants, foods);
-		System.out.print(combined.size() + " alternatives --- ");
-		
-		// Get best solution
-		double bestBadness = Double.POSITIVE_INFINITY;
-		Collection<Triplet> bestSolution = null;
-		for (Collection<Triplet> solution : combined) {
-			double badness = getSolutionBadness(solution);
-			if (badness <= bestBadness) {
-				bestBadness = badness;
-				bestSolution = solution;
-			}
-		}
-
-		// Get food assigned to local ant
-		FoodSource sourceAssignedToLocalAnt = null;
-		if(bestSolution != null) {
-			for (Triplet t : bestSolution) {
-				if (t.a == localAnt || t.b == localAnt) {
-					sourceAssignedToLocalAnt = t.c;
-				}
-			}
-		}
-
-		System.out.print("Ant " + localAnt.id + " assigned to food: ");
-		if (sourceAssignedToLocalAnt != null) {
-			System.out.println(sourceAssignedToLocalAnt.position);
-		} else {
-			System.out.println("null");
-		}
-
-		// Set assigned food source local knowledge
-		Position assignedPosition = null;
-		if (sourceAssignedToLocalAnt != null) {
-			assignedPosition = sourceAssignedToLocalAnt.position;
-		}
+		Position assignedPosition = BruteforceSolver.solve(ants, foods, localAnt);
 
 		setAssignedFoodSourceKnowledge(container.getRuntimeFramework().getContainer().getLocals().iterator().next(),
 				assignedPosition);

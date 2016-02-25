@@ -24,9 +24,9 @@ import cz.cuni.mff.d3s.jdeeco.publishing.DefaultKnowledgePublisher;
 public class DemoLauncher {
 	public static final double RADIO_RANGE_M = 250;
 	public static final int SEED = 42;
-	public static final int NUM_ANTS = 6;
-	public static final int NUM_FOOD_SOURCES = 4;
-	public static final int FOOD_SOURCE_CAPACITY = 3;
+	public static final int NUM_ANTS = 10;
+	public static final int NUM_FOOD_SOURCES = 20;
+	public static final int FOOD_SOURCE_CAPACITY = 1;
 	public static final double ANT_SPAWN_DIAMETER_M = 5;
 	public static final double FOOD_SOURCE_SPAWN_DIAMETER_M = 15;
 	public static final Position ANT_HILL_POS = new Position(0, 0);
@@ -77,7 +77,7 @@ public class DemoLauncher {
 			node.deployComponent(new AntComponent(i, new Random(rand.nextLong()), node, ANT_HILL_POS));
 			FoodLogRecord.logAll(node.getRuntimeLogger(), antWorld.foodSources);
 		}
-
+		
 		// Run the simulation
 		System.out.println("Running the simulation.");
 		realm.start(limitMs);
