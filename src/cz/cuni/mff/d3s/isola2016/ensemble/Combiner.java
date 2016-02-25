@@ -114,10 +114,17 @@ public class Combiner {
 			System.out.println("Comb:");
 			c.printPairs();
 		}*/
-		System.out.println("Total: " + toTriple.size() + " pair configurations");
+		System.out.print(" P: " + toTriple.size() + " ");
+		System.out.flush();
 		
 		// Generate all possible pairs of ant pair and food
+		long lastTime = System.currentTimeMillis();
 		while(!toTriple.isEmpty()) {
+			if(System.currentTimeMillis() - lastTime > 5000) {
+				lastTime = System.currentTimeMillis();
+				System.out.println("totriple: " + toTriple.size() + " done: " + done.size());
+			}
+			
 			C c = toTriple.pop();
 			
 			if(c.toTriplet.isEmpty() || c.pairs.isEmpty()) {
@@ -138,7 +145,8 @@ public class Combiner {
 			System.out.println("Comb:");
 			c.printTriplets();
 		}*/
-		System.out.println("Total: " + done.size() + " triplet configurations");
+		System.out.print(" T: " + done.size() + " ");
+		System.out.flush();
 		
 		Collection<Collection<Triplet>> ret = new LinkedList<>();
 		
