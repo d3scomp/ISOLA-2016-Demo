@@ -29,6 +29,11 @@ import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 	private DEECoContainer container;
+	private AntAssignmetSolver solver;
+	
+	public IntelligentAntPlanning(AntAssignmetSolver solver) {
+		this.solver = solver;
+	}
 
 	@Override
 	public List<Class<? extends DEECoPlugin>> getDependencies() {
@@ -131,7 +136,7 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 		}
 		foods.addAll(foodsToAdd);
 
-		Position assignedPosition = BruteforceSolver.solve(ants, foods, localAnt);
+		Position assignedPosition = solver.solve(ants, foods, localAnt);
 
 		setAssignedFoodSourceKnowledge(container.getRuntimeFramework().getContainer().getLocals().iterator().next(),
 				assignedPosition);
