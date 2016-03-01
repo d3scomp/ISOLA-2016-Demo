@@ -6,5 +6,5 @@ import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 public interface AntAssignmetSolver {
-	Position solve(Collection<AntInfo> ants, Collection<FoodSource> foods, AntInfo localAnt);
+	Position solve(Collection<AntInfo> ants, Collection<FoodSource> foods, AntInfo localAnt, Position antHill);
 }

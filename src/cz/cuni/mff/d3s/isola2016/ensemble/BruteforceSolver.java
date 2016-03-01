@@ -168,7 +168,7 @@ public class BruteforceSolver implements AntAssignmetSolver {
 		return badness;
 	}
 
-	public Position solve(Collection<AntInfo> ants, Collection<FoodSource> foods, AntInfo localAnt) {
+	public Position solve(Collection<AntInfo> ants, Collection<FoodSource> foods, AntInfo localAnt, Position antHill) {
 		// Generate all possible solutions
 		System.out.print("Fake intelligence: Ants: " + ants.size() + " foods: " + foods.size() + " >>> ");
 		System.out.flush();

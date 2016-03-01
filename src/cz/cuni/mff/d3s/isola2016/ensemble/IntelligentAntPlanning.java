@@ -23,6 +23,7 @@ import cz.cuni.mff.d3s.deeco.scheduler.Scheduler;
 import cz.cuni.mff.d3s.deeco.task.TimerTask;
 import cz.cuni.mff.d3s.deeco.task.TimerTaskListener;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
+import cz.cuni.mff.d3s.isola2016.demo.DemoLauncher;
 import cz.cuni.mff.d3s.isola2016.demo.Mode;
 import cz.cuni.mff.d3s.isola2016.demo.TimestampedFoodSource;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
@@ -136,7 +137,7 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 		}
 		foods.addAll(foodsToAdd);
 
-		Position assignedPosition = solver.solve(ants, foods, localAnt);
+		Position assignedPosition = solver.solve(ants, foods, localAnt, DemoLauncher.ANT_HILL_POS);
 
 		setAssignedFoodSourceKnowledge(container.getRuntimeFramework().getContainer().getLocals().iterator().next(),
 				assignedPosition);

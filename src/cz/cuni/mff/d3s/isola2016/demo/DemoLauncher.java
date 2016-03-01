@@ -12,6 +12,7 @@ import cz.cuni.mff.d3s.isola2016.antsim.AntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
 import cz.cuni.mff.d3s.isola2016.ensemble.AntAssignmetSolver;
 import cz.cuni.mff.d3s.isola2016.ensemble.BruteforceSolver;
+import cz.cuni.mff.d3s.isola2016.ensemble.HeuristicSolver;
 import cz.cuni.mff.d3s.isola2016.ensemble.IntelligentAntPlanning;
 import cz.cuni.mff.d3s.isola2016.utils.FoodLogRecord;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
@@ -72,7 +73,8 @@ public class DemoLauncher {
 		realm.addPlugin(OMNeTBroadcastDevice.class);
 		
 		// Ensemble solver
-		AntAssignmetSolver solver = new BruteforceSolver();
+		//AntAssignmetSolver solver = new BruteforceSolver();
+		AntAssignmetSolver solver = new HeuristicSolver();
 		
 		// Create nodes
 		for (int i = 0; i < numAnts; ++i) {
