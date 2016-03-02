@@ -28,7 +28,9 @@ public class AntPlugin implements DEECoPlugin, PositionProvider {
 	}
 
 	public static double SENSE_RANGE_M = 1.5;
-	public static double SPEED_M_PER_S = 0.07;
+	// Realistic ant speed is 0.07 m/s
+	// Mechanic ants are a lot faster
+	public static double SPEED_M_PER_S = 0.5;
 
 	private AntWorldPlugin world;
 
