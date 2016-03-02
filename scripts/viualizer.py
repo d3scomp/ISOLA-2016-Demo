@@ -17,7 +17,6 @@ class PlottingCanvas(FigureCanvas):
     def __init__(self, log, parent=None, width=5, height=4, dpi=100):
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.plot = self.fig.add_subplot(1, 1, 1)
-        self.plot.hold(False)
         self.log = log
 
         self.drawPlot(0)
@@ -32,9 +31,17 @@ class PlottingCanvas(FigureCanvas):
     
     def drawPlot(self, time):
         time = time * 1000
-                
         rec = self.log[time]
-        print(time)
+
+        self.plot.clear()
+        self.plotRecordSources(rec)
+        self.plotRecordAnts(rec)
+        
+        self.plot.set_title("Time: " + str(time) + " ms")
+        self.plot.set_xlim(-15, 15)
+        self.plot.set_ylim(-15, 15)
+        
+    def plotRecordAnts(self, rec):
         x = []
         y = []
         c = []
@@ -45,10 +52,16 @@ class PlottingCanvas(FigureCanvas):
             c.append(colors[col])
             col = col + 1
          
-        self.plot.scatter(x, y, c=colors, linewidths=0)
-        self.plot.set_title("Time: " + str(time) + " ms")
-        self.plot.set_xlim(-15, 15)
-        self.plot.set_ylim(-15, 15)
+        self.plot.scatter(x, y, c=colors, alpha=0.5, linewidths=0)
+        
+    def plotRecordSources(self, rec):
+        x = []
+        y = []
+        for source in rec.foodSources:
+            x.append(source.position.x)
+            y.append(source.position.y)
+         
+        self.plot.scatter(x, y, c="black", linewidths=0)
         
     def updatePlot(self, time):
         self.drawPlot(time)
