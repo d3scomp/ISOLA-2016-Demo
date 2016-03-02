@@ -5,9 +5,7 @@ import java.util.Random;
 
 import cz.cuni.mff.d3s.deeco.runners.DEECoSimulation;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoNode;
-import cz.cuni.mff.d3s.deeco.runtimelog.RuntimeLogRecord;
 import cz.cuni.mff.d3s.deeco.runtimelog.RuntimeLogWriters;
-import cz.cuni.mff.d3s.deeco.runtimelog.SnapshotProvider;
 import cz.cuni.mff.d3s.deeco.simulation.omnet.OMNeTUtils;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.AntWorldPlugin;
@@ -15,7 +13,6 @@ import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
 import cz.cuni.mff.d3s.isola2016.ensemble.AntAssignmetSolver;
 import cz.cuni.mff.d3s.isola2016.ensemble.HeuristicSolver;
 import cz.cuni.mff.d3s.isola2016.ensemble.IntelligentAntPlanning;
-import cz.cuni.mff.d3s.isola2016.utils.FoodLogRecord;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.network.Network;
 import cz.cuni.mff.d3s.jdeeco.network.l2.strategy.KnowledgeInsertingStrategy;
@@ -83,17 +80,6 @@ public class DemoLauncher {
 					new PositionPlugin(PosUtils.getRandomPosition(rand, 0, 0, ANT_SPAWN_DIAMETER_M)),
 					new IntelligentAntPlanning(solver));
 			node.deployComponent(new AntComponent(i, new Random(rand.nextLong()), node, ANT_HILL_POS));
-			node.getRuntimeLogger().registerSnapshotProvider(new SnapshotProvider() {
-				@Override
-				public RuntimeLogRecord getSnapshot() {
-					return new FoodLogRecord(antWorld.foodSources.iterator().next());
-				}
-				
-				@Override
-				public Class<? extends RuntimeLogRecord> getRecordClass() {
-					return FoodLogRecord.class;
-				}
-			}, 5000);
 		}
 		
 		// Run the simulation

@@ -64,7 +64,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 		lockedAtSource.put(source, new LinkedHashSet<>());
 		foodSources.add(source);
 	}
-
+	
 	Collection<FoodSource> getSensedFood(Position position, double range) {
 		List<FoodSource> sensed = new LinkedList<>();
 
@@ -112,19 +112,15 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 	 * 
 	 * @param source
 	 */
-	void removeFoodSource(FoodSource source) {
-		if (source.portions != 0) {
-			System.err.println("Removing nonempty food source at " + source.portions + " with " + source.portions
-					+ " portions remaining");
-		}
-
+	public void removeFoodSource(FoodSource source) {
 		for (AntPlugin ant : lockedAtSource.get(source)) {
 			if (ant.state == State.Locked) {
 				ant.state = State.Free;
 			}
-			foodSources.remove(source);
-			lockedAtSource.remove(source);
 		}
+		
+		foodSources.remove(source);
+		lockedAtSource.remove(source);
 	}
 	
 	private void resolveLocked() {
