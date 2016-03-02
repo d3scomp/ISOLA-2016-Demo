@@ -23,6 +23,7 @@ import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin.State;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
 import cz.cuni.mff.d3s.isola2016.utils.AntLogRecord;
+import cz.cuni.mff.d3s.isola2016.utils.FoodLogRecord;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
@@ -143,13 +144,14 @@ public class AntComponent {
 
 	@Process
 	@PeriodicScheduling(period = 1000, order = 4)
-	public static void log(@In("id") String id, @In("position") Position position) {
+	public static void log(@In("id") String id, @In("position") Position position, @In("foods") List<TimestampedFoodSource> foods) {
 		if (position == null) {
 			return;
 		}
 
 		try {
 			ProcessContext.getRuntimeLogger().log(new AntLogRecord(id, position));
+			FoodLogRecord.logAll(ProcessContext.getRuntimeLogger(), foods);
 		} catch (Exception e) {
 			throw new DEECoRuntimeException("Ant log failed with exception", e);
 		}

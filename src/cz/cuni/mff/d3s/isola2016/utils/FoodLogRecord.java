@@ -24,7 +24,7 @@ public final class FoodLogRecord extends RuntimeLogRecord {
 		xmlPos = new XMLPosition(source.position);
 	}
 	
-	public static void logAll(RuntimeLogger logger, Collection<FoodSource> sources) throws IllegalStateException, IOException {
+	public static void logAll(RuntimeLogger logger, Collection<? extends FoodSource> sources) throws IllegalStateException, IOException {
 		for(FoodSource source: sources) {
 			logger.log(new FoodLogRecord(source));
 		}

@@ -5,13 +5,14 @@ import java.util.Random;
 
 import cz.cuni.mff.d3s.deeco.runners.DEECoSimulation;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoNode;
+import cz.cuni.mff.d3s.deeco.runtimelog.RuntimeLogRecord;
 import cz.cuni.mff.d3s.deeco.runtimelog.RuntimeLogWriters;
+import cz.cuni.mff.d3s.deeco.runtimelog.SnapshotProvider;
 import cz.cuni.mff.d3s.deeco.simulation.omnet.OMNeTUtils;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.AntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
 import cz.cuni.mff.d3s.isola2016.ensemble.AntAssignmetSolver;
-import cz.cuni.mff.d3s.isola2016.ensemble.BruteforceSolver;
 import cz.cuni.mff.d3s.isola2016.ensemble.HeuristicSolver;
 import cz.cuni.mff.d3s.isola2016.ensemble.IntelligentAntPlanning;
 import cz.cuni.mff.d3s.isola2016.utils.FoodLogRecord;
@@ -75,14 +76,24 @@ public class DemoLauncher {
 		// Ensemble solver
 		//AntAssignmetSolver solver = new BruteforceSolver();
 		AntAssignmetSolver solver = new HeuristicSolver();
-		
+				
 		// Create nodes
 		for (int i = 0; i < numAnts; ++i) {
 			DEECoNode node = realm.createNode(i, logWriters,
 					new PositionPlugin(PosUtils.getRandomPosition(rand, 0, 0, ANT_SPAWN_DIAMETER_M)),
 					new IntelligentAntPlanning(solver));
 			node.deployComponent(new AntComponent(i, new Random(rand.nextLong()), node, ANT_HILL_POS));
-			FoodLogRecord.logAll(node.getRuntimeLogger(), antWorld.foodSources);
+			node.getRuntimeLogger().registerSnapshotProvider(new SnapshotProvider() {
+				@Override
+				public RuntimeLogRecord getSnapshot() {
+					return new FoodLogRecord(antWorld.foodSources.iterator().next());
+				}
+				
+				@Override
+				public Class<? extends RuntimeLogRecord> getRecordClass() {
+					return FoodLogRecord.class;
+				}
+			}, 5000);
 		}
 		
 		// Run the simulation

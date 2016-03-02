@@ -1,5 +1,6 @@
 package cz.cuni.mff.d3s.isola2016.antsim;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,6 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.xml.bind.JAXB;
 
 import cz.cuni.mff.d3s.deeco.runtime.DEECoContainer;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoPlugin;
@@ -22,19 +25,21 @@ import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 	public static long SIM_STEP_MS = 100;
-
+	
 	public Position antHill;
 	public int collectedFoodPieces = 0;
 	public Collection<AntPlugin> ants = new LinkedHashSet<>();
 	public Collection<FoodSource> foodSources = new LinkedHashSet<>();
 	public Collection<FoodPiece> foodPieces = new LinkedHashSet<>();
-
+	
 	Map<FoodSource, Set<AntPlugin>> lockedAtSource = new HashMap<>();
 
 	private boolean initialized = false;
+	private final long startTime;
 
 	public AntWorldPlugin(Position antHill) {
 		this.antHill = antHill;
+		startTime = System.currentTimeMillis();
 	}
 
 	@Override
@@ -232,6 +237,13 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 		}
 		piece.position = newPos;
 	}
+	
+	public void log(long time) {
+		File dir = new File(String.format("logs/world-%d/%09d", startTime, time / 60000));
+		dir.mkdirs();
+		File out = new File(String.format("%s/%09d.xml", dir.getAbsolutePath(), time));
+		JAXB.marshal(this, out);
+	}
 
 	// Ant world simulation step
 	@Override
@@ -256,6 +268,11 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 		// Resolve food movements
 		for(FoodPiece piece: foodPieces) {
 			moveFood(piece);
+		}
+		
+		// Log current state
+		if(time % 1000 == 0) { 
+			log(time);
 		}
 	}
 }

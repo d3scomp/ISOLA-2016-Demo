@@ -32,10 +32,10 @@ public class AntPlugin implements DEECoPlugin, PositionProvider {
 
 	private AntWorldPlugin world;
 
-	State state;
-	private Position position;
+	public State state;
+	public Position position;
 	private Position target;
-	FoodPiece pulledFoodPiece;
+	public FoodPiece pulledFoodPiece;
 	
 	public double totalTraveledDistance = 0;
 
