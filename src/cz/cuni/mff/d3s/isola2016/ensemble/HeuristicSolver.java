@@ -79,6 +79,7 @@ public class HeuristicSolver implements AntAssignmetSolver {
 			
 				remaing.remove(optimalPair.a);
 				remaing.remove(optimalPair.b);
+				foods.remove(optimalPair.nearestFoodSource);
 			} else {
 				remaing.clear();
 			}
