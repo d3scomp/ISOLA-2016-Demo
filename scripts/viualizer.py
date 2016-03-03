@@ -31,6 +31,7 @@ class PlottingCanvas(FigureCanvas):
         rec = self.log[recNum]
 
         self.plot.clear()
+        self.plot.plot(float(rec.antHill.x), float(rec.antHill.y), "go")
         self.plotRecordSources(rec)
         self.plotRecordAnts(rec)
         self.plotRecordAntTargets(rec)
