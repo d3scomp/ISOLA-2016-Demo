@@ -40,35 +40,23 @@ class PlottingCanvas(FigureCanvas):
         self.plot.set_ylim(-15, 15)
         
     def plotRecordAnts(self, rec):
-        x = []
-        y = []
-        c = []
         col = 0
         for ant in rec.ants:
-            x.append(ant.position.x)
-            y.append(ant.position.y)
-            c.append(colors[col])
+            self.plot.plot(float(ant.position.x), float(ant.position.y), "g^")
             col = col + 1
-         
-        self.plot.scatter(x, y, c=colors, alpha=0.5, linewidths=0)
         
     def plotRecordAntTargets(self, rec):
         col = 0
         for ant in rec.ants:
-            col = col + 1
             try:
                 self.plot.plot([float(ant.position.x), float(ant.target.x)], [float(ant.position.y), float(ant.target.y)])
             except Exception as e:
                 print(e)
+            col = col + 1
         
     def plotRecordSources(self, rec):
-        x = []
-        y = []
         for source in rec.foodSources:
-            x.append(source.position.x)
-            y.append(source.position.y)
-         
-        self.plot.scatter(x, y, c="black", linewidths=0)
+            self.plot.plot(float(source.position.x), float(source.position.y), "bs")
         
     def updatePlot(self, recNum):
         self.drawPlot(recNum)
@@ -88,7 +76,7 @@ class Visualizer(QWidget):
         
         slider.valueChanged.connect(drawing.updatePlot)
         slider.setMinimum(0)
-        slider.setMaximum(len(log))
+        slider.setMaximum(len(log) - 1)
         
         self.setGeometry(150, 250, 1024, 768)
         self.setWindowTitle("Visualizer")
