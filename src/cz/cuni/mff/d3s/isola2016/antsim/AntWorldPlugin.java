@@ -209,12 +209,18 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 	private void moveFood(FoodPiece piece) {
 		double dx = 0;
 		double dy = 0;
+		double tx = 0;
+		double ty = 0;
 
 		// Get vector
 		for(AntPlugin puller: piece.pullers) {
 			dx += puller.getTarget().x - puller.getPosition().x;
 			dy += puller.getTarget().y - puller.getPosition().y;
+			tx += puller.getTarget().x;
+			ty += puller.getTarget().y;
 		}
+		tx /= piece.pullers.size();
+		ty /= piece.pullers.size();
 
 		// Normalize
 		double length = Math.sqrt(dx * dx + dy * dy);
@@ -222,9 +228,9 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 		dy /= length;
 
 		// Apply speed
-		double multiplier = (AntPlugin.SPEED_M_PER_S * AntWorldPlugin.SIM_STEP_MS) / 1000;
-		dx *= multiplier;
-		dy *= multiplier;
+		double moveDistance = (AntPlugin.SPEED_M_PER_S * AntWorldPlugin.SIM_STEP_MS) / 1000;
+		dx *= moveDistance;
+		dy *= moveDistance;
 		
 		// Get average position of pulleys and piece
 		double x = piece.position.x;
@@ -236,12 +242,21 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 		x /= 1 + piece.pullers.size();
 		y /= 1 + piece.pullers.size();
 		
-		// Move pulleys and piece
-		Position newPos = new Position(x + dx, y + dy);
-		for(AntPlugin puller: piece.pullers) {
-			puller.setPosition(newPos);
+		// Closer to target than move distance
+		Position target = new Position(tx, ty);
+		if(target.euclidDistanceTo(new Position(x, y)) < moveDistance) {
+			for(AntPlugin puller: piece.pullers) {
+				puller.setPosition(target);
+				piece.position = target;
+			}
+		} else {
+			// Move pulleys and piece
+			Position newPos = new Position(x + dx, y + dy);
+			for(AntPlugin puller: piece.pullers) {
+				puller.setPosition(newPos);
+			}
+			piece.position = newPos;
 		}
-		piece.position = newPos;
 	}
 	
 	public void log(long time) {
