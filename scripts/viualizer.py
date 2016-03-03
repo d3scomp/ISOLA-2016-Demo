@@ -36,7 +36,7 @@ class PlottingCanvas(FigureCanvas):
         self.plotRecordAnts(rec)
         self.plotRecordAntTargets(rec)
         
-        self.plot.set_title("Time: " + str(rec.time) + " ms")
+        self.plot.set_title("Time: " + str(rec.time) + " ms, collected pieces of food: " + str(rec.collectedFoodPieces))
         self.plot.set_xlim(-15, 15)
         self.plot.set_ylim(-15, 15)
         
@@ -59,6 +59,12 @@ class PlottingCanvas(FigureCanvas):
     def plotRecordSources(self, rec):
         for source in rec.foodSources:
             self.plot.plot(float(source.position.x), float(source.position.y), "bs")
+        if hasattr(rec, 'foodPieces'):
+            for piece in rec.foodPieces:
+                try:
+                    self.plot.plot(float(piece.position.x), float(piece.position.y), "r*")
+                except Exception:
+                    print("Food piece plot failed")
         
     def updatePlot(self, recNum):
         self.drawPlot(recNum)
