@@ -43,6 +43,7 @@ class PlottingCanvas(FigureCanvas):
         col = 0
         for ant in rec.ants:
             self.plot.plot(float(ant.position.x), float(ant.position.y), "g^")
+            #self.plot.annotate("ant", xy=(float(ant.position.x), float(ant.position.y)), arrowprops=dict(facecolor='black', shrink=0.05))
             col = col + 1
         
     def plotRecordAntTargets(self, rec):

@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
@@ -50,8 +51,14 @@ public class HeuristicSolver implements AntAssignmetSolver {
 	public Position solve(Collection<AntInfo> ants, Collection<FoodSource> foods, AntInfo localAnt, Position antHill) {
 		LinkedHashSet<AntInfo> remaing = new LinkedHashSet<>(ants);
 		Map<AntInfo, FoodSource> done = new HashMap<>();
+		
+		System.out.println("Start food positions");
+		for(FoodSource s: foods) {
+			System.out.println(s.position);
+		}
 
 		while (!remaing.isEmpty()) {
+			System.out.println("Remaining " + remaing.size() + " foods: " + foods.size());
 			// Assign nearest foods to pairs
 			LinkedHashSet<AntAntSource> antDistances = new LinkedHashSet<>();
 			for (AntInfo antA : remaing) {
@@ -74,6 +81,7 @@ public class HeuristicSolver implements AntAssignmetSolver {
 			}
 			
 			if(optimalPair != null) {
+				System.out.println("Optimal pair: " + optimalPair.a.id + " " + optimalPair.b.id + " " + optimalPair.nearestFoodSource.position + " " + optimalPair.nearestFoodSource.portions);
 				done.put(optimalPair.a, optimalPair.nearestFoodSource);
 				done.put(optimalPair.b, optimalPair.nearestFoodSource);
 			
@@ -82,7 +90,12 @@ public class HeuristicSolver implements AntAssignmetSolver {
 				foods.remove(optimalPair.nearestFoodSource);
 			} else {
 				remaing.clear();
+				break;
 			}
+		}
+		
+		for(Entry<AntInfo, FoodSource> e: done.entrySet()) {
+			//print(e.)
 		}
 		
 		FoodSource assignedFood = done.get(localAnt);
