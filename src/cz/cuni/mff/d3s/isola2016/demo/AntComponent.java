@@ -14,16 +14,12 @@ import cz.cuni.mff.d3s.deeco.annotations.Out;
 import cz.cuni.mff.d3s.deeco.annotations.PeriodicScheduling;
 import cz.cuni.mff.d3s.deeco.annotations.Process;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoNode;
-import cz.cuni.mff.d3s.deeco.runtime.DEECoRuntimeException;
 import cz.cuni.mff.d3s.deeco.runtimelog.RuntimeLogger;
 import cz.cuni.mff.d3s.deeco.task.ParamHolder;
-import cz.cuni.mff.d3s.deeco.task.ProcessContext;
 import cz.cuni.mff.d3s.deeco.timer.CurrentTimeProvider;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin.State;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
-import cz.cuni.mff.d3s.isola2016.utils.AntLogRecord;
-import cz.cuni.mff.d3s.isola2016.utils.FoodLogRecord;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
@@ -142,7 +138,7 @@ public class AntComponent {
 		}
 	}
 
-	@Process
+/*	@Process
 	@PeriodicScheduling(period = 1000, order = 4)
 	public static void log(@In("id") String id, @In("position") Position position, @In("foods") List<TimestampedFoodSource> foods) {
 		if (position == null) {
@@ -155,7 +151,7 @@ public class AntComponent {
 		} catch (Exception e) {
 			throw new DEECoRuntimeException("Ant log failed with exception", e);
 		}
-	}
+	}*/
 
 	@Process
 	@PeriodicScheduling(period = 5000, order = 5)

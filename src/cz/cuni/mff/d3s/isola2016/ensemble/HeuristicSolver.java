@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
@@ -93,11 +92,7 @@ public class HeuristicSolver implements AntAssignmetSolver {
 				break;
 			}
 		}
-		
-		for(Entry<AntInfo, FoodSource> e: done.entrySet()) {
-			//print(e.)
-		}
-		
+				
 		FoodSource assignedFood = done.get(localAnt);
 		if(assignedFood == null) {
 			return null;

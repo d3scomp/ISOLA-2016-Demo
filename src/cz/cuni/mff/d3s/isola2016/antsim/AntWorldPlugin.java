@@ -142,7 +142,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 			if (helper == null) {
 				continue;
 			}
-
+			
 			// Create food piece and start polling
 			if(--source.portions == 0) {
 				removeFoodSource(source);
@@ -174,26 +174,36 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 	}
 	
 	private void moveAnt(AntPlugin ant) {
-		if(ant.getTarget() == null) {
+		Position target = ant.getTarget();
+		
+		// No target -> no move
+		if(target == null) {
 			return;
 		}
 		
-		// Get vector
-		double dx = ant.getTarget().x - ant.getPosition().x;
-		double dy = ant.getTarget().y - ant.getPosition().y;
-
-		// Normalize
-		double length = Math.sqrt(dx * dx + dy * dy);
-		dx /= length;
-		dy /= length;
-
-		// Apply speed
-		double multiplier = (AntPlugin.SPEED_M_PER_S * AntWorldPlugin.SIM_STEP_MS) / 1000;
-		dx *= multiplier;
-		dy *= multiplier;
-
-		// Apply movement
-		ant.setPosition(new Position(ant.getPosition().x + dx, ant.getPosition().y + dy));
+		// Get movement speed
+		double moveDistance = (AntPlugin.SPEED_M_PER_S * AntWorldPlugin.SIM_STEP_MS) / 1000;
+		
+		// Closer than movement distance -> move to target
+		if(ant.getPosition().euclidDistanceTo(ant.getTarget()) < moveDistance) {
+			ant.setPosition(new Position(target.x, target.y + 0.0001));
+		} else {
+			// Get vector
+			double dx = target.x - ant.getPosition().x;
+			double dy = target.y - ant.getPosition().y;
+	
+			// Normalize
+			double length = Math.sqrt(dx * dx + dy * dy);
+			dx /= length;
+			dy /= length;
+	
+			// Apply speed
+			dx *= moveDistance;
+			dy *= moveDistance;
+	
+			// Apply movement
+			ant.setPosition(new Position(ant.getPosition().x + dx, ant.getPosition().y + dy));
+		}
 	}
 	
 	private void moveFood(FoodPiece piece) {

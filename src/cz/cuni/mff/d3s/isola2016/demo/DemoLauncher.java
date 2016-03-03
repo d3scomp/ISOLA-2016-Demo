@@ -32,7 +32,7 @@ public class DemoLauncher {
 	public static final double FOOD_SOURCE_SPAWN_DIAMETER_M = 15;
 	public static final Position ANT_HILL_POS = new Position(0, 0);
 	public static final String LOG_PATH = "logs/runtime";
-	public static final long LIMIT_MS = 30_000;
+	public static final long LIMIT_MS = 300_000;
 
 	public static void main(String[] args) throws Exception {
 		run(SEED, LIMIT_MS, NUM_ANTS, NUM_FOOD_SOURCES, FOOD_SOURCE_CAPACITY, RADIO_RANGE_M);
