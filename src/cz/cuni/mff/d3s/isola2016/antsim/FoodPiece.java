@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 public class FoodPiece {
-	Position position;
+	public Position position;
 	Collection<AntPlugin> pullers = new LinkedList<>();
 	
 	public FoodPiece(Position position, AntPlugin pullerA, AntPlugin pullerB) {

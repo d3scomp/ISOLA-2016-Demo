@@ -91,7 +91,7 @@ public class AntComponent {
 		Set<TimestampedFoodSource> toRemove = new LinkedHashSet<>();
 		for (TimestampedFoodSource source : foods.value) {
 			// Remove too old source data
-			if (clock.getCurrentMilliseconds() - source.timestamp > MAX_FOOD_AGE_MS) {
+			if (clock.getCurrentMilliseconds() - source.timestamp > MAX_FOOD_AGE_MS && source.portions != 0) {
 				toRemove.add(source);
 			}
 
@@ -105,7 +105,8 @@ public class AntComponent {
 					}
 				}
 				if (!found) {
-					toRemove.add(source);
+					source.timestamp = clock.getCurrentMilliseconds();
+					source.portions = 0;
 				}
 			}
 		}
@@ -205,12 +206,23 @@ public class AntComponent {
 		case Grip:
 			// Advance
 			if (ant.getState() == State.Locked || ant.getState() == State.Pulling) {
-				mode.value = Mode.Pulling;
+				mode.value = Mode.Gripped;
 			} else if (clock.getCurrentMilliseconds() - gripTimestamp > GRIP_PATIENCE_MS) {
 				mode.value = Mode.Searching;
 			}
 			break;
+		case Gripped:
+			if(ant.getState() == State.Pulling) {
+				mode.value = Mode.Pulling;
+			} else if (assignedFood == null || PosUtils.isSame(assignedFood, ant.getTarget())) {
+				mode.value = Mode.Release;
+			}
+		case Release:
+			if(ant.getState() == State.Free) {
+				mode.value = Mode.Searching;
+			}
 		case Pulling:
+			// Cancel pull
 			if (ant.getState() == State.Free) {
 				mode.value = Mode.Searching;
 			}
@@ -238,6 +250,10 @@ public class AntComponent {
 			ant.grab();
 			gripTimestamp.value = clock.getCurrentMilliseconds();
 			break;
+		case Gripped:
+			break;
+		case Release:
+			ant.release();
 		case Pulling:
 			// TODO: use ant hill position
 			ant.setTarget(new Position(0, 0));

@@ -51,13 +51,7 @@ public class HeuristicSolver implements AntAssignmetSolver {
 		LinkedHashSet<AntInfo> remaing = new LinkedHashSet<>(ants);
 		Map<AntInfo, FoodSource> done = new HashMap<>();
 		
-		System.out.println("Start food positions");
-		for(FoodSource s: foods) {
-			System.out.println(s.position);
-		}
-
 		while (!remaing.isEmpty()) {
-			System.out.println("Remaining " + remaing.size() + " foods: " + foods.size());
 			// Assign nearest foods to pairs
 			LinkedHashSet<AntAntSource> antDistances = new LinkedHashSet<>();
 			for (AntInfo antA : remaing) {

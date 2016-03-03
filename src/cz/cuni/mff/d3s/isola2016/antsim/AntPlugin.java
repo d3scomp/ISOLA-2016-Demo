@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import cz.cuni.mff.d3s.deeco.logging.Log;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoContainer;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoPlugin;
 import cz.cuni.mff.d3s.deeco.runtime.PluginInitFailedException;
@@ -98,9 +99,15 @@ public class AntPlugin implements DEECoPlugin, PositionProvider {
 	}
 
 	public void release() {
-		state = State.Free;
-		pulledFoodPiece.pullers.remove(this);
-		pulledFoodPiece = null;
+		if(state == State.Locked) {
+			state = State.Free;
+			if(pulledFoodPiece != null) {
+				pulledFoodPiece.pullers.remove(this);
+				pulledFoodPiece = null;
+			}
+		} else {
+			Log.e("Releasing when not Locked, state: " + state);
+		}
 	}
 
 	public State getState() {

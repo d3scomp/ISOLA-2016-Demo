@@ -45,7 +45,7 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 	public void init(DEECoContainer container) throws PluginInitFailedException {
 		this.container = container;
 		Scheduler scheduler = container.getRuntimeFramework().getScheduler();
-		new TimerTask(scheduler, this, "FakeIntellignetEnsemble", 0, 10000).schedule();
+		new TimerTask(scheduler, this, "FakeIntellignetEnsemble", 0, 3000).schedule();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -104,16 +104,35 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 		ants.add(localAnt);
 		ants.addAll(remoteAnts);
 
-		// Collect all foods
-		Collection<FoodSource> foods = new LinkedHashSet<>();
+		// Collect all foods, prefer up-to-date information
+		Collection<TimestampedFoodSource> foods = new LinkedHashSet<>();
 		for (AntInfo ant : ants) {
+			for(TimestampedFoodSource source: ant.foods) {
+				if(!foods.contains(source)) {
+					// Not contained add
+					foods.add(source);
+				} else {
+					// Contained, add only when newer
+					boolean add = false;
+					for(TimestampedFoodSource s: foods) {
+						if(s.equals(source)) {
+							if(source.timestamp > s.timestamp) {
+								add = true;
+							}
+						}
+					}
+					if(add) {
+						foods.add(source);
+					}
+				}
+			}
 			foods.addAll(ant.foods);
 		}
 
 		// Filter out pulling ants
 		List<AntInfo> antsToRemove = new LinkedList<>();
 		for (AntInfo ant : ants) {
-			if (ant.mode != null && ant.mode == Mode.Pulling) {
+			if (ant.mode != null && !ant.mode.isPlanable()) {
 				antsToRemove.add(ant);
 			}
 		}
@@ -128,16 +147,15 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 		}
 		foods.removeAll(foodsToRemove);
 		
-		List<FoodSource> foodsToAdd = new LinkedList<>();
+		List<FoodSource> outFoods = new LinkedList<>();
 		// Multiply food sources according to capacity
 		for(FoodSource source: foods) {
 			for(int i = 0; i < source.portions;++i) {
-				foodsToAdd.add(source);
+				outFoods.add(source);
 			}
 		}
-		foods = foodsToAdd;
-
-		Position assignedPosition = solver.solve(ants, foods, localAnt, DemoLauncher.ANT_HILL_POS);
+		
+		Position assignedPosition = solver.solve(ants, outFoods, localAnt, DemoLauncher.ANT_HILL_POS);
 
 		setAssignedFoodSourceKnowledge(container.getRuntimeFramework().getContainer().getLocals().iterator().next(),
 				assignedPosition);

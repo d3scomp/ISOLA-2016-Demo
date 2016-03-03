@@ -43,9 +43,9 @@ public class DemoLauncher {
 		System.out.println("Ant food picking simulation demo");
 
 		// Setup logging directory
-		final String logPath = String.format(Locale.US, "%s_seed-%d_ants-%d_foods-%d_capacity-%d_range-%02f", LOG_PATH,
+	/*	final String logPath = String.format(Locale.US, "%s_seed-%d_ants-%d_foods-%d_capacity-%d_range-%02f", LOG_PATH,
 				seed, numAnts, numFoodSources, foodSourceCapacity, radioRangeM);
-		final RuntimeLogWriters logWriters = new RuntimeLogWriters(logPath);
+		final RuntimeLogWriters logWriters = new RuntimeLogWriters(logPath);*/
 
 		OMNeTSimulation omnetSim = new OMNeTSimulation();
 		omnetSim.set80154txPower(OMNeTUtils.RangeToPower_802_15_4(radioRangeM));
@@ -81,7 +81,7 @@ public class DemoLauncher {
 				
 		// Create nodes
 		for (int i = 0; i < numAnts; ++i) {
-			DEECoNode node = realm.createNode(i, logWriters,
+			DEECoNode node = realm.createNode(i, /*logWriters,*/
 					new PositionPlugin(PosUtils.getRandomPosition(rand, 0, 0, ANT_SPAWN_DIAMETER_M)),
 					new IntelligentAntPlanning(solver));
 			node.deployComponent(new AntComponent(i, new Random(rand.nextLong()), node, ANT_HILL_POS));
