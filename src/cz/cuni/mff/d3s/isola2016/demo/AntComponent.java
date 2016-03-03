@@ -49,9 +49,6 @@ public class AntComponent {
 	public Random rand;
 
 	@Local
-	public Position curTarget;
-
-	@Local
 	public Position antHill;
 
 	@Local
@@ -192,7 +189,7 @@ public class AntComponent {
 			break;
 		case ToFood:
 			// Cancel move to food
-			if (assignedFood == null) {
+			if (assignedFood == null || PosUtils.isSame(assignedFood, ant.getTarget())) {
 				mode.value = Mode.Searching;
 			}
 			// Grip the food
