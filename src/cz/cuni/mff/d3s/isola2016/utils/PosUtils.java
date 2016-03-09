@@ -24,6 +24,10 @@ public class PosUtils {
 		return new Position(px, py);
 	}
 	
+	public static Position getRandomPosition(Random rand, Position center, double diameter) {
+		return getRandomPosition(rand, center.x,  center.y, diameter);
+	}
+	
 	/**
 	 * Distance at which the positions are considered same
 	 */

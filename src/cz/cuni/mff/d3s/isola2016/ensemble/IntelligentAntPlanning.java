@@ -45,7 +45,7 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 	public void init(DEECoContainer container) throws PluginInitFailedException {
 		this.container = container;
 		Scheduler scheduler = container.getRuntimeFramework().getScheduler();
-		new TimerTask(scheduler, this, "FakeIntellignetEnsemble", 0, 3000).schedule();
+		new TimerTask(scheduler, this, "FakeIntellignetEnsemble", 0, 1000).schedule();
 	}
 
 	@SuppressWarnings("unchecked")

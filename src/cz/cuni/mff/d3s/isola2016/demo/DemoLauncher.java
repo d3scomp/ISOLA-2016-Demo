@@ -1,15 +1,12 @@
 package cz.cuni.mff.d3s.isola2016.demo;
 
-import java.util.Locale;
 import java.util.Random;
 
 import cz.cuni.mff.d3s.deeco.runners.DEECoSimulation;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoNode;
-import cz.cuni.mff.d3s.deeco.runtimelog.RuntimeLogWriters;
 import cz.cuni.mff.d3s.deeco.simulation.omnet.OMNeTUtils;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.AntWorldPlugin;
-import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
 import cz.cuni.mff.d3s.isola2016.ensemble.AntAssignmetSolver;
 import cz.cuni.mff.d3s.isola2016.ensemble.HeuristicSolver;
 import cz.cuni.mff.d3s.isola2016.ensemble.IntelligentAntPlanning;
@@ -26,20 +23,16 @@ public class DemoLauncher {
 	public static final double RADIO_RANGE_M = 250;
 	public static final int SEED = 42;
 	public static final int NUM_ANTS = 10;
-	public static final int NUM_FOOD_SOURCES = 20;
-	public static final int FOOD_SOURCE_CAPACITY = 1;
 	public static final double ANT_SPAWN_DIAMETER_M = 5;
-	public static final double FOOD_SOURCE_SPAWN_DIAMETER_M = 15;
 	public static final Position ANT_HILL_POS = new Position(0, 0);
 	public static final String LOG_PATH = "logs/runtime";
-	public static final long LIMIT_MS = 300_000;
+	public static final long LIMIT_MS = 180_000;
 
 	public static void main(String[] args) throws Exception {
-		run(SEED, LIMIT_MS, NUM_ANTS, NUM_FOOD_SOURCES, FOOD_SOURCE_CAPACITY, RADIO_RANGE_M);
+		run(SEED, LIMIT_MS, NUM_ANTS, RADIO_RANGE_M);
 	}
 
-	public static void run(int seed, long limitMs, int numAnts, int numFoodSources, int foodSourceCapacity,
-			double radioRangeM) throws Exception {
+	public static void run(int seed, long limitMs, int numAnts, double radioRangeM) throws Exception {
 		System.out.println("Ant food picking simulation demo");
 
 		// Setup logging directory
@@ -52,20 +45,9 @@ public class DemoLauncher {
 
 		DEECoSimulation realm = new DEECoSimulation(omnetSim.getTimer());
 
-		AntWorldPlugin antWorld = new AntWorldPlugin(ANT_HILL_POS);
 		Random rand = new Random(seed);
-
-		// Add food sources
-		for (int i = 0; i < numFoodSources; ++i) {
-			Position pos = PosUtils.getRandomPosition(rand, 0, 0, FOOD_SOURCE_SPAWN_DIAMETER_M);
-			antWorld.addFoodSource(new FoodSource(pos, foodSourceCapacity));
-		}
+		AntWorldPlugin antWorld = new AntWorldPlugin(ANT_HILL_POS, new Random(rand.nextLong()));		
 		
-		System.out.println("Initial food sources");
-		for(FoodSource s: antWorld.foodSources) {
-			System.out.println(s.position);
-		}
-
 		// Add plugins
 		realm.addPlugin(omnetSim);
 		realm.addPlugin(Network.class);
@@ -92,8 +74,7 @@ public class DemoLauncher {
 		realm.start(limitMs);
 		System.out.println("All done.");
 
-		System.out.println("Total food pieced delivered: " + antWorld.collectedFoodPieces + " out of "
-				+ numFoodSources * foodSourceCapacity);
+		System.out.println("Total food pieced delivered: " + antWorld.collectedFoodPieces);
 		double totalDistance = 0;
 		for (AntPlugin ant : antWorld.ants) {
 			System.out.println("Ant traveled distance: " + ant.totalTraveledDistance + " meters");

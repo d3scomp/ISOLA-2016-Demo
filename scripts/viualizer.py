@@ -57,8 +57,9 @@ class PlottingCanvas(FigureCanvas):
             col = col + 1
         
     def plotRecordSources(self, rec):
-        for source in rec.foodSources:
-            self.plot.plot(float(source.position.x), float(source.position.y), "bs")
+        if hasattr(rec, 'foodSources'):
+            for source in rec.foodSources:
+                self.plot.plot(float(source.position.x), float(source.position.y), "bs")
         if hasattr(rec, 'foodPieces'):
             for piece in rec.foodPieces:
                 try:

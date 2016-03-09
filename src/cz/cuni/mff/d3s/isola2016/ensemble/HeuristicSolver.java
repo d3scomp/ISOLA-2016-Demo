@@ -74,7 +74,7 @@ public class HeuristicSolver implements AntAssignmetSolver {
 			}
 			
 			if(optimalPair != null) {
-				System.out.println("Optimal pair: " + optimalPair.a.id + " " + optimalPair.b.id + " " + optimalPair.nearestFoodSource.position + " " + optimalPair.nearestFoodSource.portions);
+			//	System.out.println("Optimal pair: " + optimalPair.a.id + " " + optimalPair.b.id + " " + optimalPair.nearestFoodSource.position + " " + optimalPair.nearestFoodSource.portions);
 				done.put(optimalPair.a, optimalPair.nearestFoodSource);
 				done.put(optimalPair.b, optimalPair.nearestFoodSource);
 			
