@@ -22,7 +22,7 @@ import cz.cuni.mff.d3s.jdeeco.position.PositionPlugin;
 import cz.cuni.mff.d3s.jdeeco.publishing.DefaultKnowledgePublisher;
 
 public class DemoLauncher {
-	public static final double RADIO_RANGE_M = 250;
+	public static final double RADIO_RANGE_M = 5;
 	public static final int SEED = 42;
 	public static final int NUM_ANTS = 10;
 	public static final double ANT_SPAWN_DIAMETER_M = 5;
@@ -54,6 +54,7 @@ public class DemoLauncher {
 		realm.addPlugin(AntPlugin.class);
 		realm.addPlugin(OMNeTBroadcastDevice.class);
 		//realm.addPlugin(new SimpleBroadcastDevice());
+		
 		
 		// Ensemble solver
 		//AntAssignmetSolver solver = new BruteforceSolver();
