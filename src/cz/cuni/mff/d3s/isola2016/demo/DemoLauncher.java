@@ -10,6 +10,7 @@ import cz.cuni.mff.d3s.isola2016.antsim.AntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.ensemble.AntAssignmetSolver;
 import cz.cuni.mff.d3s.isola2016.ensemble.HeuristicSolver;
 import cz.cuni.mff.d3s.isola2016.ensemble.IntelligentAntPlanning;
+import cz.cuni.mff.d3s.isola2016.ensemble.ProactiveSolver;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.network.Network;
 import cz.cuni.mff.d3s.jdeeco.network.device.SimpleBroadcastDevice;
@@ -62,6 +63,7 @@ public class DemoLauncher {
 		// Ensemble solver
 		//AntAssignmetSolver solver = new BruteforceSolver();
 		AntAssignmetSolver solver = new HeuristicSolver();
+		//AntAssignmetSolver solver = new ProactiveSolver();
 				
 		// Create nodes
 		for (int i = 0; i < numAnts; ++i) {
