@@ -32,9 +32,9 @@ class PlottingCanvas(FigureCanvas):
 
         self.plot.clear()
         self.plot.plot(float(rec.antHill.x), float(rec.antHill.y), "go")
-        self.plotRecordSources(rec)
         self.plotRecordAnts(rec)
         self.plotRecordAntTargets(rec)
+        self.plotRecordSources(rec)
         
         self.plot.set_title("Time: " + str(rec.time) + " ms, collected pieces of food: " + str(rec.collectedFoodPieces))
         self.plot.set_xlim(-15, 15)
