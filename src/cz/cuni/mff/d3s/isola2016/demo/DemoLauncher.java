@@ -57,8 +57,8 @@ public class DemoLauncher {
 		realm.addPlugin(KnowledgeInsertingStrategy.class);
 		realm.addPlugin(antWorld);
 		realm.addPlugin(AntPlugin.class);
-		//realm.addPlugin(OMNeTBroadcastDevice.class);
-		realm.addPlugin(new SimpleBroadcastDevice());
+		realm.addPlugin(OMNeTBroadcastDevice.class);
+		//realm.addPlugin(new SimpleBroadcastDevice());
 		
 		// Ensemble solver
 		//AntAssignmetSolver solver = new BruteforceSolver();
