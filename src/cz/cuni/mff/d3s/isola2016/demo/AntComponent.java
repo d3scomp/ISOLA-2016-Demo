@@ -27,7 +27,7 @@ import cz.cuni.mff.d3s.jdeeco.position.Position;
 public class AntComponent {
 	public static final long MAX_FOOD_AGE_MS = 300000;
 	public static final double RANDOM_WALK_DIAMETER = 15;
-	public static final long GRIP_PATIENCE_MS = 5000;
+	public static final long GRIP_PATIENCE_MS = 30000;
 
 	public String id;
 	public Position position;
@@ -152,7 +152,7 @@ public class AntComponent {
 	}*/
 
 	@Process
-	@PeriodicScheduling(period = 5000, order = 5)
+	@PeriodicScheduling(period = 1000, order = 5)
 	public static void printStatus(@In("clock") CurrentTimeProvider clock, @In("id") String id,
 			@In("position") Position position, @In("state") State state, @In("mode") Mode mode,
 			@In("foods") List<TimestampedFoodSource> foods, @In("assignedFood") Position assignedFood) {
@@ -178,7 +178,7 @@ public class AntComponent {
 	}
 
 	@Process
-	@PeriodicScheduling(period = 1000, order = 6)
+	@PeriodicScheduling(period = 500, order = 6)
 	public static void modeSwitch(@In("ant") AntPlugin ant, @InOut("mode") ParamHolder<Mode> mode,
 			@In("assignedFood") Position assignedFood, @In("position") Position position,
 			@In("clock") CurrentTimeProvider clock, @In("gripTimestamp") Long gripTimestamp) {
@@ -214,7 +214,7 @@ public class AntComponent {
 		case Gripped:
 			if(ant.getState() == State.Pulling) {
 				mode.value = Mode.Pulling;
-			} else if (assignedFood == null || PosUtils.isSame(assignedFood, ant.getTarget())) {
+			} else if (assignedFood == null) {
 				mode.value = Mode.Release;
 			}
 		case Release:
@@ -231,7 +231,7 @@ public class AntComponent {
 	}
 
 	@Process
-	@PeriodicScheduling(period = 1000, order = 7)
+	@PeriodicScheduling(period = 500, order = 7)
 	public static void move(@In("ant") AntPlugin ant, @In("mode") Mode mode, @In("rand") Random rand,
 			@In("assignedFood") Position assignedFood, @Out("gripTimestamp") ParamHolder<Long> gripTimestamp,
 			@In("clock") CurrentTimeProvider clock) {
