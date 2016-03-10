@@ -37,11 +37,6 @@ public class DemoLauncher {
 	public static void run(int seed, long limitMs, int numAnts, double radioRangeM) throws Exception {
 		System.out.println("Ant food picking simulation demo");
 
-		// Setup logging directory
-	/*	final String logPath = String.format(Locale.US, "%s_seed-%d_ants-%d_foods-%d_capacity-%d_range-%02f", LOG_PATH,
-				seed, numAnts, numFoodSources, foodSourceCapacity, radioRangeM);
-		final RuntimeLogWriters logWriters = new RuntimeLogWriters(logPath);*/
-
 		OMNeTSimulation omnetSim = new OMNeTSimulation();
 		omnetSim.set80154txPower(OMNeTUtils.RangeToPower_802_15_4(radioRangeM));
 
@@ -79,11 +74,5 @@ public class DemoLauncher {
 		System.out.println("All done.");
 
 		System.out.println("Total food pieced delivered: " + antWorld.collectedFoodPieces);
-		double totalDistance = 0;
-		for (AntPlugin ant : antWorld.ants) {
-			System.out.println("Ant traveled distance: " + ant.totalTraveledDistance + " meters");
-			totalDistance += ant.totalTraveledDistance;
-		}
-		System.out.println("Total distance traveled: " + totalDistance);
 	}
 }
