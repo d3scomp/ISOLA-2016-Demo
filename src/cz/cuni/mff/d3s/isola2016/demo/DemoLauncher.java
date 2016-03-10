@@ -12,6 +12,7 @@ import cz.cuni.mff.d3s.isola2016.ensemble.HeuristicSolver;
 import cz.cuni.mff.d3s.isola2016.ensemble.IntelligentAntPlanning;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.network.Network;
+import cz.cuni.mff.d3s.jdeeco.network.device.SimpleBroadcastDevice;
 import cz.cuni.mff.d3s.jdeeco.network.l2.strategy.KnowledgeInsertingStrategy;
 import cz.cuni.mff.d3s.jdeeco.network.omnet.OMNeTBroadcastDevice;
 import cz.cuni.mff.d3s.jdeeco.network.omnet.OMNeTSimulation;
@@ -55,7 +56,8 @@ public class DemoLauncher {
 		realm.addPlugin(KnowledgeInsertingStrategy.class);
 		realm.addPlugin(antWorld);
 		realm.addPlugin(AntPlugin.class);
-		realm.addPlugin(OMNeTBroadcastDevice.class);
+		//realm.addPlugin(OMNeTBroadcastDevice.class);
+		realm.addPlugin(new SimpleBroadcastDevice());
 		
 		// Ensemble solver
 		//AntAssignmetSolver solver = new BruteforceSolver();
