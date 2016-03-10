@@ -28,7 +28,7 @@ public class AntPlugin implements DEECoPlugin, PositionProvider {
 		Free, Locked, Pulling
 	}
 
-	public static double SENSE_RANGE_M = 1.5;
+	public static double SENSE_RANGE_M = 3;
 	// Realistic ant speed is 0.07 m/s
 	// Mechanic ants are a lot faster
 	public static double SPEED_M_PER_S = 0.5;
