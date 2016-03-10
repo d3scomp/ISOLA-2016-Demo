@@ -20,29 +20,27 @@ import cz.cuni.mff.d3s.jdeeco.position.PositionPlugin;
 import cz.cuni.mff.d3s.jdeeco.publishing.DefaultKnowledgePublisher;
 
 public class DemoLauncher {
-	public static final double RADIO_RANGE_M = 5;
-	public static final int SEED = 42;
-	public static final int NUM_ANTS = 10;
 	public static final double ANT_SPAWN_DIAMETER_M = 5;
 	public static final Position ANT_HILL_POS = new Position(0, 0);
 	public static final String LOG_PATH = "logs/runtime";
-	public static final long LIMIT_MS = 180_000;
-
+	
 	public static void main(String[] args) throws Exception {
-		run(SEED, LIMIT_MS, NUM_ANTS, RADIO_RANGE_M);
+		Config cfg = new Config(args);
+		run(cfg);
 	}
 
-	public static void run(int seed, long limitMs, int numAnts, double radioRangeM) throws Exception {
+	public static void run(Config cfg) throws Exception {
 		System.out.println("Ant food picking simulation demo");
 
 		OMNeTSimulation omnetSim = new OMNeTSimulation();
-		omnetSim.set80154txPower(OMNeTUtils.RangeToPower_802_15_4(radioRangeM));
+		omnetSim.set80154txPower(OMNeTUtils.RangeToPower_802_15_4(cfg.radioRangeM));
 
 		DEECoSimulation realm = new DEECoSimulation(omnetSim.getTimer());
 
-		Random rand = new Random(seed);
-		AntWorldPlugin antWorld = new AntWorldPlugin(ANT_HILL_POS, new Random(rand.nextLong()));		
-		
+		Random rand = new Random(cfg.seed);
+		AntWorldPlugin antWorld = new AntWorldPlugin(ANT_HILL_POS, new Random(rand.nextLong()));
+		antWorld.config = cfg;
+
 		// Add plugins
 		realm.addPlugin(omnetSim);
 		realm.addPlugin(Network.class);
@@ -51,26 +49,25 @@ public class DemoLauncher {
 		realm.addPlugin(antWorld);
 		realm.addPlugin(AntPlugin.class);
 		realm.addPlugin(OMNeTBroadcastDevice.class);
-		//realm.addPlugin(new SimpleBroadcastDevice());
+		// realm.addPlugin(new SimpleBroadcastDevice());
 		realm.addPlugin(ProabilisticRebroadcastStrategy.class);
-		
-		
+
 		// Ensemble solver
-		//AntAssignmetSolver solver = new BruteforceSolver();
+		// AntAssignmetSolver solver = new BruteforceSolver();
 		AntAssignmetSolver solver = new HeuristicSolver();
-		//AntAssignmetSolver solver = new ProactiveSolver();
-				
+		// AntAssignmetSolver solver = new ProactiveSolver();
+
 		// Create nodes
-		for (int i = 0; i < numAnts; ++i) {
-			DEECoNode node = realm.createNode(i, /*logWriters,*/
+		for (int i = 0; i < cfg.numAnts; ++i) {
+			DEECoNode node = realm.createNode(i, /* logWriters, */
 					new PositionPlugin(PosUtils.getRandomPosition(rand, 0, 0, ANT_SPAWN_DIAMETER_M)),
-					new IntelligentAntPlanning(solver));
+					new IntelligentAntPlanning(solver, cfg.maxTimeSkewMs));
 			node.deployComponent(new AntComponent(i, new Random(rand.nextLong()), node, ANT_HILL_POS));
 		}
-		
+
 		// Run the simulation
 		System.out.println("Running the simulation.");
-		realm.start(limitMs);
+		realm.start(cfg.limitMs);
 		System.out.println("All done.");
 
 		System.out.println("Total food pieced delivered: " + antWorld.collectedFoodPieces);

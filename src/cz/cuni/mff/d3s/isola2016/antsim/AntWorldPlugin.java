@@ -21,6 +21,7 @@ import cz.cuni.mff.d3s.deeco.scheduler.Scheduler;
 import cz.cuni.mff.d3s.deeco.task.TimerTask;
 import cz.cuni.mff.d3s.deeco.task.TimerTaskListener;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin.State;
+import cz.cuni.mff.d3s.isola2016.demo.Config;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
@@ -42,6 +43,9 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 	private boolean initialized = false;
 	private final long startTime;
 	private final Random rand;
+	
+	// Configuration object (this is here just to be serialized)
+	public Config config;
 
 	private double sourceAppearProbabilityPerSec = DEFAULT_SOURCE_APPEAR_PROBABILITY_PER_S;
 	private double sourceDisappearProbabilityPerSec = DEFAULT_SOURCE_DISAPPEAR_PROBABILITY_PER_S;

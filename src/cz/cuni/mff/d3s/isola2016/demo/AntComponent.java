@@ -16,6 +16,7 @@ import cz.cuni.mff.d3s.deeco.annotations.Process;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoNode;
 import cz.cuni.mff.d3s.deeco.runtimelog.RuntimeLogger;
 import cz.cuni.mff.d3s.deeco.task.ParamHolder;
+import cz.cuni.mff.d3s.deeco.task.ProcessContext;
 import cz.cuni.mff.d3s.deeco.timer.CurrentTimeProvider;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin.State;
@@ -33,11 +34,11 @@ public class AntComponent {
 	public Position position;
 	public List<TimestampedFoodSource> foods;
 	public Position assignedFood;
+	public Mode mode;
+	public Long time;
 
 	@Local
 	public State state;
-
-	public Mode mode;
 
 	@Local
 	public CurrentTimeProvider clock;
@@ -71,6 +72,12 @@ public class AntComponent {
 	}
 
 	/// Processes
+	@Process
+	@PeriodicScheduling(period = 500, order = 1)
+	public static void senseTime(@Out("time") ParamHolder<Long> time) {
+		time.value = ProcessContext.getTimeProvider().getCurrentMilliseconds();
+	}
+	
 	@Process
 	@PeriodicScheduling(period = 500, order = 1)
 	public static void sensePosition(@In("ant") AntPlugin ant, @Out("position") ParamHolder<Position> position) {

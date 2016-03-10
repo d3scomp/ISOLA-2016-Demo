@@ -1,6 +1,5 @@
 package cz.cuni.mff.d3s.isola2016.ensemble;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -12,7 +11,6 @@ import cz.cuni.mff.d3s.deeco.knowledge.KnowledgeManager;
 import cz.cuni.mff.d3s.deeco.knowledge.KnowledgeNotFoundException;
 import cz.cuni.mff.d3s.deeco.knowledge.KnowledgeUpdateException;
 import cz.cuni.mff.d3s.deeco.knowledge.ReadOnlyKnowledgeManager;
-import cz.cuni.mff.d3s.deeco.knowledge.ValueSet;
 import cz.cuni.mff.d3s.deeco.model.runtime.RuntimeModelHelper;
 import cz.cuni.mff.d3s.deeco.model.runtime.api.KnowledgePath;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoContainer;
@@ -24,16 +22,17 @@ import cz.cuni.mff.d3s.deeco.task.TimerTask;
 import cz.cuni.mff.d3s.deeco.task.TimerTaskListener;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
 import cz.cuni.mff.d3s.isola2016.demo.DemoLauncher;
-import cz.cuni.mff.d3s.isola2016.demo.Mode;
 import cz.cuni.mff.d3s.isola2016.demo.TimestampedFoodSource;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 	private DEECoContainer container;
-	private AntAssignmetSolver solver;
+	private final AntAssignmetSolver solver;
+	private final long maxTimeSkew; 
 	
-	public IntelligentAntPlanning(AntAssignmetSolver solver) {
+	public IntelligentAntPlanning(AntAssignmetSolver solver, long maxTimeSkew) {
 		this.solver = solver;
+		this.maxTimeSkew = maxTimeSkew;
 	}
 
 	@Override
@@ -48,18 +47,9 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 		new TimerTask(scheduler, this, "FakeIntellignetEnsemble", 0, 1000).schedule();
 	}
 
-	@SuppressWarnings("unchecked")
 	private AntInfo getKnowledge(ReadOnlyKnowledgeManager knowledgeManager) {
 		try {
-			KnowledgePath idPath = RuntimeModelHelper.createKnowledgePath("id");
-			KnowledgePath positionPath = RuntimeModelHelper.createKnowledgePath("position");
-			KnowledgePath foodsPath = RuntimeModelHelper.createKnowledgePath("foods");
-			KnowledgePath modePath = RuntimeModelHelper.createKnowledgePath("mode");
-			ValueSet set = knowledgeManager.get(Arrays.asList(idPath, foodsPath, positionPath, modePath));
-
-			return new AntInfo((String) set.getValue(idPath), (Position) set.getValue(positionPath),
-					(List<TimestampedFoodSource>) set.getValue(foodsPath), (Mode) set.getValue(modePath));
-
+			return new AntInfo(knowledgeManager);
 		} catch (KnowledgeNotFoundException e) {
 			throw new DEECoRuntimeException("Knowledge extraction failed", e);
 		}
@@ -128,6 +118,23 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 			}
 			foods.addAll(ant.foods);
 		}
+		
+		// Filter out old ants data
+		List<AntInfo> oldAntsToRemove = new LinkedList<>();
+		for (AntInfo ant : ants) {
+			if (ant.time == null) {
+				System.err.println("Removing ant infor, time == null");
+				oldAntsToRemove.add(ant);
+			} else {
+				long off = container.getRuntimeFramework().getScheduler().getTimer().getCurrentMilliseconds() - ant.time;
+				if(off > maxTimeSkew) {
+					System.err.println("Removing ant info, time is off by: " + off);
+					oldAntsToRemove.add(ant);
+				}
+			}
+		}
+		ants.removeAll(oldAntsToRemove);
+		
 
 		// Filter out pulling ants
 		List<AntInfo> antsToRemove = new LinkedList<>();
