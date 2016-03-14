@@ -16,7 +16,11 @@ class Cfg(threading.Thread):
         print("Running execution thread")
         wd = os.getcwd()
         os.system("export PATH=$PATH" + os.pathsep + wd + os.sep + "omnet")
-        os.system('mvn exec:java -Dexec.args="--numants ' + str(self.numants) + ' --seed ' + str(self.seed) + '--limit ' + str(self.limit) + ' --maxtimeskew ' + str(self.maxtimeskew) + '"')
+        args = '--numants ' + str(self.numants) + ' '
+        args += '--seed ' + str(self.seed) + ' '
+        args += '--limit ' + str(self.limit) + ' '
+        args += '--maxtimeskew ' + str(self.maxtimeskew) + ' '
+        os.system('mvn exec:java -Dexec.args="' + args + '"')
         print("Execution done")
 
 MAX_THREADS = 4
@@ -24,12 +28,11 @@ cfgs = [];
 
 # Define configurations
 numants = 20
-seedfrom = 0
-seedto = 10
-maxtimeskews = [3000, 5000, 10000, 20000, 30000]
-for maxtimeskew in maxtimeskews:
-    for i in range(seedfrom, seedto):
-        cfgs.append(Cfg(numants=numants, seed=i, limit=180000, maxtimeskew=maxtimeskew))
+seeds = range(0, 10)
+maxtimeskews = [2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 20000, 30000]
+for seed in seeds:
+    for maxtimeskew in maxtimeskews:
+        cfgs.append(Cfg(numants=numants, seed=seed, limit=180000, maxtimeskew=maxtimeskew))
     
 print("Running " + str(len(cfgs)) + " configurations")
 
