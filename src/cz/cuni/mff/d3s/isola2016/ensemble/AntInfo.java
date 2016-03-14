@@ -6,8 +6,8 @@ import java.util.List;
 import cz.cuni.mff.d3s.deeco.knowledge.KnowledgeNotFoundException;
 import cz.cuni.mff.d3s.deeco.knowledge.ReadOnlyKnowledgeManager;
 import cz.cuni.mff.d3s.deeco.knowledge.ValueSet;
-import cz.cuni.mff.d3s.deeco.model.runtime.RuntimeModelHelper;
 import cz.cuni.mff.d3s.deeco.model.runtime.api.KnowledgePath;
+import cz.cuni.mff.d3s.deeco.model.runtime.custom.KnowledgePathExt;
 import cz.cuni.mff.d3s.isola2016.demo.Mode;
 import cz.cuni.mff.d3s.isola2016.demo.TimestampedFoodSource;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
@@ -21,11 +21,11 @@ public class AntInfo {
 	
 	@SuppressWarnings("unchecked")
 	public AntInfo(ReadOnlyKnowledgeManager knowledgeManager) throws KnowledgeNotFoundException {
-		KnowledgePath idPath = RuntimeModelHelper.createKnowledgePath("id");
-		KnowledgePath positionPath = RuntimeModelHelper.createKnowledgePath("position");
-		KnowledgePath foodsPath = RuntimeModelHelper.createKnowledgePath("foods");
-		KnowledgePath modePath = RuntimeModelHelper.createKnowledgePath("mode");
-		KnowledgePath timePath = RuntimeModelHelper.createKnowledgePath("time");
+		KnowledgePath idPath = KnowledgePathExt.createKnowledgePath("id");
+		KnowledgePath positionPath = KnowledgePathExt.createKnowledgePath("position");
+		KnowledgePath foodsPath = KnowledgePathExt.createKnowledgePath("foods");
+		KnowledgePath modePath = KnowledgePathExt.createKnowledgePath("mode");
+		KnowledgePath timePath = KnowledgePathExt.createKnowledgePath("time");
 		ValueSet set = knowledgeManager.get(Arrays.asList(idPath, foodsPath, positionPath, modePath, timePath));
 
 		this.id = (String) set.getValue(idPath);

@@ -78,12 +78,6 @@
 		</dependency>
 		<dependency>
 			<groupId>cz.cuni.mff.d3s.jdeeco</groupId>
-			<artifactId>cz.cuni.mff.d3s.jdeeco.core</artifactId>
-			<version>3.0.2</version>
-			<type>test-jar</type>
-		</dependency>
-		<dependency>
-			<groupId>cz.cuni.mff.d3s.jdeeco</groupId>
 			<artifactId>cz.cuni.mff.d3s.jdeeco.network.omnet</artifactId>
 			<version>3.0.2</version>
 		</dependency>

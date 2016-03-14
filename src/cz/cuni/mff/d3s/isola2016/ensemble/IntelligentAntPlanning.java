@@ -11,8 +11,8 @@ import cz.cuni.mff.d3s.deeco.knowledge.KnowledgeManager;
 import cz.cuni.mff.d3s.deeco.knowledge.KnowledgeNotFoundException;
 import cz.cuni.mff.d3s.deeco.knowledge.KnowledgeUpdateException;
 import cz.cuni.mff.d3s.deeco.knowledge.ReadOnlyKnowledgeManager;
-import cz.cuni.mff.d3s.deeco.model.runtime.RuntimeModelHelper;
 import cz.cuni.mff.d3s.deeco.model.runtime.api.KnowledgePath;
+import cz.cuni.mff.d3s.deeco.model.runtime.custom.KnowledgePathExt;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoContainer;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoPlugin;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoRuntimeException;
@@ -56,7 +56,7 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 	}
 
 	private void setAssignedFoodSourceKnowledge(KnowledgeManager knowledgeManager, Position foodSourcePosition) {
-		KnowledgePath knowledgePath = RuntimeModelHelper.createKnowledgePath("assignedFood");
+		KnowledgePath knowledgePath = KnowledgePathExt.createKnowledgePath("assignedFood");
 		try {
 			ChangeSet changes = new ChangeSet();
 			changes.setValue(knowledgePath, foodSourcePosition);
