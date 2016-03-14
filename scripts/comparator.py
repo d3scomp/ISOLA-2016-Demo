@@ -46,4 +46,6 @@ for key in sorted(data.keys()):
 
 plot.boxplot(pdata)
 plot.xticks(xtckcnt, xtckname)
+plot.xlabel("Max allowed data age in ms")
+plot.ylabel("Solution value in collected foods")
 plot.show()
