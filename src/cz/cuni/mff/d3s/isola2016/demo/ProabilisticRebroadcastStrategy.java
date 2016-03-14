@@ -11,11 +11,20 @@ import cz.cuni.mff.d3s.jdeeco.network.l2.L2Packet;
 import cz.cuni.mff.d3s.jdeeco.network.l2.strategy.RebroadcastStrategy;
 
 public class ProabilisticRebroadcastStrategy extends RebroadcastStrategy {
-	public long SEEN_HISTORY_LENGTH_MS = 5000;
-	public double STATIC_REBROADCAST_PROBABILITY = 0.75;
+	public final static long SEEN_HISTORY_LENGTH_MS = 3000;
+	public final static double STATIC_REBROADCAST_PROBABILITY = 0.75;
 	
 	private Map<String, Long> nodeToLastSeen = new HashMap<>();
 	private Random rand = new Random(42);
+	private double staticRebroadcastProbability;
+	
+	public ProabilisticRebroadcastStrategy() {
+		this(STATIC_REBROADCAST_PROBABILITY);
+	}
+	
+	public ProabilisticRebroadcastStrategy(double staticRebroadcastProbability) {
+		this.staticRebroadcastProbability = staticRebroadcastProbability;
+	}
 
 	private void markNodeSeen(String address) {
 		nodeToLastSeen.put(address, scheduler.getTimer().getCurrentMilliseconds());
@@ -24,7 +33,7 @@ public class ProabilisticRebroadcastStrategy extends RebroadcastStrategy {
 	private int getNodesInRange() {
 		int inRange = 0;
 		for (long lastSeen : nodeToLastSeen.values()) {
-			if (lastSeen < SEEN_HISTORY_LENGTH_MS) {
+			if (scheduler.getTimer().getCurrentMilliseconds() - lastSeen < SEEN_HISTORY_LENGTH_MS) {
 				inRange++;
 			}
 		}
@@ -54,7 +63,7 @@ public class ProabilisticRebroadcastStrategy extends RebroadcastStrategy {
 		// System.err.println("Nodes in range: " + getNodesInRange());
 
 		int divider = Math.max(1, getNodesInRange());
-		if (rand.nextDouble() > (STATIC_REBROADCAST_PROBABILITY / divider)) {
+		if (rand.nextDouble() > (staticRebroadcastProbability / divider)) {
 			return;
 		}
 
