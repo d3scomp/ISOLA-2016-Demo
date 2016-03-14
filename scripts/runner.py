@@ -26,21 +26,17 @@ cfgs = [];
 numants = 20
 seedfrom = 0
 seedto = 10
-for i in range(seedfrom, seedto):
-    cfgs.append(Cfg(numants=numants, seed=i, limit=180000, maxtimeskew=5000))
-for i in range(seedfrom, seedto):
-    cfgs.append(Cfg(numants=numants, seed=i, limit=180000, maxtimeskew=10000))
-for i in range(seedfrom, seedto):
-    cfgs.append(Cfg(numants=numants, seed=i, limit=180000, maxtimeskew=30000))
+maxtimeskews = [3000, 5000, 10000, 20000, 30000]
+for maxtimeskew in maxtimeskews:
+    for i in range(seedfrom, seedto):
+        cfgs.append(Cfg(numants=numants, seed=i, limit=180000, maxtimeskew=maxtimeskew))
     
 print("Running " + str(len(cfgs)) + " configurations")
-
-print(threading.active_count())
 
 running = []
 
 while len(cfgs) > 0:
-    if threading.active_count() > MAX_THREADS:
+    if threading.active_count() >= MAX_THREADS:
         running.pop().join();
     
     sleep(3);
