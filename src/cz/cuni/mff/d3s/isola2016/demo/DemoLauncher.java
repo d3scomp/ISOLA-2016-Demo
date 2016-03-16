@@ -4,19 +4,16 @@ import java.util.Random;
 
 import cz.cuni.mff.d3s.deeco.runners.DEECoSimulation;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoNode;
-import cz.cuni.mff.d3s.deeco.simulation.omnet.OMNeTUtils;
 import cz.cuni.mff.d3s.deeco.timer.DiscreteEventTimer;
 import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.AntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.ensemble.AntAssignmetSolver;
-import cz.cuni.mff.d3s.isola2016.ensemble.HeuristicSolver;
+import cz.cuni.mff.d3s.isola2016.ensemble.BruteforceSolver;
 import cz.cuni.mff.d3s.isola2016.ensemble.IntelligentAntPlanning;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.network.Network;
 import cz.cuni.mff.d3s.jdeeco.network.device.SimpleBroadcastDevice;
 import cz.cuni.mff.d3s.jdeeco.network.l2.strategy.KnowledgeInsertingStrategy;
-import cz.cuni.mff.d3s.jdeeco.network.omnet.OMNeTBroadcastDevice;
-import cz.cuni.mff.d3s.jdeeco.network.omnet.OMNeTSimulation;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 import cz.cuni.mff.d3s.jdeeco.position.PositionPlugin;
 import cz.cuni.mff.d3s.jdeeco.publishing.DefaultKnowledgePublisher;
@@ -58,8 +55,8 @@ public class DemoLauncher {
 		realm.addPlugin(ProabilisticRebroadcastStrategy.class);
 
 		// Ensemble solver
-		// AntAssignmetSolver solver = new BruteforceSolver();
-		AntAssignmetSolver solver = new HeuristicSolver();
+		AntAssignmetSolver solver = new BruteforceSolver();
+		//AntAssignmetSolver solver = new HeuristicSolver();
 		// AntAssignmetSolver solver = new ProactiveSolver();
 
 		// Create nodes

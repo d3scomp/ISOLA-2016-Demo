@@ -99,8 +99,11 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 		for (AntInfo ant : ants) {
 			for(TimestampedFoodSource source: ant.foods) {
 				if(!foods.contains(source)) {
-					// Not contained add
-					foods.add(source);
+					long off = container.getRuntimeFramework().getScheduler().getTimer().getCurrentMilliseconds() - source.timestamp;
+					if(off < maxTimeSkew) {
+						// Not contained add
+						foods.add(source);
+					}
 				} else {
 					// Contained, add only when newer
 					boolean add = false;

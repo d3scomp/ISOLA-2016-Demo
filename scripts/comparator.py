@@ -45,6 +45,12 @@ for key in sorted(data.keys()):
     xtckname.append(str(key) + " ms")
 
 plot.boxplot(pdata)
+
+for i in range(len(pdata)):
+    y = pdata[i]
+    x = np.random.normal(1 + i, 0.075, size=len(y))
+    plot.plot(x, y, 'bo', alpha=0.4)
+
 plot.xticks(xtckcnt, xtckname)
 plot.xlabel("Max allowed data age in ms")
 plot.ylabel("Solution value in collected foods")
