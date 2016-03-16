@@ -5,19 +5,21 @@ from time import sleep
 os.chdir("..")
 
 class Cfg(threading.Thread):
-    def __init__(self, seed=42, limit=30000, maxtimeskew=30000, numants = 10, radiorange = 10):
+    def __init__(self, seed, limit, maxtimeskew, numbigants, numsmallants, radiorange):
         super().__init__()
         self.seed = seed
         self.limit = limit
         self.maxtimeskew = maxtimeskew
-        self.numants = numants
+        self.numbigants = numbigants
+        self.numsmallants = numsmallants
         self.radiorange = radiorange
         
     def run(self):
         print("Running execution thread")
         wd = os.getcwd()
         os.system("export PATH=$PATH" + os.pathsep + wd + os.sep + "omnet")
-        args = '--numants ' + str(self.numants) + ' '
+        args = '--numbigants ' + str(self.numbigants) + ' '
+        args += '--numsmallants ' + str(self.numsmallants) + ' '
         args += '--seed ' + str(self.seed) + ' '
         args += '--limit ' + str(self.limit) + ' '
         args += '--maxtimeskew ' + str(self.maxtimeskew) + ' '
@@ -29,14 +31,15 @@ MAX_THREADS = 4
 cfgs = [];
 
 # Define configurations
-numants = 10
-radiorange = 5
-limit=600000
-seeds = range(0, 40)
+numbigants = 10
+numsmallants = 20
+radiorange = 3
+limit = 180000
+seeds = range(0, 10)
 maxtimeskews = [3000, 5000, 10000, 20000, 30000]
 for seed in seeds:
     for maxtimeskew in maxtimeskews:
-        cfgs.append(Cfg(numants=numants, seed=seed, limit=limit, maxtimeskew=maxtimeskew, radiorange=radiorange))
+        cfgs.append(Cfg(numbigants=numbigants, numsmallants=numsmallants, seed=seed, limit=limit, maxtimeskew=maxtimeskew, radiorange=radiorange))
     
 print("Running " + str(len(cfgs)) + " configurations")
 
@@ -46,6 +49,7 @@ while len(cfgs) > 0:
     if threading.active_count() >= MAX_THREADS:
         running.pop().join();
     
+    print("To go: " + str(len(cfgs)))
     sleep(3);
     cfg = cfgs.pop()
     running.append(cfg)

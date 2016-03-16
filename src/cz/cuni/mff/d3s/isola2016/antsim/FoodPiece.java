@@ -7,9 +7,9 @@ import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 public class FoodPiece {
 	public Position position;
-	Collection<AntPlugin> pullers = new LinkedList<>();
+	Collection<BigAntPlugin> pullers = new LinkedList<>();
 	
-	public FoodPiece(Position position, AntPlugin pullerA, AntPlugin pullerB) {
+	public FoodPiece(Position position, BigAntPlugin pullerA, BigAntPlugin pullerB) {
 		this.position = position;
 		this.pullers.add(pullerA);
 		this.pullers.add(pullerB);

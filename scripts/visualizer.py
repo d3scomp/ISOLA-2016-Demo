@@ -42,14 +42,18 @@ class PlottingCanvas(FigureCanvas):
         
     def plotRecordAnts(self, rec):
         col = 0
-        for ant in rec.ants:
+        for ant in rec.bigAnts:
             self.plot.plot(float(ant.position.x), float(ant.position.y), "g^")
             #self.plot.annotate("ant", xy=(float(ant.position.x), float(ant.position.y)), arrowprops=dict(facecolor='black', shrink=0.05))
+            col = col + 1
+            
+        for ant in rec.smallAnts:
+            self.plot.plot(float(ant.position.x), float(ant.position.y), "b*")
             col = col + 1
         
     def plotRecordAntTargets(self, rec):
         col = 0
-        for ant in rec.ants:
+        for ant in rec.bigAnts:
             try:
                 self.plot.plot([float(ant.position.x), float(ant.target.x)], [float(ant.position.y), float(ant.target.y)])
             except Exception as e:

@@ -20,7 +20,7 @@ import cz.cuni.mff.d3s.deeco.runtime.PluginInitFailedException;
 import cz.cuni.mff.d3s.deeco.scheduler.Scheduler;
 import cz.cuni.mff.d3s.deeco.task.TimerTask;
 import cz.cuni.mff.d3s.deeco.task.TimerTaskListener;
-import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin.State;
+import cz.cuni.mff.d3s.isola2016.antsim.BigAntPlugin.State;
 import cz.cuni.mff.d3s.isola2016.demo.Config;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
@@ -34,16 +34,17 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 
 	public Position antHill;
 	public int collectedFoodPieces = 0;
-	public Collection<AntPlugin> ants = new LinkedHashSet<>();
+	public Collection<BigAntPlugin> bigAnts = new LinkedHashSet<>();
+	public Collection<SmallAntPlugin> smallAnts = new LinkedHashSet<>();
 	public Collection<FoodSource> foodSources = new LinkedHashSet<>();
 	public Collection<FoodPiece> foodPieces = new LinkedHashSet<>();
 
-	Map<FoodSource, Set<AntPlugin>> lockedAtSource = new HashMap<>();
+	Map<FoodSource, Set<BigAntPlugin>> lockedAtSource = new HashMap<>();
 
 	private boolean initialized = false;
 	private final long startTime;
 	private final Random rand;
-	
+
 	// Configuration object (this is here just to be serialized)
 	public Config config;
 
@@ -70,8 +71,12 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 		}
 	}
 
-	void registerAnt(AntPlugin ant) {
-		ants.add(ant);
+	void registerAnt(BigAntPlugin ant) {
+		bigAnts.add(ant);
+	}
+
+	void registerAnt(SmallAntPlugin ant) {
+		smallAnts.add(ant);
 	}
 
 	public void addFoodSource(FoodSource source) {
@@ -111,8 +116,8 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 	 * Returns helper ant
 	 * 
 	 */
-	public AntPlugin getHelper(AntPlugin ant) {
-		for (AntPlugin helper : ants) {
+	public BigAntPlugin getHelper(BigAntPlugin ant) {
+		for (BigAntPlugin helper : bigAnts) {
 			if (helper != ant && helper.state == State.Locked
 					&& PosUtils.isSame(helper.getPosition(), ant.getPosition())) {
 				return helper;
@@ -127,7 +132,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 	 * @param source
 	 */
 	public void removeFoodSource(FoodSource source) {
-		for (AntPlugin ant : lockedAtSource.get(source)) {
+		for (BigAntPlugin ant : lockedAtSource.get(source)) {
 			if (ant.state == State.Locked) {
 				ant.state = State.Free;
 			}
@@ -139,7 +144,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 
 	private void resolveLocked() {
 		// Resolve Locked -> Pulling
-		for (AntPlugin ant : ants) {
+		for (BigAntPlugin ant : bigAnts) {
 			// Ant not locked
 			if (ant.state != State.Locked) {
 				continue;
@@ -152,7 +157,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 			}
 
 			// There is no helper
-			AntPlugin helper = getHelper(ant);
+			BigAntPlugin helper = getHelper(ant);
 			if (helper == null) {
 				continue;
 			}
@@ -176,7 +181,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 		for (FoodPiece piece : foodPieces) {
 			if (PosUtils.isSame(piece.position, antHill)) {
 				System.err.println("Food piece delivered");
-				for (AntPlugin puller : piece.pullers) {
+				for (BigAntPlugin puller : piece.pullers) {
 					puller.state = State.Free;
 					puller.pulledFoodPiece = null;
 				}
@@ -303,25 +308,30 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 	@Override
 	public void at(long time, Object triger) {
 		resolveLocked();
-		
+
 		removeFoodAtHill();
-		
+
 		maintainFoodSourcePopulation();
 
 		// Move free ants
-		for (AntPlugin ant : ants) {
-			if(ant.state == State.Free) {
+		for (BigAntPlugin ant : bigAnts) {
+			if (ant.state == State.Free) {
 				moveAnt(ant);
 			}
 		}
 
+		// Move small ants
+		for (AntPlugin ant : smallAnts) {
+			moveAnt(ant);
+		}
+
 		// Resolve food movements
-		for(FoodPiece piece: foodPieces) {
+		for (FoodPiece piece : foodPieces) {
 			moveFood(piece);
 		}
-				
+
 		// Log current state
-		if(time % 1000 == 0) { 
+		if (time % 1000 == 0) {
 			log(time);
 		}
 	}

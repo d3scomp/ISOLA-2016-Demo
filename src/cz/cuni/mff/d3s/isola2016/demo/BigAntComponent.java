@@ -18,14 +18,14 @@ import cz.cuni.mff.d3s.deeco.runtimelog.RuntimeLogger;
 import cz.cuni.mff.d3s.deeco.task.ParamHolder;
 import cz.cuni.mff.d3s.deeco.task.ProcessContext;
 import cz.cuni.mff.d3s.deeco.timer.CurrentTimeProvider;
-import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin;
-import cz.cuni.mff.d3s.isola2016.antsim.AntPlugin.State;
+import cz.cuni.mff.d3s.isola2016.antsim.BigAntPlugin;
+import cz.cuni.mff.d3s.isola2016.antsim.BigAntPlugin.State;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 @Component
-public class AntComponent {
+public class BigAntComponent {
 	public static final long MAX_FOOD_AGE_MS = 300000;
 	public static final double RANDOM_WALK_DIAMETER = 15;
 	public static final long GRIP_PATIENCE_MS = 30000;
@@ -44,7 +44,7 @@ public class AntComponent {
 	public CurrentTimeProvider clock;
 
 	@Local
-	public AntPlugin ant;
+	public BigAntPlugin ant;
 
 	@Local
 	public Random rand;
@@ -59,11 +59,11 @@ public class AntComponent {
 	public RuntimeLogger logger;
 
 	/// Initial knowledge
-	public AntComponent(int id, Random rand, DEECoNode node, Position antHill) {
+	public BigAntComponent(int id, Random rand, DEECoNode node, Position antHill) {
 		this.id = String.valueOf(id);
 		this.rand = rand;
 		this.clock = node.getRuntimeFramework().getScheduler().getTimer();
-		this.ant = node.getPluginInstance(AntPlugin.class);
+		this.ant = node.getPluginInstance(BigAntPlugin.class);
 		this.foods = new LinkedList<>();
 		this.state = State.Free;
 		this.mode = Mode.Searching;
@@ -80,19 +80,19 @@ public class AntComponent {
 	
 	@Process
 	@PeriodicScheduling(period = 500, order = 1)
-	public static void sensePosition(@In("ant") AntPlugin ant, @Out("position") ParamHolder<Position> position) {
+	public static void sensePosition(@In("ant") BigAntPlugin ant, @Out("position") ParamHolder<Position> position) {
 		position.value = ant.getPosition();
 	}
 
 	@Process
 	@PeriodicScheduling(period = 500, order = 2)
-	public static void senseState(@In("ant") AntPlugin ant, @Out("state") ParamHolder<State> state) {
+	public static void senseState(@In("ant") BigAntPlugin ant, @Out("state") ParamHolder<State> state) {
 		state.value = ant.getState();
 	}
 
 	@Process
 	@PeriodicScheduling(period = 500, order = 3)
-	public static void senseFood(@In("ant") AntPlugin ant, @In("clock") CurrentTimeProvider clock,
+	public static void senseFood(@In("ant") BigAntPlugin ant, @In("clock") CurrentTimeProvider clock,
 			@InOut("foods") ParamHolder<List<TimestampedFoodSource>> foods, @In("position") Position position) {
 		// Remove old food
 		Set<TimestampedFoodSource> toRemove = new LinkedHashSet<>();
@@ -103,7 +103,7 @@ public class AntComponent {
 			}
 
 			// Remove sources in range but not sensed (already collected sources)
-			if (source.position.euclidDistanceTo(position) < AntPlugin.SENSE_RANGE_M) {
+			if (source.position.euclidDistanceTo(position) < BigAntPlugin.SENSE_RANGE_M) {
 				boolean found = false;
 				for (FoodSource sensed : ant.getSensedFood()) {
 					if (PosUtils.isSame(sensed.position, source.position)) {
@@ -186,7 +186,7 @@ public class AntComponent {
 
 	@Process
 	@PeriodicScheduling(period = 500, order = 6)
-	public static void modeSwitch(@In("ant") AntPlugin ant, @InOut("mode") ParamHolder<Mode> mode,
+	public static void modeSwitch(@In("ant") BigAntPlugin ant, @InOut("mode") ParamHolder<Mode> mode,
 			@In("assignedFood") Position assignedFood, @In("position") Position position,
 			@In("clock") CurrentTimeProvider clock, @In("gripTimestamp") Long gripTimestamp) {
 		switch (mode.value) {
@@ -239,7 +239,7 @@ public class AntComponent {
 
 	@Process
 	@PeriodicScheduling(period = 500, order = 7)
-	public static void move(@In("ant") AntPlugin ant, @In("mode") Mode mode, @In("rand") Random rand,
+	public static void move(@In("ant") BigAntPlugin ant, @In("mode") Mode mode, @In("rand") Random rand,
 			@In("assignedFood") Position assignedFood, @Out("gripTimestamp") ParamHolder<Long> gripTimestamp,
 			@In("clock") CurrentTimeProvider clock) {
 		switch (mode) {
