@@ -42,7 +42,7 @@ public class ProabilisticRebroadcastStrategy extends RebroadcastStrategy {
 
 	@Override
 	public void processL2Packet(L2Packet packet) {
-		// Get average RSSI and report neighbour nodes
+		// Get average RSSI and report neighbor nodes
 		double rssiSum = 0;
 		int pktCnt = 0;
 		for (L1Packet l1 : packet.getReceivedInfo().srcFragments) {
@@ -68,8 +68,10 @@ public class ProabilisticRebroadcastStrategy extends RebroadcastStrategy {
 		}
 
 		// Calculate rebroadcast delay
-		double ratio = Math.min(1, Math.abs(Math.log(rssiAvg) / Math.log(RSSI_250m)));
-		long delayMs = 1 + (long) ((1 - ratio) * MAX_DELAY);
+		//double ratio = Math.min(1, Math.abs(Math.log(rssiAvg) / Math.log(RSSI_250m)));
+		//long delayMs = 1 + (long) ((1 - ratio) * MAX_DELAY);
+		
+		long delayMs = (long) (rand.nextDouble() * 250);
 		scheduleRebroadcast(packet, delayMs);
 				
 		// Rebroadcast packet
