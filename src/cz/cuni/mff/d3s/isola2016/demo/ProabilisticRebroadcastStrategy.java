@@ -11,8 +11,10 @@ import cz.cuni.mff.d3s.jdeeco.network.l2.L2Packet;
 import cz.cuni.mff.d3s.jdeeco.network.l2.strategy.RebroadcastStrategy;
 
 public class ProabilisticRebroadcastStrategy extends RebroadcastStrategy {
-	public final static long SEEN_HISTORY_LENGTH_MS = 3000;
-	public final static double STATIC_REBROADCAST_PROBABILITY = 0.75;
+	public final static long SEEN_HISTORY_LENGTH_MS = 1500;
+	public final static double STATIC_REBROADCAST_PROBABILITY = 0.95;
+	public final static long STATIC_REBROADCAST_DEALY_MEAN_MS = 25;
+	public final static long STATIC_REBROADCAST_DEALY_VARIANCE_MS = 5;
 	
 	private Map<String, Long> nodeToLastSeen = new HashMap<>();
 	private Random rand = new Random(42);
@@ -71,10 +73,10 @@ public class ProabilisticRebroadcastStrategy extends RebroadcastStrategy {
 		//double ratio = Math.min(1, Math.abs(Math.log(rssiAvg) / Math.log(RSSI_250m)));
 		//long delayMs = 1 + (long) ((1 - ratio) * MAX_DELAY);
 		
-		long delayMs = (long) (rand.nextDouble() * 250);
+		long delayMs = STATIC_REBROADCAST_DEALY_MEAN_MS + (long) ((0.5 - rand.nextDouble()) * STATIC_REBROADCAST_DEALY_VARIANCE_MS);
 		scheduleRebroadcast(packet, delayMs);
 				
-		// Rebroadcast packet
-		//layer2.sendL2Packet(packet, MANETBroadcastAddress.BROADCAST);
+		// Rebroadcast packet now
+//		layer2.sendL2Packet(packet, MANETBroadcastAddress.BROADCAST);
 	}
 }
