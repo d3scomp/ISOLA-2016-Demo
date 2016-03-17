@@ -25,11 +25,12 @@ public class AntPlugin implements DEECoPlugin, PositionProvider {
 	public static double SPEED_M_PER_S = 0.5;
 
 	protected AntWorldPlugin world;
+	protected DEECoContainer container;
 
 	public Position position;
 	private Position target;
 	public double totalTraveledDistance = 0;
-
+	
 	@Override
 	public List<Class<? extends DEECoPlugin>> getDependencies() {
 		return Arrays.asList(AntWorldPlugin.class, PositionPlugin.class);
@@ -37,6 +38,7 @@ public class AntPlugin implements DEECoPlugin, PositionProvider {
 
 	@Override
 	public void init(DEECoContainer container) throws PluginInitFailedException {
+		this.container = container;
 		// Get world plugin reference
 		world = container.getPluginInstance(AntWorldPlugin.class);
 		

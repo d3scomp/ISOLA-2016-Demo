@@ -55,7 +55,7 @@ public class DemoLauncher {
 		realm.addPlugin(ProabilisticRebroadcastStrategy.class);
 
 		// Ensemble solver
-		// AntAssignmetSolver solver = new BruteforceSolver();
+		//AntAssignmetSolver solver = new BruteforceSolver();
 		AntAssignmetSolver solver = new HeuristicSolver();
 		// AntAssignmetSolver solver = new ProactiveSolver();
 

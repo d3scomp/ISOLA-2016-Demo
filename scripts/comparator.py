@@ -11,27 +11,24 @@ print("Comparator")
 #logsDir = "../logs/10-99rebprob"
 logsDir = "../logs"
 
-logs = []
+data = {}
 
 for (dirpath, dirnames, filenames) in os.walk(logsDir):
     for dir in dirnames:
         if dir.startswith("world"):
             path = dirpath + os.sep + dir;
             print(path)
+            
+            
             log = simloader.load(path)
-            logs.append(log)
+            maxtimeskew = log[0].config.maxTimeSkewMs;
+            collected = log[len(log) - 1].collectedFoodPieces
+    
+            if not maxtimeskew in data:
+                data[maxtimeskew] = []
+            data[maxtimeskew].append(int(collected))
     break
 
-data = {}
-
-for log in logs:
-    maxtimeskew = log[0].config.maxTimeSkewMs;
-    collected = log[len(log) - 1].collectedFoodPieces
-    
-    if not maxtimeskew in data:
-        data[maxtimeskew] = []
-    
-    data[maxtimeskew].append(int(collected))
 
 pdata = []
 

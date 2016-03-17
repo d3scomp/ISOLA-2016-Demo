@@ -1,10 +1,15 @@
 package cz.cuni.mff.d3s.isola2016.antsim;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
 
+import cz.cuni.mff.d3s.deeco.knowledge.KnowledgeNotFoundException;
+import cz.cuni.mff.d3s.deeco.knowledge.ReadOnlyKnowledgeManager;
 import cz.cuni.mff.d3s.deeco.logging.Log;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoContainer;
+import cz.cuni.mff.d3s.deeco.runtime.DEECoRuntimeException;
 import cz.cuni.mff.d3s.deeco.runtime.PluginInitFailedException;
+import cz.cuni.mff.d3s.isola2016.ensemble.AntInfo;
 
 /**
  * Represents one ant in simulation
@@ -21,13 +26,15 @@ public class BigAntPlugin extends AntPlugin {
 		Free, Locked, Pulling
 	}
 	
-	public static double SENSE_RANGE_M = 3;
+	public static double SENSE_RANGE_M = 5;
 	// Realistic ant speed is 0.07 m/s
 	// Mechanic ants are a lot faster
 	public static double SPEED_M_PER_S = 0.5;
 
 	public State state;
 	public FoodPiece pulledFoodPiece;
+	public AntInfo antInfo;
+	public LinkedHashSet<AntInfo> otherAntInfo;
 	
 	@Override
 	public void init(DEECoContainer container) throws PluginInitFailedException {
@@ -66,5 +73,17 @@ public class BigAntPlugin extends AntPlugin {
 
 	public State getState() {
 		return state;
+	}
+	
+	public void updateAntInfo() {
+		try {
+			antInfo = new AntInfo(container.getRuntimeFramework().getContainer().getLocals().iterator().next());
+			otherAntInfo = new LinkedHashSet<>();
+			for (ReadOnlyKnowledgeManager remote : container.getRuntimeFramework().getContainer().getReplicas()) {
+				otherAntInfo.add(new AntInfo(remote));
+			}
+		} catch (KnowledgeNotFoundException e) {
+			new DEECoRuntimeException("Knowledge exstraction for simulation dump failed");
+		}
 	}
 }

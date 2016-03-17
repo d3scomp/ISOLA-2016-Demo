@@ -32,11 +32,11 @@ cfgs = [];
 
 # Define configurations
 numbigants = 10
-numsmallants = 20
+numsmallants = 40
 radiorange = 3
 limit = 180000
 seeds = range(0, 10)
-maxtimeskews = [3000, 5000, 10000, 20000, 30000]
+maxtimeskews = [5000, 10000, 20000, 30000]
 for seed in seeds:
     for maxtimeskew in maxtimeskews:
         cfgs.append(Cfg(numbigants=numbigants, numsmallants=numsmallants, seed=seed, limit=limit, maxtimeskew=maxtimeskew, radiorange=radiorange))

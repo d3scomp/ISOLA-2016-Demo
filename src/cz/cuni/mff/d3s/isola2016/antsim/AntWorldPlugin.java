@@ -30,7 +30,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 	public static final double FOOD_SOURCE_SPAWN_DIAMETER_M = 15;
 	public static final int FOOD_SOURCE_CAPACITY = 1;
 	public static final double DEFAULT_SOURCE_APPEAR_PROBABILITY_PER_S = 1.0 / 2.75; // 1.0 / 7.5
-	public static final double DEFAULT_SOURCE_DISAPPEAR_PROBABILITY_PER_S = 1.0 / 15.0; // 1.0 / 60
+	public static final double DEFAULT_SOURCE_DISAPPEAR_PROBABILITY_PER_S = 1.0 / 45.0; // 1.0 / 60
 
 	public Position antHill;
 	public int collectedFoodPieces = 0;
@@ -318,8 +318,9 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 			if (ant.state == State.Free) {
 				moveAnt(ant);
 			}
+			ant.updateAntInfo();
 		}
-
+		
 		// Move small ants
 		for (AntPlugin ant : smallAnts) {
 			moveAnt(ant);

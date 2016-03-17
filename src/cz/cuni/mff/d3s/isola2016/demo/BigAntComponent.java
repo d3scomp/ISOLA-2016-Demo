@@ -14,7 +14,6 @@ import cz.cuni.mff.d3s.deeco.annotations.Out;
 import cz.cuni.mff.d3s.deeco.annotations.PeriodicScheduling;
 import cz.cuni.mff.d3s.deeco.annotations.Process;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoNode;
-import cz.cuni.mff.d3s.deeco.runtimelog.RuntimeLogger;
 import cz.cuni.mff.d3s.deeco.task.ParamHolder;
 import cz.cuni.mff.d3s.deeco.task.ProcessContext;
 import cz.cuni.mff.d3s.deeco.timer.CurrentTimeProvider;
@@ -27,7 +26,7 @@ import cz.cuni.mff.d3s.jdeeco.position.Position;
 @Component
 public class BigAntComponent {
 	public static final long MAX_FOOD_AGE_MS = 300000;
-	public static final double RANDOM_WALK_DIAMETER = 15;
+	public static final double RANDOM_WALK_DIAMETER_M = 15;
 	public static final long GRIP_PATIENCE_MS = 30000;
 
 	public String id;
@@ -55,9 +54,6 @@ public class BigAntComponent {
 	@Local
 	public Long gripTimestamp;
 
-	@Local
-	public RuntimeLogger logger;
-
 	/// Initial knowledge
 	public BigAntComponent(int id, Random rand, DEECoNode node, Position antHill) {
 		this.id = String.valueOf(id);
@@ -68,7 +64,6 @@ public class BigAntComponent {
 		this.state = State.Free;
 		this.mode = Mode.Searching;
 		this.antHill = antHill;
-		this.logger = node.getRuntimeLogger();
 	}
 
 	/// Processes
@@ -245,7 +240,7 @@ public class BigAntComponent {
 		switch (mode) {
 		case Searching:
 			if (ant.isAtTarget()) {
-				ant.setTarget(PosUtils.getRandomPosition(rand, 0, 0, RANDOM_WALK_DIAMETER));
+				ant.setTarget(PosUtils.getRandomPosition(rand, 0, 0, RANDOM_WALK_DIAMETER_M));
 			}
 			break;
 		case ToFood:
