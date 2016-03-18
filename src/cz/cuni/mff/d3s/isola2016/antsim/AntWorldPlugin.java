@@ -29,9 +29,9 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 	public static final long SIM_STEP_MS = 100;
 	public static final double FOOD_SOURCE_SPAWN_DIAMETER_M = 15;
 	public static final int FOOD_SOURCE_CAPACITY = 1;
-	public static final double DEFAULT_SOURCE_APPEAR_PROBABILITY_PER_S = 1.0 / 15;
-	public static final double DEFAULT_SOURCE_DISAPPEAR_PROBABILITY_PER_S = 1.0 / 20.0;
-
+	public static final int SOURCE_COUNT = 4;
+	public static final double PER_SOURCE_DIE_PROBABILITY_PER_S = 1.0 / 10;
+	
 	public Position antHill;
 	public int collectedFoodPieces = 0;
 	public Collection<BigAntPlugin> bigAnts = new LinkedHashSet<>();
@@ -47,9 +47,6 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 
 	// Configuration object (this is here just to be serialized)
 	public Config config;
-
-	private double sourceAppearProbabilityPerSec = DEFAULT_SOURCE_APPEAR_PROBABILITY_PER_S;
-	private double sourceDisappearProbabilityPerSec = DEFAULT_SOURCE_DISAPPEAR_PROBABILITY_PER_S;
 
 	public AntWorldPlugin(Position antHill, Random rand) {
 		this.antHill = antHill;
@@ -287,7 +284,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 
 	private void maintainFoodSourcePopulation() {
 		// Add new food sources
-		if (rand.nextDouble() < sourceAppearProbabilityPerSec / (1000 / SIM_STEP_MS)) {
+		if(foodSources.size() < SOURCE_COUNT) {
 			addFoodSource(new FoodSource(PosUtils.getRandomPosition(rand, antHill, FOOD_SOURCE_SPAWN_DIAMETER_M),
 					FOOD_SOURCE_CAPACITY));
 		}
@@ -295,7 +292,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 		// Remove food sources
 		List<FoodSource> toRemove = new LinkedList<>();
 		for (FoodSource source : foodSources) {
-			if (rand.nextDouble() < sourceDisappearProbabilityPerSec / (1000 / SIM_STEP_MS)) {
+			if (rand.nextDouble() < PER_SOURCE_DIE_PROBABILITY_PER_S / (1000 / SIM_STEP_MS)) {
 				toRemove.add(source);
 			}
 		}
