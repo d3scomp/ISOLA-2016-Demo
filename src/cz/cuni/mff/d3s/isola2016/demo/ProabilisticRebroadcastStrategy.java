@@ -12,7 +12,7 @@ import cz.cuni.mff.d3s.jdeeco.network.l2.strategy.RebroadcastStrategy;
 
 public class ProabilisticRebroadcastStrategy extends RebroadcastStrategy {
 	public final static long SEEN_HISTORY_LENGTH_MS = 1500;
-	public final static double STATIC_REBROADCAST_PROBABILITY = 0.95;
+	public final static double STATIC_REBROADCAST_PROBABILITY = 0.90;
 	public final static long STATIC_REBROADCAST_DEALY_MEAN_MS = 25;
 	public final static long STATIC_REBROADCAST_DEALY_VARIANCE_MS = 5;
 	

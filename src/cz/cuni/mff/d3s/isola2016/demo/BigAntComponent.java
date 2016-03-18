@@ -1,8 +1,11 @@
 package cz.cuni.mff.d3s.isola2016.demo;
 
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -27,6 +30,8 @@ import cz.cuni.mff.d3s.jdeeco.position.Position;
 public class BigAntComponent {
 	public static final long MAX_FOOD_AGE_MS = 300000;
 	public static final double RANDOM_WALK_DIAMETER_M = 15;
+	public static final double RANDOM_WALK_DIFF_M = 1;
+	public static final double RANDOM_WALK_NOFEAR_M = 15;
 	public static final long GRIP_PATIENCE_MS = 30000;
 
 	public String id;
@@ -35,6 +40,9 @@ public class BigAntComponent {
 	public Position assignedFood;
 	public Mode mode;
 	public Long time;
+	
+	@Local
+	public Map<String, Position> otherPos;
 
 	@Local
 	public State state;
@@ -64,6 +72,8 @@ public class BigAntComponent {
 		this.state = State.Free;
 		this.mode = Mode.Searching;
 		this.antHill = antHill;
+		this.time = clock.getCurrentMilliseconds();
+		this.otherPos = new LinkedHashMap<>();
 	}
 
 	/// Processes
@@ -236,11 +246,11 @@ public class BigAntComponent {
 	@PeriodicScheduling(period = 500, order = 7)
 	public static void move(@In("ant") BigAntPlugin ant, @In("mode") Mode mode, @In("rand") Random rand,
 			@In("assignedFood") Position assignedFood, @Out("gripTimestamp") ParamHolder<Long> gripTimestamp,
-			@In("clock") CurrentTimeProvider clock) {
+			@In("clock") CurrentTimeProvider clock, @In("otherPos") Map<String, Position> otherPos) {
 		switch (mode) {
 		case Searching:
 			if (ant.isAtTarget()) {
-				ant.setTarget(PosUtils.getRandomPosition(rand, 0, 0, RANDOM_WALK_DIAMETER_M));
+				ant.setTarget(getRandomWalkPos(otherPos.values(), ant.getPosition(), rand));
 			}
 			break;
 		case ToFood:
@@ -260,5 +270,35 @@ public class BigAntComponent {
 			// TODO: use ant hill position
 			ant.setTarget(new Position(0, 0));
 		}
+	}
+	
+	/**
+	 * Picks N random close targets and uses the one which is the most distant from all other
+	 */
+	private static Position getRandomWalkPos(Collection<Position> others, Position current, Random rand) {
+		Position result = null;
+		double colDist = 0;
+		while(result == null || result.euclidDistanceTo(new Position(0, 0)) > RANDOM_WALK_DIAMETER_M) {
+			result = null;
+			for(int i = 0; i < 10; ++i) {
+				Position newPos = PosUtils.getRandomPosition(rand, current, RANDOM_WALK_DIFF_M);
+				double newDist = collectiveDistance(others, newPos);
+				if(result == null || newDist > colDist) {
+					result = newPos;
+					colDist = newDist;
+				}
+			}
+		}
+		return result;
+	}
+	
+	private static double collectiveDistance(Collection<Position> collective, Position sample) {
+		double res = 0;
+		for(Position pos: collective) {
+			double dist = pos.euclidDistanceTo(sample);
+			if(dist < RANDOM_WALK_NOFEAR_M)
+				res += dist; 
+		}
+		return res;
 	}
 }

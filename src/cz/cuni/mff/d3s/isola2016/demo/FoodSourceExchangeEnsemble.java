@@ -18,27 +18,28 @@ public class FoodSourceExchangeEnsemble {
 	public static boolean membership(@In("coord.id") String coordId, @In("member.id") String memberId) {
 		return !coordId.equals(memberId);
 	}
-	
+
 	@KnowledgeExchange
-	public static void exchange(@In("coord.foods") List<TimestampedFoodSource> coordFoods, @InOut("member.foods") ParamHolder<List<TimestampedFoodSource>> memberFoods) {
+	public static void exchange(@In("coord.foods") List<TimestampedFoodSource> coordFoods,
+			@InOut("member.foods") ParamHolder<List<TimestampedFoodSource>> memberFoods) {
 		// Mapping coord foods -> member foods
-		for(TimestampedFoodSource coord: coordFoods) {
+		for (TimestampedFoodSource coord : coordFoods) {
 			// Try to update age
 			boolean updated = false;
-			for(TimestampedFoodSource member: memberFoods.value) {
-				if(PosUtils.isSame(member.position, coord.position)) {
+			for (TimestampedFoodSource member : memberFoods.value) {
+				if (PosUtils.isSame(member.position, coord.position)) {
 					updated = true;
-					if(member.timestamp < coord.timestamp) {
+					if (member.timestamp < coord.timestamp) {
 						member.timestamp = coord.timestamp;
 						member.portions = coord.portions;
 					}
 				}
 			}
-			
-			if(updated) {
+
+			if (updated) {
 				continue;
 			}
-			
+
 			// Add new record
 			memberFoods.value.add(coord);
 		}

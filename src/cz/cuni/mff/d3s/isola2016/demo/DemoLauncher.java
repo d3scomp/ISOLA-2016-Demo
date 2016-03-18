@@ -18,10 +18,9 @@ import cz.cuni.mff.d3s.jdeeco.network.l2.strategy.KnowledgeInsertingStrategy;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 import cz.cuni.mff.d3s.jdeeco.position.PositionPlugin;
 import cz.cuni.mff.d3s.jdeeco.publishing.DefaultKnowledgePublisher;
-import cz.cuni.mff.d3s.jdeeco.publishing.KnowledgeSizeSampler;
 
 public class DemoLauncher {
-	public static final double ANT_SPAWN_DIAMETER_M = 5;
+	public static final double ANT_SPAWN_DIAMETER_M = 10;
 	public static final Position ANT_HILL_POS = new Position(0, 0);
 	public static final String LOG_PATH = "logs/runtime";
 
@@ -67,6 +66,7 @@ public class DemoLauncher {
 					new PositionPlugin(PosUtils.getRandomPosition(rand, 0, 0, ANT_SPAWN_DIAMETER_M)),
 					new IntelligentAntPlanning(solver, cfg.maxTimeSkewMs));
 			node.deployComponent(new BigAntComponent(nodeCnt, new Random(rand.nextLong()), node, ANT_HILL_POS));
+			node.deployEnsemble(AntPosExchangeEnsemble.class);
 		}
 
 		// Create small ant nodes
