@@ -41,37 +41,47 @@ class PlottingCanvas(FigureCanvas):
         
     def plotRecordAnts(self, rec):
         # SMALL
-        for ant in rec.smallAnts:
-            self.plot.plot(float(ant.position.x), float(ant.position.y), "b*")
+        if hasattr(rec, "smallAnts"):
+            for ant in rec.smallAnts:
+                self.plot.plot(float(ant.position.x), float(ant.position.y), "*", color="lightgrey", linestyle="none")
                    
         # BIG
         for ant in rec.bigAnts:
-            # BIG KNOWN ANTS
-            if hasattr(ant, "otherAntInfo"):
-                print("Others: " + str(len(ant.otherAntInfo)))
-                for other in ant.otherAntInfo:
-                    self.plot.plot([float(ant.position.x), float(other.position.x)], [float(ant.position.y), float(other.position.y)], color="green", linestyle="dotted")
+            if int(ant.antInfo.id) == 1:
+                # BIG KNOWN ANTS
+                if hasattr(ant, "otherAntInfo"):
+                    for other in ant.otherAntInfo:
+                        green = "green" 
+                        if hasattr(other, "time"):
+                            age = rec.time - other.time
+                            print(age)
+                            if age > 10000:
+                                green = "yellow"
                         
-            # BIG KNOWN FOODS - LOCAL
-            if hasattr(ant.antInfo, "foods"):
-                for food in ant.antInfo.foods:
-                    if food.portions > 0:
-                        self.plot.plot([float(ant.position.x), float(food.position.x)], [float(ant.position.y), float(food.position.y)], color="blue", linestyle="dotted")
-                        
-            # BIG KNOWN FOODS - REMOTE
-            if hasattr(ant, "otherAntInfo"):
-                for other in ant.otherAntInfo:
-                    if hasattr(other, "foods"):
-                        for food in other.foods:
-                            if food.portions > 0:
-                                self.plot.plot([float(ant.position.x), float(food.position.x)], [float(ant.position.y), float(food.position.y)], color="blue", linestyle="dotted")
-                        
-            # TARGET
-            if hasattr(ant, "target"):
-                self.plot.plot([float(ant.position.x), float(ant.target.x)], [float(ant.position.y), float(ant.target.y)], color="yellow", linestyle="dashed")
+                        self.plot.plot([float(ant.position.x), float(other.position.x)], [float(ant.position.y), float(other.position.y)], color=green, linestyle="dashed")
+            
+            
+                # BIG KNOWN FOODS - LOCAL
+                if hasattr(ant.antInfo, "foods"):
+                    for food in ant.antInfo.foods:
+                        if food.portions > 0:
+                            self.plot.plot([float(ant.position.x), float(food.position.x)], [float(ant.position.y), float(food.position.y)], color="red", linestyle="dashed")
+                            
+                # BIG KNOWN FOODS - REMOTE
+                if hasattr(ant, "otherAntInfo"):
+                    for other in ant.otherAntInfo:
+                        if hasattr(other, "foods"):
+                            for food in other.foods:
+                                if food.portions > 0:
+                                    self.plot.plot([float(ant.position.x), float(food.position.x)], [float(ant.position.y), float(food.position.y)], color="red", linestyle="dashed")
+                            
+                # TARGET
+                if hasattr(ant, "target"):
+                    self.plot.plot([float(ant.position.x), float(ant.target.x)], [float(ant.position.y), float(ant.target.y)], color="blue", linestyle="dashed")
                 
             # ANT
             self.plot.plot(float(ant.position.x), float(ant.position.y), "g^")
+            
         
     def plotRecordSources(self, rec):
         if hasattr(rec, 'foodSources'):
