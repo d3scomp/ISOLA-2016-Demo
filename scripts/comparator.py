@@ -20,9 +20,9 @@ for (dirpath, dirnames, filenames) in os.walk(logsDir):
             print(path)
             
             
-            log = simloader.load(path)
-            maxtimeskew = log[0].config.maxTimeSkewMs;
-            collected = log[len(log) - 1].collectedFoodPieces
+            log = simloader.loadLast(path)
+            maxtimeskew = log.config.maxTimeSkewMs;
+            collected = log.collectedFoodPieces
     
             if not maxtimeskew in data:
                 data[maxtimeskew] = []
