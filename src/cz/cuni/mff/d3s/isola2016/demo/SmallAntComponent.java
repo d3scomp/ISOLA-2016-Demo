@@ -18,6 +18,7 @@ import cz.cuni.mff.d3s.jdeeco.position.Position;
 @Component
 public class SmallAntComponent {
 	public static final double RANDOM_WALK_DIAMETER = 15;
+	public static final double RANDOM_WALK_DIAMETER_DIFF = 1;
 	public String id;
 
 	@Local
@@ -52,7 +53,11 @@ public class SmallAntComponent {
 	public static void move(@In("ant") SmallAntPlugin ant, @In("rand") Random rand,
 			@In("clock") CurrentTimeProvider clock) {
 		if (ant.isAtTarget() || ant.getTarget() == null) {
-			ant.setTarget(PosUtils.getRandomPosition(rand, 0, 0, RANDOM_WALK_DIAMETER));
+			Position newPos = null;
+			while(newPos == null || newPos.euclidDistanceTo(new Position(0, 0)) > RANDOM_WALK_DIAMETER) {
+				newPos = PosUtils.getRandomPosition(rand, ant.getPosition().x, ant.getPosition().y, RANDOM_WALK_DIAMETER_DIFF);
+			}
+			ant.setTarget(newPos);
 		}
 	}
 }
