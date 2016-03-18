@@ -9,7 +9,7 @@ import cz.cuni.mff.d3s.isola2016.antsim.AntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.BigAntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.SmallAntPlugin;
 import cz.cuni.mff.d3s.isola2016.ensemble.AntAssignmetSolver;
-import cz.cuni.mff.d3s.isola2016.ensemble.HeuristicSolver;
+import cz.cuni.mff.d3s.isola2016.ensemble.BruteforceSolver;
 import cz.cuni.mff.d3s.isola2016.ensemble.IntelligentAntPlanning;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.network.Network;
@@ -54,8 +54,8 @@ public class DemoLauncher {
 		realm.addPlugin(ProabilisticRebroadcastStrategy.class);
 
 		// Ensemble solver
-		//AntAssignmetSolver solver = new BruteforceSolver();
-		AntAssignmetSolver solver = new HeuristicSolver();
+		AntAssignmetSolver solver = new BruteforceSolver();
+		//AntAssignmetSolver solver = new HeuristicSolver();
 		// AntAssignmetSolver solver = new ProactiveSolver();
 
 		// Create big ant nodes

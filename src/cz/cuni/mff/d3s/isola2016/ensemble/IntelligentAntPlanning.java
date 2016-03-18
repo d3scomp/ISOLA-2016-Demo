@@ -98,6 +98,8 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 						- ant.time;
 				if (age < maxTimeSkew) {
 					ants.add(ant);
+				} else {
+					System.err.println("AGE: " + age + " > " + maxTimeSkew);
 				}
 			}
 		}

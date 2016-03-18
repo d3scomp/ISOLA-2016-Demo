@@ -278,9 +278,10 @@ public class BigAntComponent {
 	private static Position getRandomWalkPos(Collection<Position> others, Position current, Random rand) {
 		Position result = null;
 		double colDist = 0;
-		while(result == null || result.euclidDistanceTo(new Position(0, 0)) > RANDOM_WALK_DIAMETER_M) {
+		int rounds = 10;
+		while(rounds > 0 && (result == null || result.euclidDistanceTo(new Position(0, 0)) > RANDOM_WALK_DIAMETER_M)) {
 			result = null;
-			for(int i = 0; i < 10; ++i) {
+			for(int i = 0; i < rounds; ++i) {
 				Position newPos = PosUtils.getRandomPosition(rand, current, RANDOM_WALK_DIFF_M);
 				double newDist = collectiveDistance(others, newPos);
 				if(result == null || newDist > colDist) {
@@ -288,6 +289,10 @@ public class BigAntComponent {
 					colDist = newDist;
 				}
 			}
+			rounds--;
+		}
+		if(rounds == 0) {
+			result = PosUtils.getRandomPosition(rand, new Position(0, 0), RANDOM_WALK_DIAMETER_M);
 		}
 		return result;
 	}
