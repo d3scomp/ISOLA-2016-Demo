@@ -7,15 +7,16 @@ import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 public class ProactiveSolver implements AntAssignmetSolver {
 	@Override
-	public Position solve(Collection<AntInfo> ants, Collection<FoodSource> foods, AntInfo localAnt, Position antHill) {
-		Position nearestPosition = null;
-		
-		for(FoodSource source: foods) {
-			if(nearestPosition == null || source.position.euclidDistanceTo(localAnt.position) < nearestPosition.euclidDistanceTo(localAnt.position)) {
-				nearestPosition = source.position;
+	public Result solve(Collection<AntInfo> ants, Collection<FoodSource> foods, AntInfo localAnt, Position antHill) {
+		FoodSource nearestSource = null;
+
+		for (FoodSource source : foods) {
+			if (nearestSource == null || source.position.euclidDistanceTo(localAnt.position) < nearestSource.position
+					.euclidDistanceTo(localAnt.position)) {
+				nearestSource = source;
 			}
 		}
-		
-		return nearestPosition;
+
+		return new Result(nearestSource, null);
 	}
 }

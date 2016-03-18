@@ -1,5 +1,6 @@
 package cz.cuni.mff.d3s.isola2016.ensemble;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -12,12 +13,15 @@ import cz.cuni.mff.d3s.isola2016.demo.Mode;
 import cz.cuni.mff.d3s.isola2016.demo.TimestampedFoodSource;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
-public class AntInfo {
+@SuppressWarnings("serial")
+public class AntInfo implements Serializable {
 	public String id;
 	public Position position;
 	public List<TimestampedFoodSource> foods;
 	public Mode mode;
 	public Long time;
+	public AntInfo assistant;
+	public Position assignedFood;
 	
 	@SuppressWarnings("unchecked")
 	public AntInfo(ReadOnlyKnowledgeManager knowledgeManager) throws KnowledgeNotFoundException {
@@ -26,21 +30,27 @@ public class AntInfo {
 		KnowledgePath foodsPath = KnowledgePathExt.createKnowledgePath("foods");
 		KnowledgePath modePath = KnowledgePathExt.createKnowledgePath("mode");
 		KnowledgePath timePath = KnowledgePathExt.createKnowledgePath("time");
-		ValueSet set = knowledgeManager.get(Arrays.asList(idPath, foodsPath, positionPath, modePath, timePath));
+		KnowledgePath assistantPath = KnowledgePathExt.createKnowledgePath("assistant");
+		KnowledgePath assistantFoodPath = KnowledgePathExt.createKnowledgePath("assignedFood");
+		ValueSet set = knowledgeManager.get(Arrays.asList(idPath, foodsPath, positionPath, modePath, timePath, assistantPath, assistantFoodPath));
 
 		this.id = (String) set.getValue(idPath);
 		this.position  = (Position) set.getValue(positionPath);
 		this.foods = (List<TimestampedFoodSource>) set.getValue(foodsPath);
 		this.mode = (Mode) set.getValue(modePath);
 		this.time = (Long) set.getValue(timePath);
+		this.assistant = (AntInfo) set.getValue(assistantPath);
+		this.assignedFood = (Position) set.getValue(assistantFoodPath);
 	}
 
-	public AntInfo(String id, Position position, List<TimestampedFoodSource> foods, Mode mode, Long time) {
+	public AntInfo(String id, Position position, List<TimestampedFoodSource> foods, Mode mode, Long time, AntInfo assistant, Position assignedFood) {
 		this.id = id;
 		this.position = position;
 		this.foods = foods;
 		this.mode = mode;
 		this.time = time;
+		this.assistant = assistant;
+		this.assignedFood = assignedFood;
 	}
 
 	@Override

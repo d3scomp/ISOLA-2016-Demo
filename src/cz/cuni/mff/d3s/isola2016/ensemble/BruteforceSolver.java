@@ -168,7 +168,7 @@ public class BruteforceSolver implements AntAssignmetSolver {
 		return badness;
 	}
 
-	public Position solve(Collection<AntInfo> ants, Collection<FoodSource> foods, AntInfo localAnt, Position antHill) {
+	public Result solve(Collection<AntInfo> ants, Collection<FoodSource> foods, AntInfo localAnt, Position antHill) {
 		// Generate all possible solutions
 		System.out.print("Fake intelligence: Ants: " + ants.size() + " foods: " + foods.size() + " >>> ");
 		System.out.flush();
@@ -186,12 +186,20 @@ public class BruteforceSolver implements AntAssignmetSolver {
 			}
 		}
 
+		AntInfo assistant = null;
+		
 		// Get food assigned to local ant
 		FoodSource sourceAssignedToLocalAnt = null;
 		if (bestSolution != null) {
 			for (Triplet t : bestSolution) {
-				if (t.a == localAnt || t.b == localAnt) {
+				if (t.a == localAnt) {
 					sourceAssignedToLocalAnt = t.c;
+					assistant = t.b;
+				}
+				
+				if(t.b == localAnt) {
+					sourceAssignedToLocalAnt = t.c;
+					assistant = t.a;
 				}
 			}
 		}
@@ -204,10 +212,10 @@ public class BruteforceSolver implements AntAssignmetSolver {
 		}
 
 		// Set assigned food source local knowledge
-		Position assignedPosition = null;
 		if (sourceAssignedToLocalAnt != null) {
-			assignedPosition = sourceAssignedToLocalAnt.position;
+			return new Result(sourceAssignedToLocalAnt, assistant);
+		} else {
+			return new Result(null, null);
 		}
-		return assignedPosition;
 	}
 }

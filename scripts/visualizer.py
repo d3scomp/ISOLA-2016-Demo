@@ -79,6 +79,17 @@ class PlottingCanvas(FigureCanvas):
                 if hasattr(ant, "target"):
                     self.plot.plot([float(ant.position.x), float(ant.target.x)], [float(ant.position.y), float(ant.target.y)], color="blue", linestyle="dashed")
                 
+                # ASSISTANT
+                if hasattr(ant.antInfo, "assistant"):
+                    assistant = ant.antInfo.assistant
+                    self.plot.plot([float(ant.position.x), float(assistant.position.x)], [float(ant.position.y), float(assistant.position.y)], color="green", linestyle="solid")
+                    
+                # ASSIGNED FOOD
+                if hasattr(ant.antInfo, "assignedFoodPos"):
+                    assignedFoodPos = ant.antInfo.assignedFood
+                    self.plot.plot([float(ant.position.x), float(assignedFoodPos.x)], [float(ant.position.y), float(assignedFoodPos.y)], color="red", linestyle="solid")
+                
+                
             # ANT
             self.plot.plot(float(ant.position.x), float(ant.position.y), "g^")
             

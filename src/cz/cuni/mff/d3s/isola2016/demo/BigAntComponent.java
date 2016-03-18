@@ -23,6 +23,7 @@ import cz.cuni.mff.d3s.deeco.timer.CurrentTimeProvider;
 import cz.cuni.mff.d3s.isola2016.antsim.BigAntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.BigAntPlugin.State;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
+import cz.cuni.mff.d3s.isola2016.ensemble.AntInfo;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
@@ -61,6 +62,8 @@ public class BigAntComponent {
 
 	@Local
 	public Long gripTimestamp;
+	
+	public AntInfo assistant;
 
 	/// Initial knowledge
 	public BigAntComponent(int id, Random rand, DEECoNode node, Position antHill) {

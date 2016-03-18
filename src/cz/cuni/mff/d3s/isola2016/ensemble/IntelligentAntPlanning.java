@@ -23,6 +23,7 @@ import cz.cuni.mff.d3s.deeco.task.TimerTaskListener;
 import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
 import cz.cuni.mff.d3s.isola2016.demo.DemoLauncher;
 import cz.cuni.mff.d3s.isola2016.demo.TimestampedFoodSource;
+import cz.cuni.mff.d3s.isola2016.ensemble.AntAssignmetSolver.Result;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
@@ -60,6 +61,18 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 		try {
 			ChangeSet changes = new ChangeSet();
 			changes.setValue(knowledgePath, foodSourcePosition);
+			knowledgeManager.update(changes);
+
+		} catch (KnowledgeUpdateException e) {
+			throw new DEECoRuntimeException("Knowledge insertion failed", e);
+		}
+	}
+	
+	private void setAssignedAssistantKnowledge(KnowledgeManager knowledgeManager, AntInfo assistant) {
+		KnowledgePath knowledgePath = KnowledgePathExt.createKnowledgePath("assistant");
+		try {
+			ChangeSet changes = new ChangeSet();
+			changes.setValue(knowledgePath, assistant);
 			knowledgeManager.update(changes);
 
 		} catch (KnowledgeUpdateException e) {
@@ -179,9 +192,9 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 			}
 		}
 
-		Position assignedPosition = solver.solve(ants, outFoods, localAnt, DemoLauncher.ANT_HILL_POS);
-
+		Result assigned = solver.solve(ants, outFoods, localAnt, DemoLauncher.ANT_HILL_POS);
 		setAssignedFoodSourceKnowledge(container.getRuntimeFramework().getContainer().getLocals().iterator().next(),
-				assignedPosition);
+				assigned.food!=null?assigned.food.position:null);
+		setAssignedAssistantKnowledge(container.getRuntimeFramework().getContainer().getLocals().iterator().next(), assigned.assistingAnt);
 	}
 }

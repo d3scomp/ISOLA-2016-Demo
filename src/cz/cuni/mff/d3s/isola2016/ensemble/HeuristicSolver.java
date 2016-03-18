@@ -47,9 +47,10 @@ public class HeuristicSolver implements AntAssignmetSolver {
 	}
 
 	@Override
-	public Position solve(Collection<AntInfo> ants, Collection<FoodSource> foods, AntInfo localAnt, Position antHill) {
+	public Result solve(Collection<AntInfo> ants, Collection<FoodSource> foods, AntInfo localAnt, Position antHill) {
 		LinkedHashSet<AntInfo> remaing = new LinkedHashSet<>(ants);
 		Map<AntInfo, FoodSource> done = new HashMap<>();
+		Map<AntInfo, AntInfo> donePairs = new HashMap<>();
 		
 	/*	for(FoodSource source: foods) {
 			System.out.println("Food: " + source.position);
@@ -84,6 +85,8 @@ public class HeuristicSolver implements AntAssignmetSolver {
 			//	System.out.println("Optimal pair: " + optimalPair.a.id + " " + optimalPair.b.id + " " + optimalPair.nearestFoodSource.position + " " + optimalPair.nearestFoodSource.portions);
 				done.put(optimalPair.a, optimalPair.nearestFoodSource);
 				done.put(optimalPair.b, optimalPair.nearestFoodSource);
+				donePairs.put(optimalPair.a, optimalPair.b);
+				donePairs.put(optimalPair.b, optimalPair.a);
 			
 				remaing.remove(optimalPair.a);
 				remaing.remove(optimalPair.b);
@@ -96,10 +99,11 @@ public class HeuristicSolver implements AntAssignmetSolver {
 				
 		System.out.println("Local ant: " + localAnt.id);
 		FoodSource assignedFood = done.get(localAnt);
+		AntInfo assistant = donePairs.get(localAnt);
 		if(assignedFood == null) {
-			return null;
+			return new Result(null, null);
 		} else {
-			return assignedFood.position;
+			return new Result(assignedFood, assistant);
 		}
 	}
 
