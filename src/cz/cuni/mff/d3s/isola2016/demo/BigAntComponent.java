@@ -29,7 +29,7 @@ import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 @Component
 public class BigAntComponent {
-	public static final long MAX_FOOD_AGE_MS = 300000;
+	public static final long MAX_FOOD_AGE_MS = 30000;
 	public static final double RANDOM_WALK_DIAMETER_M = 15;
 	public static final double RANDOM_WALK_DIFF_M = 1;
 	public static final double RANDOM_WALK_NOFEAR_M = 15;
@@ -104,10 +104,11 @@ public class BigAntComponent {
 			// Remove too old source data
 			if (clock.getCurrentMilliseconds() - source.timestamp > MAX_FOOD_AGE_MS && source.portions != 0) {
 				toRemove.add(source);
+				System.err.println("TOO OLD FOOD REMOVED");
 			}
 
 			// Remove sources in range but not sensed (already collected sources)
-			if (source.position.euclidDistanceTo(position) < BigAntPlugin.SENSE_RANGE_M) {
+			if (source.position.euclidDistanceTo(position) < BigAntPlugin.SENSE_RANGE_M && source.portions > 0) {
 				boolean found = false;
 				for (FoodSource sensed : ant.getSensedFood()) {
 					if (PosUtils.isSame(sensed.position, source.position)) {
@@ -197,7 +198,7 @@ public class BigAntComponent {
 			break;
 		case ToFood:
 			// Cancel move to food
-			if (assignedFood == null || PosUtils.isSame(assignedFood, ant.getTarget())) {
+			if (assignedFood == null) {
 				mode.value = Mode.Searching;
 			}
 			// Grip the food
@@ -207,6 +208,10 @@ public class BigAntComponent {
 					if (PosUtils.isSame(source.position, assignedFood) && source.portions > 0) {
 						mode.value = Mode.Grip;
 					}
+				}
+				
+				if(mode.value != Mode.Grip) {
+					System.err.println("NOT SURE");
 				}
 			}
 			break;

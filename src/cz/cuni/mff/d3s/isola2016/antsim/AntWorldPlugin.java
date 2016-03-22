@@ -329,7 +329,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 		}
 
 		// Log current state
-		if (time % 1000 == 0) {
+		if (time % 10000 == 0) {
 			log(time);
 		}
 	}

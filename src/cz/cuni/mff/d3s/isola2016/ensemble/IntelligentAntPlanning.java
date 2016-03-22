@@ -139,32 +139,15 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 				}
 			}
 		}
-
-		System.out.println("Food ages: ");
+		
+/*		System.out.println("Food ages: ");
 		for (TimestampedFoodSource food : foods) {
 			if (food.portions > 0) {
 				long age = container.getRuntimeFramework().getScheduler().getTimer().getCurrentMilliseconds()
 						- food.timestamp;
-				System.out.println(food.position.toString() + " " + age + " ms");
+				System.out.println(food.position.toString() + " " + age + " ms" + " " + food.portions + " portions");
 			}
-		}
-
-		// Filter out old ants data
-		List<AntInfo> oldAntsToRemove = new LinkedList<>();
-		for (AntInfo ant : ants) {
-			if (ant.time == null) {
-				System.err.println("Removing ant infor, time == null");
-				oldAntsToRemove.add(ant);
-			} else {
-				long off = container.getRuntimeFramework().getScheduler().getTimer().getCurrentMilliseconds()
-						- ant.time;
-				if (off > maxTimeSkew) {
-					System.err.println("Removing ant info, time is off by: " + off);
-					oldAntsToRemove.add(ant);
-				}
-			}
-		}
-		ants.removeAll(oldAntsToRemove);
+		}*/
 
 		// Filter out pulling ants
 		List<AntInfo> antsToRemove = new LinkedList<>();
