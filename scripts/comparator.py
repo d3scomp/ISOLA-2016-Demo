@@ -32,6 +32,7 @@ for (dirpath, dirnames, filenames) in os.walk(logsDir):
 
 pdata = []
 
+# Boxplot names
 cnt = 1
 xtckcnt = []
 xtckname = []
@@ -41,8 +42,10 @@ for key in sorted(data.keys()):
     cnt = cnt + 1
     xtckname.append(str(key) + " ms")
 
+# Box-plots
 plot.boxplot(pdata)
 
+# value dots
 for i in range(len(pdata)):
     y = pdata[i]
     x = np.random.normal(1 + i, 0.075, size=len(y))
