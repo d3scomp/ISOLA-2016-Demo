@@ -1,7 +1,10 @@
 package cz.cuni.mff.d3s.isola2016.demo;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 
 import cz.cuni.mff.d3s.deeco.model.runtime.custom.KnowledgePathExt;
@@ -43,15 +46,19 @@ public class CachingRebroadcastStrategy extends RebroadcastStrategy implements T
 
 	@Override
 	public void at(long time, Object triger) {
+		// Drop bounded data
+		List<Byte> toRemove = new LinkedList<>();
+		for(Entry<Byte, L2Packet> entry: cache.entrySet()) {
+			if(isBounded(entry.getValue()) || customBounded(entry.getValue())) {
+				toRemove.add(entry.getKey());
+			}
+		}
+		for(Byte remove: toRemove) {
+			cache.remove(remove);
+		}
+		
+		// Rebroadcast cache content
 		for(L2Packet packet: cache.values()) {
-			if(isBounded(packet)) {
-				continue;
-			}
-			
-			if(customBounded(packet)) {
-				continue;
-			}
-			
 			layer2.sendL2Packet(packet, MANETBroadcastAddress.BROADCAST);
 		}
 	}
