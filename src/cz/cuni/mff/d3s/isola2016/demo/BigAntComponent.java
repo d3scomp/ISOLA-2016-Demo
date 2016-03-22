@@ -33,7 +33,6 @@ public class BigAntComponent {
 	public static final double RANDOM_WALK_DIAMETER_M = 15;
 	public static final double RANDOM_WALK_DIFF_M = 1;
 	public static final double RANDOM_WALK_NOFEAR_M = 15;
-	public static final long GRIP_PATIENCE_MS = 30000;
 
 	public String id;
 	public Position position;
@@ -41,7 +40,7 @@ public class BigAntComponent {
 	public Position assignedFood;
 	public Mode mode;
 	public Long time;
-	
+
 	@Local
 	public Map<String, Position> otherPos;
 
@@ -60,9 +59,6 @@ public class BigAntComponent {
 	@Local
 	public Position antHill;
 
-	@Local
-	public Long gripTimestamp;
-	
 	public AntInfo assistant;
 
 	/// Initial knowledge
@@ -85,7 +81,7 @@ public class BigAntComponent {
 	public static void senseTime(@Out("time") ParamHolder<Long> time) {
 		time.value = ProcessContext.getTimeProvider().getCurrentMilliseconds();
 	}
-	
+
 	@Process
 	@PeriodicScheduling(period = 500, order = 1)
 	public static void sensePosition(@In("ant") BigAntPlugin ant, @Out("position") ParamHolder<Position> position) {
@@ -151,20 +147,16 @@ public class BigAntComponent {
 		}
 	}
 
-/*	@Process
-	@PeriodicScheduling(period = 1000, order = 4)
-	public static void log(@In("id") String id, @In("position") Position position, @In("foods") List<TimestampedFoodSource> foods) {
-		if (position == null) {
-			return;
-		}
-
-		try {
-			ProcessContext.getRuntimeLogger().log(new AntLogRecord(id, position));
-			FoodLogRecord.logAll(ProcessContext.getRuntimeLogger(), foods);
-		} catch (Exception e) {
-			throw new DEECoRuntimeException("Ant log failed with exception", e);
-		}
-	}*/
+	/*
+	 * @Process
+	 * 
+	 * @PeriodicScheduling(period = 1000, order = 4) public static void log(@In("id") String id, @In("position")
+	 * Position position, @In("foods") List<TimestampedFoodSource> foods) { if (position == null) { return; }
+	 * 
+	 * try { ProcessContext.getRuntimeLogger().log(new AntLogRecord(id, position));
+	 * FoodLogRecord.logAll(ProcessContext.getRuntimeLogger(), foods); } catch (Exception e) { throw new
+	 * DEECoRuntimeException("Ant log failed with exception", e); } }
+	 */
 
 	@Process
 	@PeriodicScheduling(period = 1000, order = 5)
@@ -196,7 +188,7 @@ public class BigAntComponent {
 	@PeriodicScheduling(period = 500, order = 6)
 	public static void modeSwitch(@In("ant") BigAntPlugin ant, @InOut("mode") ParamHolder<Mode> mode,
 			@In("assignedFood") Position assignedFood, @In("position") Position position,
-			@In("clock") CurrentTimeProvider clock, @In("gripTimestamp") Long gripTimestamp) {
+			@In("clock") CurrentTimeProvider clock) {
 		switch (mode.value) {
 		case Searching:
 			if (assignedFood != null) {
@@ -222,18 +214,18 @@ public class BigAntComponent {
 			// Advance
 			if (ant.getState() == State.Locked || ant.getState() == State.Pulling) {
 				mode.value = Mode.Gripped;
-			} else if (clock.getCurrentMilliseconds() - gripTimestamp > GRIP_PATIENCE_MS) {
+			} else if (assignedFood == null || !PosUtils.isSame(assignedFood, position)) {
 				mode.value = Mode.Searching;
 			}
 			break;
 		case Gripped:
-			if(ant.getState() == State.Pulling) {
+			if (ant.getState() == State.Pulling) {
 				mode.value = Mode.Pulling;
 			} else if (assignedFood == null) {
 				mode.value = Mode.Release;
 			}
 		case Release:
-			if(ant.getState() == State.Free) {
+			if (ant.getState() == State.Free) {
 				mode.value = Mode.Searching;
 			}
 		case Pulling:
@@ -248,8 +240,8 @@ public class BigAntComponent {
 	@Process
 	@PeriodicScheduling(period = 500, order = 7)
 	public static void move(@In("ant") BigAntPlugin ant, @In("mode") Mode mode, @In("rand") Random rand,
-			@In("assignedFood") Position assignedFood, @Out("gripTimestamp") ParamHolder<Long> gripTimestamp,
-			@In("clock") CurrentTimeProvider clock, @In("otherPos") Map<String, Position> otherPos) {
+			@In("assignedFood") Position assignedFood, @In("clock") CurrentTimeProvider clock,
+			@In("otherPos") Map<String, Position> otherPos) {
 		switch (mode) {
 		case Searching:
 			if (ant.isAtTarget()) {
@@ -263,7 +255,6 @@ public class BigAntComponent {
 			break;
 		case Grip:
 			ant.grab();
-			gripTimestamp.value = clock.getCurrentMilliseconds();
 			break;
 		case Gripped:
 			break;
@@ -274,7 +265,7 @@ public class BigAntComponent {
 			ant.setTarget(new Position(0, 0));
 		}
 	}
-	
+
 	/**
 	 * Picks N random close targets and uses the one which is the most distant from all other
 	 */
@@ -282,30 +273,30 @@ public class BigAntComponent {
 		Position result = null;
 		double colDist = 0;
 		int rounds = 10;
-		while(rounds > 0 && (result == null || result.euclidDistanceTo(new Position(0, 0)) > RANDOM_WALK_DIAMETER_M)) {
+		while (rounds > 0 && (result == null || result.euclidDistanceTo(new Position(0, 0)) > RANDOM_WALK_DIAMETER_M)) {
 			result = null;
-			for(int i = 0; i < rounds; ++i) {
+			for (int i = 0; i < rounds; ++i) {
 				Position newPos = PosUtils.getRandomPosition(rand, current, RANDOM_WALK_DIFF_M);
 				double newDist = collectiveDistance(others, newPos);
-				if(result == null || newDist > colDist) {
+				if (result == null || newDist > colDist) {
 					result = newPos;
 					colDist = newDist;
 				}
 			}
 			rounds--;
 		}
-		if(rounds == 0) {
+		if (rounds == 0) {
 			result = PosUtils.getRandomPosition(rand, new Position(0, 0), RANDOM_WALK_DIAMETER_M);
 		}
 		return result;
 	}
-	
+
 	private static double collectiveDistance(Collection<Position> collective, Position sample) {
 		double res = 0;
-		for(Position pos: collective) {
+		for (Position pos : collective) {
 			double dist = pos.euclidDistanceTo(sample);
-			if(dist < RANDOM_WALK_NOFEAR_M)
-				res += dist; 
+			if (dist < RANDOM_WALK_NOFEAR_M)
+				res += dist;
 		}
 		return res;
 	}
