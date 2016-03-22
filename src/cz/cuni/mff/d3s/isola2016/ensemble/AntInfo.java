@@ -20,7 +20,7 @@ public class AntInfo implements Serializable {
 	public List<TimestampedFoodSource> foods;
 	public Mode mode;
 	public Long time;
-	public AntInfo assistant;
+	public Position assistantPos;
 	public Position assignedFood;
 	
 	@SuppressWarnings("unchecked")
@@ -30,7 +30,7 @@ public class AntInfo implements Serializable {
 		KnowledgePath foodsPath = KnowledgePathExt.createKnowledgePath("foods");
 		KnowledgePath modePath = KnowledgePathExt.createKnowledgePath("mode");
 		KnowledgePath timePath = KnowledgePathExt.createKnowledgePath("time");
-		KnowledgePath assistantPath = KnowledgePathExt.createKnowledgePath("assistant");
+		KnowledgePath assistantPath = KnowledgePathExt.createKnowledgePath("assistantPos");
 		KnowledgePath assistantFoodPath = KnowledgePathExt.createKnowledgePath("assignedFood");
 		ValueSet set = knowledgeManager.get(Arrays.asList(idPath, foodsPath, positionPath, modePath, timePath, assistantPath, assistantFoodPath));
 
@@ -39,17 +39,17 @@ public class AntInfo implements Serializable {
 		this.foods = (List<TimestampedFoodSource>) set.getValue(foodsPath);
 		this.mode = (Mode) set.getValue(modePath);
 		this.time = (Long) set.getValue(timePath);
-		this.assistant = (AntInfo) set.getValue(assistantPath);
+		this.assistantPos = (Position) set.getValue(assistantPath);
 		this.assignedFood = (Position) set.getValue(assistantFoodPath);
 	}
 
-	public AntInfo(String id, Position position, List<TimestampedFoodSource> foods, Mode mode, Long time, AntInfo assistant, Position assignedFood) {
+	public AntInfo(String id, Position position, List<TimestampedFoodSource> foods, Mode mode, Long time, Position assistantPos, Position assignedFood) {
 		this.id = id;
 		this.position = position;
 		this.foods = foods;
 		this.mode = mode;
 		this.time = time;
-		this.assistant = assistant;
+		this.assistantPos = assistantPos;
 		this.assignedFood = assignedFood;
 	}
 

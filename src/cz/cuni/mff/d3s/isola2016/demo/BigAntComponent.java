@@ -59,7 +59,7 @@ public class BigAntComponent {
 	@Local
 	public Position antHill;
 
-	public AntInfo assistant;
+	public Position assistantPos;
 
 	/// Initial knowledge
 	public BigAntComponent(int id, Random rand, DEECoNode node, Position antHill) {

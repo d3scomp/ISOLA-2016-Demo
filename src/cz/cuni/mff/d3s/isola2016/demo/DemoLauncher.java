@@ -18,6 +18,7 @@ import cz.cuni.mff.d3s.jdeeco.network.l2.strategy.KnowledgeInsertingStrategy;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 import cz.cuni.mff.d3s.jdeeco.position.PositionPlugin;
 import cz.cuni.mff.d3s.jdeeco.publishing.DefaultKnowledgePublisher;
+import cz.cuni.mff.d3s.jdeeco.publishing.KnowledgeSizeSampler;
 
 public class DemoLauncher {
 	public static final double ANT_SPAWN_DIAMETER_M = 10;
@@ -53,6 +54,7 @@ public class DemoLauncher {
 		realm.addPlugin(new SimpleBroadcastDevice(25, 10, cfg.radioRangeM, 1024));
 	//	realm.addPlugin(ProabilisticRebroadcastStrategy.class);
 		realm.addPlugin(CachingRebroadcastStrategy.class);
+	//	realm.addPlugin(KnowledgeSizeSampler.class);
 
 		// Ensemble solver
 		//AntAssignmetSolver solver = new BruteforceSolver();

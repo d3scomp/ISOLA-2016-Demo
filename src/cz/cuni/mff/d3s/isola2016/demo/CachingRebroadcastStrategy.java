@@ -46,7 +46,7 @@ public class CachingRebroadcastStrategy extends RebroadcastStrategy implements T
 
 	@Override
 	public void at(long time, Object triger) {
-		// Drop bounded data
+/*		// Drop bounded data
 		List<Byte> toRemove = new LinkedList<>();
 		for(Entry<Byte, L2Packet> entry: cache.entrySet()) {
 			if(isBounded(entry.getValue()) || customBounded(entry.getValue())) {
@@ -55,10 +55,14 @@ public class CachingRebroadcastStrategy extends RebroadcastStrategy implements T
 		}
 		for(Byte remove: toRemove) {
 			cache.remove(remove);
-		}
+		}*/
 		
 		// Rebroadcast cache content
 		for(L2Packet packet: cache.values()) {
+			if(isBounded(packet) || customBounded(packet)) {
+				continue;
+			}
+			
 			layer2.sendL2Packet(packet, MANETBroadcastAddress.BROADCAST);
 		}
 	}
