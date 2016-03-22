@@ -51,7 +51,8 @@ public class DemoLauncher {
 		realm.addPlugin(antWorld);
 		// realm.addPlugin(OMNeTBroadcastDevice.class);
 		realm.addPlugin(new SimpleBroadcastDevice(25, 10, cfg.radioRangeM, 1024));
-		realm.addPlugin(ProabilisticRebroadcastStrategy.class);
+	//	realm.addPlugin(ProabilisticRebroadcastStrategy.class);
+		realm.addPlugin(CachingRebroadcastStrategy.class);
 
 		// Ensemble solver
 		//AntAssignmetSolver solver = new BruteforceSolver();
