@@ -31,7 +31,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 	public static final int FOOD_SOURCE_CAPACITY = 1;
 	public static final int SOURCE_COUNT = 4;
 	public static final double PER_SOURCE_DIE_PROBABILITY_PER_S = 1.0 / 10;
-	
+
 	public Position antHill;
 	public int collectedFoodPieces = 0;
 	public Collection<BigAntPlugin> bigAnts = new LinkedHashSet<>();
@@ -113,14 +113,15 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 	 * Returns helper ant
 	 * 
 	 */
-	public BigAntPlugin getHelper(BigAntPlugin ant) {
+	public Collection<BigAntPlugin> getHelpers(BigAntPlugin ant) {
+		Collection<BigAntPlugin> helpers = new LinkedHashSet<>();
 		for (BigAntPlugin helper : bigAnts) {
 			if (helper != ant && helper.state == State.Locked
 					&& PosUtils.isSame(helper.getPosition(), ant.getPosition())) {
-				return helper;
+				helpers.add(helper);
 			}
 		}
-		return null;
+		return helpers;
 	}
 
 	/**
@@ -154,8 +155,8 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 			}
 
 			// There is no helper
-			BigAntPlugin helper = getHelper(ant);
-			if (helper == null) {
+			Collection<BigAntPlugin> helpers = getHelpers(ant);
+			if (helpers.isEmpty()) {
 				continue;
 			}
 
@@ -163,12 +164,14 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 			if (--source.portions == 0) {
 				removeFoodSource(source);
 			}
-			FoodPiece piece = new FoodPiece(ant.getPosition(), ant, helper);
+			FoodPiece piece = new FoodPiece(ant.getPosition(), ant, helpers);
 			foodPieces.add(piece);
 			ant.state = State.Pulling;
 			ant.pulledFoodPiece = piece;
-			helper.state = State.Pulling;
-			helper.pulledFoodPiece = piece;
+			for (BigAntPlugin helper : helpers) {
+				helper.state = State.Pulling;
+				helper.pulledFoodPiece = piece;
+			}
 		}
 	}
 
@@ -229,7 +232,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 		double ty = 0;
 
 		// Get vector
-		for (AntPlugin puller : piece.pullers) {
+		for (BigAntPlugin puller : piece.pullers) {
 			dx += puller.getTarget().x - puller.getPosition().x;
 			dy += puller.getTarget().y - puller.getPosition().y;
 			tx += puller.getTarget().x;
@@ -284,7 +287,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 
 	private void maintainFoodSourcePopulation() {
 		// Add new food sources
-		if(foodSources.size() < SOURCE_COUNT) {
+		if (foodSources.size() < SOURCE_COUNT) {
 			addFoodSource(new FoodSource(PosUtils.getRandomPosition(rand, antHill, FOOD_SOURCE_SPAWN_DIAMETER_M),
 					FOOD_SOURCE_CAPACITY));
 		}
@@ -317,7 +320,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 			}
 			ant.updateAntInfo();
 		}
-		
+
 		// Move small ants
 		for (AntPlugin ant : smallAnts) {
 			moveAnt(ant);
