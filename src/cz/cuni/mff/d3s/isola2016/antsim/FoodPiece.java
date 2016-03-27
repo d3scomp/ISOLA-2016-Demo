@@ -9,9 +9,8 @@ public class FoodPiece {
 	public Position position;
 	Collection<BigAntPlugin> pullers = new LinkedList<>();
 	
-	public FoodPiece(Position position, BigAntPlugin puller, Collection<BigAntPlugin> helpers) {
+	public FoodPiece(Position position, BigAntPlugin puller) {
 		this.position = position;
 		this.pullers.add(puller);
-		this.pullers.addAll(helpers);
 	}
 }

@@ -31,6 +31,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 	public static final int FOOD_SOURCE_CAPACITY = 1;
 	public static final int SOURCE_COUNT = 4;
 	public static final double PER_SOURCE_REMOVE_PROBABILITY_PER_S = 1.0 / 10;
+	public static final int HELPERS_NEEDED = 1;
 
 	public Position antHill;
 	public int collectedFoodPieces = 0;
@@ -156,7 +157,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 
 			// There is no helper
 			Collection<BigAntPlugin> helpers = getHelpers(ant);
-			if (helpers.isEmpty()) {
+			if (helpers.size() < HELPERS_NEEDED) {
 				continue;
 			}
 
@@ -164,13 +165,12 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 			if (--source.portions == 0) {
 				removeFoodSource(source);
 			}
-			FoodPiece piece = new FoodPiece(ant.getPosition(), ant, helpers);
+			FoodPiece piece = new FoodPiece(ant.getPosition(), ant);
 			foodPieces.add(piece);
 			ant.state = State.Pulling;
 			ant.pulledFoodPiece = piece;
 			for (BigAntPlugin helper : helpers) {
-				helper.state = State.Pulling;
-				helper.pulledFoodPiece = piece;
+				helper.state = State.Free;
 			}
 		}
 	}
