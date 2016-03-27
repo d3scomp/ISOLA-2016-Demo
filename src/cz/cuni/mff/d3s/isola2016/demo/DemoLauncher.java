@@ -70,6 +70,7 @@ public class DemoLauncher {
 					new IntelligentAntPlanning(solver, cfg.maxTimeSkewMs));
 			node.deployComponent(new BigAntComponent(nodeCnt, new Random(rand.nextLong()), node, ANT_HILL_POS));
 			node.deployEnsemble(AntPosExchangeEnsemble.class);
+			node.deployEnsemble(FoodSourceExchangeEnsemble.class);
 		}
 
 		// Create small ant nodes
@@ -85,6 +86,6 @@ public class DemoLauncher {
 		realm.start(cfg.limitMs);
 		System.out.println("All done.");
 
-		System.out.println("Total food pieced delivered: " + antWorld.collectedFoodPieces);
+		System.out.println("Total food pieces delivered: " + antWorld.collectedFoodPieces);
 	}
 }
