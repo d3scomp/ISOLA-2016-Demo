@@ -30,7 +30,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 	public static final double FOOD_SOURCE_SPAWN_DIAMETER_M = 15;
 	public static final int FOOD_SOURCE_CAPACITY = 1;
 	public static final int SOURCE_COUNT = 4;
-	public static final double PER_SOURCE_DIE_PROBABILITY_PER_S = 1.0 / 10;
+	public static final double PER_SOURCE_REMOVE_PROBABILITY_PER_S = 1.0 / 10;
 
 	public Position antHill;
 	public int collectedFoodPieces = 0;
@@ -295,7 +295,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 		// Remove food sources
 		List<FoodSource> toRemove = new LinkedList<>();
 		for (FoodSource source : foodSources) {
-			if (rand.nextDouble() < PER_SOURCE_DIE_PROBABILITY_PER_S / (1000 / SIM_STEP_MS)) {
+			if (rand.nextDouble() < PER_SOURCE_REMOVE_PROBABILITY_PER_S / (1000 / SIM_STEP_MS)) {
 				toRemove.add(source);
 			}
 		}
