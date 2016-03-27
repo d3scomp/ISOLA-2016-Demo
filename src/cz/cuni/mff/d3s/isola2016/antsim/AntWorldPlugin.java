@@ -304,32 +304,45 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 		}
 	}
 
-	// Ant world simulation step
-	@Override
-	public void at(long time, Object triger) {
-		resolveLocked();
-
-		removeFoodAtHill();
-
-		maintainFoodSourcePopulation();
-
-		// Move free ants
+	/**
+	 * Move free ants
+	 */
+	private void moveFreeAnts() {
 		for (BigAntPlugin ant : bigAnts) {
 			if (ant.state == State.Free) {
 				moveAnt(ant);
 			}
 			ant.updateAntInfo();
 		}
+	}
 
-		// Move small ants
+	/**
+	 * Move small ants
+	 */
+	private void moveSmallAnts() {
 		for (AntPlugin ant : smallAnts) {
 			moveAnt(ant);
 		}
+	}
 
-		// Resolve food movements
+	/**
+	 * Move food and pullers
+	 */
+	private void moveFoodAndPullers() {
 		for (FoodPiece piece : foodPieces) {
 			moveFood(piece);
 		}
+	}
+
+	// Ant world simulation step
+	@Override
+	public void at(long time, Object triger) {
+		resolveLocked();
+		removeFoodAtHill();
+		maintainFoodSourcePopulation();
+		moveFreeAnts();
+		moveSmallAnts();
+		moveFoodAndPullers();
 
 		// Log current state
 		if (time % 1000 == 0) {
