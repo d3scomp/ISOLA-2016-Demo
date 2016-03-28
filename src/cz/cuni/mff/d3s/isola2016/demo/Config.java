@@ -17,6 +17,7 @@ public class Config {
 	public Integer numBigAnts;
 	public Double radioRangeM;
 	public Long maxTimeSkewMs;
+	public Long logIntervalMs;
 
 	Config(String[] args) throws ParseException {
 		Options options = new Options();

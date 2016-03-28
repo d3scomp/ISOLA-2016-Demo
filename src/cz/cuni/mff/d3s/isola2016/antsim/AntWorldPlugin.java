@@ -1,7 +1,7 @@
 package cz.cuni.mff.d3s.isola2016.antsim;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,6 +15,7 @@ import java.util.Set;
 import javax.xml.bind.JAXB;
 
 import cz.cuni.mff.d3s.deeco.runtime.DEECoContainer;
+import cz.cuni.mff.d3s.deeco.runtime.DEECoContainer.ShutdownListener;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoPlugin;
 import cz.cuni.mff.d3s.deeco.runtime.PluginInitFailedException;
 import cz.cuni.mff.d3s.deeco.scheduler.Scheduler;
@@ -23,9 +24,34 @@ import cz.cuni.mff.d3s.deeco.task.TimerTaskListener;
 import cz.cuni.mff.d3s.isola2016.antsim.BigAntPlugin.State;
 import cz.cuni.mff.d3s.isola2016.demo.Config;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
+import cz.cuni.mff.d3s.jdeeco.network.Network;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
+	static class FinalLog {
+		static class Report {
+			public final long numMessages;
+			public final int collected;
+			
+			Report(AntWorldPlugin world) {
+				this.collected = world.collectedFoodPieces;
+				long msgCounter = 0;
+				for (Network network : world.networks) {
+					msgCounter += network.getL1().getTotalL2Packets();
+				}
+				this.numMessages = msgCounter;
+			}
+		}
+		
+		public final Config config;
+		public final Report report;
+		
+		public FinalLog(AntWorldPlugin world) {
+			this.config = world.config;
+			this.report = new Report(world); 
+		}
+	}
+
 	public static final long SIM_STEP_MS = 100;
 	public static final double FOOD_SOURCE_SPAWN_DIAMETER_M = 15;
 	public static final int FOOD_SOURCE_CAPACITY = 1;
@@ -45,27 +71,38 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 	private boolean initialized = false;
 	private final long startTime;
 	private final Random rand;
+	private Set<Network> networks = new LinkedHashSet<>();
 
-	// Configuration object (this is here just to be serialized)
-	public Config config;
+	// Configuration object
+	private final Config config;
 
-	public AntWorldPlugin(Position antHill, Random rand) {
+	public AntWorldPlugin(Position antHill, Random rand, Config config) {
 		this.antHill = antHill;
 		this.rand = rand;
+		this.config = config;
 		startTime = System.currentTimeMillis();
 	}
 
 	@Override
 	public List<Class<? extends DEECoPlugin>> getDependencies() {
-		return new ArrayList<>();
+		return Arrays.asList(Network.class);
 	}
 
 	@Override
 	public void init(DEECoContainer container) throws PluginInitFailedException {
+		networks.add(container.getPluginInstance(Network.class));
 		if (!initialized) {
 			initialized = true;
 			Scheduler scheduler = container.getRuntimeFramework().getScheduler();
 			new TimerTask(scheduler, this, "AntWorldSimStep", 0, SIM_STEP_MS).schedule();
+			
+			// Schedule final low write
+			container.addShutdownListener(new ShutdownListener() {
+				@Override
+				public void onShutdown() {
+					finalLog();
+				}
+			});
 		}
 	}
 
@@ -285,6 +322,14 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 		JAXB.marshal(this, out);
 	}
 
+	public void finalLog() {
+		File dir = new File(String.format("logs/world-%d/", startTime));
+		dir.mkdirs();
+		File out = new File(String.format("%s/final.xml", dir.getAbsolutePath()));
+		FinalLog log = new FinalLog(this);
+		JAXB.marshal(log, out);
+	}
+
 	private void maintainFoodSourcePopulation() {
 		// Add new food sources
 		if (foodSources.size() < SOURCE_COUNT) {
@@ -345,7 +390,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 		moveFoodAndPullers();
 
 		// Log current state
-		if (time % 1000 == 0) {
+		if (time % config.logIntervalMs == 0) {
 			log(time);
 		}
 	}

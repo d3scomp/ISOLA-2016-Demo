@@ -14,10 +14,11 @@ import simloader
 colors = ["red", "green", "blue", "yellow", "black", "lime", "cyan", "orange", "orange", "orange", "orange"]
 
 class PlottingCanvas(FigureCanvas):
-    def __init__(self, log, parent=None, width=5, height=4, dpi=100):
+    def __init__(self, logs, parent=None, width=5, height=4, dpi=100):
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.plot = self.fig.add_subplot(1, 1, 1)
-        self.log = log
+        self.log = logs.log
+        self.final = logs.final
 
         self.drawPlot(0)
 
@@ -110,11 +111,11 @@ class PlottingCanvas(FigureCanvas):
         self.draw()
         
 class Visualizer(QWidget):
-    def __init__(self, log):
+    def __init__(self, logs):
         super().__init__()
                 
         slider = QSlider(Qt.Horizontal, self)
-        drawing = PlottingCanvas(log, self, width=5, height=4, dpi=100)
+        drawing = PlottingCanvas(logs, self, width=5, height=4, dpi=100)
 
         vbox = QVBoxLayout()
         vbox.addWidget(drawing)
@@ -123,7 +124,7 @@ class Visualizer(QWidget):
         
         slider.valueChanged.connect(drawing.updatePlot)
         slider.setMinimum(0)
-        slider.setMaximum(len(log) - 1)
+        slider.setMaximum(len(logs.log) - 1)
         
         self.setGeometry(150, 250, 1024, 768)
         self.setWindowTitle("Visualizer")
@@ -138,6 +139,6 @@ if dirChooser.exec_() == QDialog.Accepted:
 else:
     raise(Exception("log dir must be chosen"))
 
-log = simloader.load(logDir)
-widget = Visualizer(log)
+logs = simloader.load(logDir)
+widget = Visualizer(logs)
 app.exec_()

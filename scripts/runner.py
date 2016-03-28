@@ -18,12 +18,13 @@ class Cfg(threading.Thread):
         print("Running execution thread")
         wd = os.getcwd()
         os.system("export PATH=$PATH" + os.pathsep + wd + os.sep + "omnet")
-        args = '--numbigants ' + str(self.numbigants) + ' '
-        args += '--numsmallants ' + str(self.numsmallants) + ' '
+        args = '--numBigAnts ' + str(self.numbigants) + ' '
+        args += '--numSmallAnts ' + str(self.numsmallants) + ' '
         args += '--seed ' + str(self.seed) + ' '
-        args += '--limit ' + str(self.limit) + ' '
-        args += '--maxtimeskew ' + str(self.maxtimeskew) + ' '
-        args += '--radiorange ' + str(self.radiorange) + ' '        
+        args += '--limitMs ' + str(self.limit) + ' '
+        args += '--maxTimeSkewMs ' + str(self.maxtimeskew) + ' '
+        args += '--radioRangeM ' + str(self.radiorange) + ' '        
+        args += '--loggingIntervalMs 30000'
         os.system('mvn exec:java -Dexec.args="' + args + '"')
         print("Execution done")
 

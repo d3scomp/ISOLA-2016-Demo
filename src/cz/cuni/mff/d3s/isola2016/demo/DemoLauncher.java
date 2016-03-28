@@ -18,7 +18,6 @@ import cz.cuni.mff.d3s.jdeeco.network.l2.strategy.KnowledgeInsertingStrategy;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 import cz.cuni.mff.d3s.jdeeco.position.PositionPlugin;
 import cz.cuni.mff.d3s.jdeeco.publishing.DefaultKnowledgePublisher;
-import cz.cuni.mff.d3s.jdeeco.publishing.KnowledgeSizeSampler;
 
 public class DemoLauncher {
 	public static final double ANT_SPAWN_DIAMETER_M = 10;
@@ -42,8 +41,7 @@ public class DemoLauncher {
 		DEECoSimulation realm = new DEECoSimulation(discreteTimer);
 
 		Random rand = new Random(cfg.seed);
-		AntWorldPlugin antWorld = new AntWorldPlugin(ANT_HILL_POS, new Random(rand.nextLong()));
-		antWorld.config = cfg;
+		AntWorldPlugin antWorld = new AntWorldPlugin(ANT_HILL_POS, new Random(rand.nextLong()), cfg);
 
 		// Add plugins
 		// realm.addPlugin(omnetSim);
