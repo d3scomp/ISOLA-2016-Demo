@@ -1,36 +1,56 @@
 package cz.cuni.mff.d3s.isola2016.demo;
 
+import java.lang.reflect.Field;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import cz.cuni.mff.d3s.deeco.runtime.DEECoRuntimeException;
+
 public class Config {
-	public long seed;
-	public long limitMs;
-	public int numSmallAnts;
-	public int numBigAnts;
-	public double radioRangeM;
-	public long maxTimeSkewMs;
+	public Long seed;
+	public Long limitMs;
+	public Integer numSmallAnts;
+	public Integer numBigAnts;
+	public Double radioRangeM;
+	public Long maxTimeSkewMs;
 
 	Config(String[] args) throws ParseException {
 		Options options = new Options();
-		options.addOption("numbigants", true, "Number of bigants");
-		options.addOption("numsmallants", true, "Number of small ants");
-		options.addOption("radiorange", true, "Range of the radio interface in meters");
-		options.addOption("seed", true, "Simulation seed");
-		options.addOption("limit", true, "Simulation time limit in ms");
-		options.addOption("maxtimeskew", true, "Maximial allowed time skew in ms");
+		
+		// Define options for fields
+		for(Field field: this.getClass().getDeclaredFields()) {
+			options.addOption(field.getName(), true, field.getName());
+		}
 
 		CommandLineParser parser = new GnuParser();
 		CommandLine commandLine = parser.parse(options, args);
-
-		seed = Long.parseLong(commandLine.getOptionValue("seed"));
-		limitMs = Long.parseLong(commandLine.getOptionValue("limit"));
-		numBigAnts = Integer.parseInt(commandLine.getOptionValue("numbigants"));
-		numSmallAnts = Integer.parseInt(commandLine.getOptionValue("numsmallants"));
-		radioRangeM = Double.parseDouble(commandLine.getOptionValue("radiorange"));
-		maxTimeSkewMs = Long.parseLong(commandLine.getOptionValue("maxtimeskew"));
+		
+		// Parser values for fields
+		for(Field field: this.getClass().getDeclaredFields()) {
+			String stringValue = commandLine.getOptionValue(field.getName());
+			Object value = null;
+			
+			if(field.getType().equals(String.class)) {
+				value = stringValue;
+			} else if(field.getType().equals(Integer.class)) {
+				value = Integer.parseInt(stringValue);
+			} else if(field.getType().equals(Long.class)) {
+				value = Long.parseLong(stringValue);
+			} else if(field.getType().equals(Double.class)) {
+				value = Double.parseDouble(stringValue);
+			} else {
+				throw new DEECoRuntimeException("Config parsing not defined for type " + field.getType().getName());
+			}
+						
+			try {
+				field.set(this, value);
+			} catch (Exception e) {
+				throw new DEECoRuntimeException("Config parsing failed", e);
+			}
+		}
 	}
 }
