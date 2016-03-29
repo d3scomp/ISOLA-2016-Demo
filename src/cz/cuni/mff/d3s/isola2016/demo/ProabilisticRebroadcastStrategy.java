@@ -44,19 +44,14 @@ public class ProabilisticRebroadcastStrategy extends RebroadcastStrategy {
 
 	@Override
 	public void processL2Packet(L2Packet packet) {
-		// Get average RSSI and report neighbor nodes
-		double rssiSum = 0;
-		int pktCnt = 0;
+		// Report neighbor nodes
 		for (L1Packet l1 : packet.getReceivedInfo().srcFragments) {
 			if (l1.receivedInfo instanceof MANETReceivedInfo) {
 				MANETReceivedInfo info = (MANETReceivedInfo) l1.receivedInfo;
 				MANETBroadcastAddress address = (MANETBroadcastAddress) info.srcAddress;
 				markNodeSeen(address.getAddress());
-				rssiSum += info.rssi;
-				pktCnt++;
 			}
 		}
-		final double rssiAvg = rssiSum / pktCnt;
 
 		// If the packet is blocked by communication boundary
 		if (isBounded(packet))
@@ -68,15 +63,8 @@ public class ProabilisticRebroadcastStrategy extends RebroadcastStrategy {
 		if (rand.nextDouble() > (staticRebroadcastProbability / divider)) {
 			return;
 		}
-
-		// Calculate rebroadcast delay
-		//double ratio = Math.min(1, Math.abs(Math.log(rssiAvg) / Math.log(RSSI_250m)));
-		//long delayMs = 1 + (long) ((1 - ratio) * MAX_DELAY);
 		
 		long delayMs = STATIC_REBROADCAST_DEALY_MEAN_MS + (long) ((0.5 - rand.nextDouble()) * STATIC_REBROADCAST_DEALY_VARIANCE_MS);
 		scheduleRebroadcast(packet, delayMs);
-				
-		// Rebroadcast packet now
-//		layer2.sendL2Packet(packet, MANETBroadcastAddress.BROADCAST);
 	}
 }

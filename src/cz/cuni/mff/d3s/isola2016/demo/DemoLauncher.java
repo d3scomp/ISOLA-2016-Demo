@@ -1,9 +1,12 @@
 package cz.cuni.mff.d3s.isola2016.demo;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 import cz.cuni.mff.d3s.deeco.runners.DEECoSimulation;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoNode;
+import cz.cuni.mff.d3s.deeco.runtime.DEECoPlugin;
 import cz.cuni.mff.d3s.deeco.timer.DiscreteEventTimer;
 import cz.cuni.mff.d3s.isola2016.antsim.AntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.BigAntPlugin;
@@ -51,7 +54,6 @@ public class DemoLauncher {
 		// realm.addPlugin(OMNeTBroadcastDevice.class);
 		realm.addPlugin(new SimpleBroadcastDevice(25, 10, cfg.radioRangeM, 1024));
 	//	realm.addPlugin(ProabilisticRebroadcastStrategy.class);
-		realm.addPlugin(CachingRebroadcastStrategy.class);
 	//	realm.addPlugin(KnowledgeSizeSampler.class);
 
 		// Ensemble solver
@@ -63,20 +65,38 @@ public class DemoLauncher {
 		int  nodeCnt = 0;
 		for (int i = 0; i < cfg.numBigAnts; ++i) {
 			nodeCnt++;
-			DEECoNode node = realm.createNode(nodeCnt, new DefaultKnowledgePublisher(), new BigAntPlugin(),
-					new PositionPlugin(PosUtils.getRandomPosition(rand, 0, 0, ANT_SPAWN_DIAMETER_M)),
-					new IntelligentAntPlanning(solver, cfg.maxTimeSkewMs));
+			
+			List<DEECoPlugin> plugins = new LinkedList<>();
+			plugins.add(new DefaultKnowledgePublisher());
+			plugins.add(new BigAntPlugin());
+			plugins.add(new PositionPlugin(PosUtils.getRandomPosition(rand, 0, 0, ANT_SPAWN_DIAMETER_M)));
+			plugins.add(new IntelligentAntPlanning(solver, cfg.maxTimeSkewMs));
+			if(cfg.useRebroadcasting) {
+				plugins.add(new CachingRebroadcastStrategy(cfg.rebroadcastDelayMs, cfg.rebroadcastRangeM));
+			}
+			
+			DEECoNode node = realm.createNode(nodeCnt, plugins.toArray(new DEECoPlugin[]{}));
+			
 			node.deployComponent(new BigAntComponent(nodeCnt, new Random(rand.nextLong()), node, ANT_HILL_POS));
+			
 			node.deployEnsemble(AntPosExchangeEnsemble.class);
 			node.deployEnsemble(FoodSourceExchangeEnsemble.class);
 		}
 
 		// Create small ant nodes
-		for (int i = 0; i < cfg.numSmallAnts; ++i) {
-			nodeCnt++;
-			DEECoNode node = realm.createNode(nodeCnt, new SmallAntPlugin(),
-					new PositionPlugin(PosUtils.getRandomPosition(rand, 0, 0, ANT_SPAWN_DIAMETER_M)));
-			node.deployComponent(new SmallAntComponent(nodeCnt, new Random(rand.nextLong()), node));
+		if(cfg.useRebroadcasting) {
+			for (int i = 0; i < cfg.numSmallAnts; ++i) {
+				nodeCnt++;
+				
+				List<DEECoPlugin> plugins = new LinkedList<>();
+				plugins.add(new SmallAntPlugin());
+				plugins.add(new PositionPlugin(PosUtils.getRandomPosition(rand, 0, 0, ANT_SPAWN_DIAMETER_M)));
+				plugins.add(new CachingRebroadcastStrategy(cfg.rebroadcastDelayMs, cfg.rebroadcastRangeM));
+				
+				DEECoNode node = realm.createNode(nodeCnt, plugins.toArray(new DEECoPlugin[]{}));
+				
+				node.deployComponent(new SmallAntComponent(nodeCnt, new Random(rand.nextLong()), node));
+			}
 		}
 
 		// Run the simulation

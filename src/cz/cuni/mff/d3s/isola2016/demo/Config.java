@@ -18,6 +18,9 @@ public class Config {
 	public Double radioRangeM;
 	public Long maxTimeSkewMs;
 	public Long logIntervalMs;
+	public Boolean useRebroadcasting;
+	public Double rebroadcastRangeM;
+	public Long rebroadcastDelayMs;
 
 	Config(String[] args) throws ParseException {
 		Options options = new Options();
@@ -37,6 +40,8 @@ public class Config {
 			
 			if(field.getType().equals(String.class)) {
 				value = stringValue;
+			} else if(field.getType().equals(Boolean.class)) {
+				value = Boolean.parseBoolean(stringValue);
 			} else if(field.getType().equals(Integer.class)) {
 				value = Integer.parseInt(stringValue);
 			} else if(field.getType().equals(Long.class)) {

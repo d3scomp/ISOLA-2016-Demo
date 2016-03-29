@@ -2,10 +2,8 @@ import os
 import threading
 from time import sleep
 
-os.chdir("..")
-
 class Cfg(threading.Thread):
-    def __init__(self, seed, limit, maxtimeskew, numbigants, numsmallants, radiorange):
+    def __init__(self, seed, limit, maxtimeskew, numbigants, numsmallants, radiorange, rebroadcastrangem, rebrodcastdelay, userebroadcasting):
         super().__init__()
         self.seed = seed
         self.limit = limit
@@ -13,6 +11,9 @@ class Cfg(threading.Thread):
         self.numbigants = numbigants
         self.numsmallants = numsmallants
         self.radiorange = radiorange
+        self.rebroadcastrangem = rebroadcastrangem
+        self.rebroadcastdelay = rebroadcastdelay
+        self.userebroadcasting = userebroadcasting
         
     def run(self):
         print("Running execution thread")
@@ -24,23 +25,43 @@ class Cfg(threading.Thread):
         args += '--limitMs ' + str(self.limit) + ' '
         args += '--maxTimeSkewMs ' + str(self.maxtimeskew) + ' '
         args += '--radioRangeM ' + str(self.radiorange) + ' '        
-        args += '--loggingIntervalMs 30000'
-        os.system('mvn exec:java -Dexec.args="' + args + '"')
+        args += '--rebroadcastRangeM ' + str(self.rebroadcastrangem) + ' '
+        args += '--rebroadcastDelayMs ' + str(self.rebroadcastdelay) + ' '
+        args += '--useRebroadcasting ' + str(self.userebroadcasting) + ' '
+        args += '--logIntervalMs 30000'
+        print(args)
+        os.system('java -jar experiment.jar ' + args)
         print("Execution done")
 
-MAX_THREADS = 4
+MAX_THREADS = 12
 cfgs = [];
 
 # Define configurations
-numbigants = 10
+numbigants = 6
 numsmallants = 40
-radiorange = 3
-limit = 180000
+radiorange = 5
+limit = 300000
 seeds = range(0, 10)
-maxtimeskews = [5000, 10000, 20000, 30000]
+rebroadcatDelays = [1000, 3000, 5000]
+rebroadcastRanges = [0, 5, 10, 15]
+maxtimeskews = [5000, 10000, 30000]
 for seed in seeds:
-    for maxtimeskew in maxtimeskews:
-        cfgs.append(Cfg(numbigants=numbigants, numsmallants=numsmallants, seed=seed, limit=limit, maxtimeskew=maxtimeskew, radiorange=radiorange))
+    for rebroadcastdelay in rebroadcatDelays:
+        for rebroadcastrange in rebroadcastRanges: 
+            for maxtimeskew in maxtimeskews:
+                userebroadcasting = rebroadcastrange != 0
+                 
+                cfgs.append(Cfg(
+                                numbigants=numbigants,
+                                numsmallants=numsmallants,
+                                seed=seed,
+                                limit=limit,
+                                maxtimeskew=maxtimeskew,
+                                radiorange=radiorange,
+                                rebroadcastrangem=rebroadcastrange,
+                                rebrodcastdelay=rebroadcastdelay,
+                                userebroadcasting=userebroadcasting)
+                            )
     
 print("Running " + str(len(cfgs)) + " configurations")
 

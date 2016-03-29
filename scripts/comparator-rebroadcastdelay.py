@@ -1,15 +1,15 @@
 import simloader
 import os
 import matplotlib
-matplotlib.use("Qt5Agg")
+matplotlib.use('Agg')
 import matplotlib.pyplot as plot
 from matplotlib import pyplot, colors
 import numpy as np
 
-print("Comparator")
+print("Comparator rebroadcast delay")
 
 #logsDir = "../logs/10-99rebprob"
-logsDir = "../logs"
+logsDir = "logs"
 
 data = {}
 
@@ -17,18 +17,26 @@ for (dirpath, dirnames, filenames) in os.walk(logsDir):
     for dir in dirnames:
         if dir.startswith("world"):
             path = dirpath + os.sep + dir;
-            print(path)
+            print("Path: " + path)
             
-            
-            log = simloader.loadLast(path)
-            maxtimeskew = log.config.maxTimeSkewMs;
-            collected = log.collectedFoodPieces
+            if not os.path.isfile(path + os.sep + "final.xml"):
+                print("no final.xml in path, skipping")
+                continue
+                        
+            log = simloader.loadFinal(path)
+            print(log)
+            key = log.config.rebroadcastDelayMs;
+            collected = log.report.collected
     
-            if not maxtimeskew in data:
-                data[maxtimeskew] = []
-            data[maxtimeskew].append(int(collected))
+            if not key in data:
+                data[key] = []
+            data[key].append(int(collected))
     break
 
+print("Data: ")
+for key in data:
+    print(str(key) + ": " + str(data[key]))
+print("Data end")
 
 pdata = []
 
@@ -52,6 +60,6 @@ for i in range(len(pdata)):
     plot.plot(x, y, 'bo', alpha=0.4)
 
 plot.xticks(xtckcnt, xtckname)
-plot.xlabel("Max allowed data age in ms")
+plot.xlabel("Boundary range in meters")
 plot.ylabel("Solution value in collected foods")
-plot.show()
+plot.savefig("rebrodcastdelay.png")

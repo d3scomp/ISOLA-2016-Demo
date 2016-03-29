@@ -2,10 +2,7 @@ package cz.cuni.mff.d3s.isola2016.demo;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 
 import cz.cuni.mff.d3s.deeco.model.runtime.custom.KnowledgePathExt;
@@ -20,11 +17,23 @@ import cz.cuni.mff.d3s.jdeeco.position.Position;
 import cz.cuni.mff.d3s.jdeeco.position.PositionPlugin;
 
 public class CachingRebroadcastStrategy extends RebroadcastStrategy implements TimerTaskListener {
-	public static final int PUBLISHING_PERIOD = 2000;
-	public static final double BOUNDARY_RANGE_M = 10;
+	public static final long DEFAULT_PUBLISHING_PERIOD_MS = 2000;
+	public static final double DEFAULT_BOUNDARY_RANGE_M = 10;
 	
 	private Map<Byte, L2Packet> cache = new HashMap<>();
 	private PositionPlugin positionPlug;
+	private final long publishingPeriodMs;
+	private final double boudaryRangeM;
+	
+	public CachingRebroadcastStrategy() {
+		publishingPeriodMs = DEFAULT_PUBLISHING_PERIOD_MS;
+		boudaryRangeM = DEFAULT_BOUNDARY_RANGE_M;
+	}
+	
+	public CachingRebroadcastStrategy(long publishingPeriodMs, double boudaryRangeM) {
+		this.publishingPeriodMs = publishingPeriodMs;
+		this.boudaryRangeM = boudaryRangeM;
+	}
 	
 	@Override
 	public void processL2Packet(L2Packet packet) {
@@ -41,8 +50,8 @@ public class CachingRebroadcastStrategy extends RebroadcastStrategy implements T
 		
 		positionPlug = container.getPluginInstance(PositionPlugin.class);
 		
-		long offset = new Random(container.getId()).nextInt(PUBLISHING_PERIOD);
-		new TimerTask(scheduler, this, "Caching rebroadcast strategy publish", offset, PUBLISHING_PERIOD).schedule();
+		long offset = new Random(container.getId()).nextLong() % publishingPeriodMs;
+		new TimerTask(scheduler, this, "Caching rebroadcast strategy publish", offset, publishingPeriodMs).schedule();
 	}
 
 	@Override
@@ -69,6 +78,6 @@ public class CachingRebroadcastStrategy extends RebroadcastStrategy implements T
 		Position remotePosition = (Position) data.getKnowledge().getValue(KnowledgePathExt.createKnowledgePath("position"));
 		Position localPosition = positionPlug.getPosition();
 		
-		return localPosition.euclidDistanceTo(remotePosition) > BOUNDARY_RANGE_M;
+		return localPosition.euclidDistanceTo(remotePosition) > boudaryRangeM;
 	}
 }
