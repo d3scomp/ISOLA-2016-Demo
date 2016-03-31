@@ -27,13 +27,13 @@ import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.network.Network;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
-public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
+public abstract class AbstractAntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 	static class FinalLog {
 		static class Report {
 			public final long numMessages;
 			public final int collected;
 			
-			Report(AntWorldPlugin world) {
+			Report(AbstractAntWorldPlugin world) {
 				this.collected = world.collectedFoodPieces;
 				long msgCounter = 0;
 				for (Network network : world.networks) {
@@ -46,7 +46,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 		public final Config config;
 		public final Report report;
 		
-		public FinalLog(AntWorldPlugin world) {
+		public FinalLog(AbstractAntWorldPlugin world) {
 			this.config = world.config;
 			this.report = new Report(world); 
 		}
@@ -70,13 +70,13 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 
 	private boolean initialized = false;
 	private final long startTime;
-	private final Random rand;
+	protected final Random rand;
 	private Set<Network> networks = new LinkedHashSet<>();
 
 	// Configuration object
 	private final Config config;
 
-	public AntWorldPlugin(Position antHill, Random rand, Config config) {
+	public AbstractAntWorldPlugin(Position antHill, Random rand, Config config) {
 		this.antHill = antHill;
 		this.rand = rand;
 		this.config = config;
@@ -148,21 +148,6 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 	}
 
 	/**
-	 * Returns helper ant
-	 * 
-	 */
-	public Collection<BigAntPlugin> getHelpers(BigAntPlugin ant) {
-		Collection<BigAntPlugin> helpers = new LinkedHashSet<>();
-		for (BigAntPlugin helper : bigAnts) {
-			if (helper != ant && helper.state == State.Locked
-					&& PosUtils.isSame(helper.getPosition(), ant.getPosition())) {
-				helpers.add(helper);
-			}
-		}
-		return helpers;
-	}
-
-	/**
 	 * Removes food source
 	 * 
 	 * @param source
@@ -178,40 +163,8 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 		lockedAtSource.remove(source);
 	}
 
-	private void resolveLocked() {
-		// Resolve Locked -> Pulling
-		for (BigAntPlugin ant : bigAnts) {
-			// Ant not locked
-			if (ant.state != State.Locked) {
-				continue;
-			}
-
-			// Get locked source
-			FoodSource source = getFoodSourceAt(ant.getPosition());
-			if (source == null) {
-				ant.state = State.Free;
-			}
-
-			// There is no helper
-			Collection<BigAntPlugin> helpers = getHelpers(ant);
-			if (helpers.size() < HELPERS_NEEDED) {
-				continue;
-			}
-
-			// Create food piece and start polling
-			if (--source.portions == 0) {
-				removeFoodSource(source);
-			}
-			FoodPiece piece = new FoodPiece(ant.getPosition(), ant);
-			foodPieces.add(piece);
-			ant.state = State.Pulling;
-			ant.pulledFoodPiece = piece;
-			for (BigAntPlugin helper : helpers) {
-				helper.state = State.Free;
-			}
-		}
-	}
-
+	protected abstract void resolveLocked();
+	
 	private void removeFoodAtHill() {
 		// Remove food at hill
 		Collection<FoodPiece> toRemove = new HashSet<>();
@@ -238,7 +191,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 		}
 
 		// Get movement speed
-		double moveDistance = (AntPlugin.SPEED_M_PER_S * AntWorldPlugin.SIM_STEP_MS) / 1000;
+		double moveDistance = (AntPlugin.SPEED_M_PER_S * AbstractAntWorldPlugin.SIM_STEP_MS) / 1000;
 
 		// Closer than movement distance -> move to target
 		if (ant.getPosition().euclidDistanceTo(ant.getTarget()) < moveDistance) {
@@ -284,7 +237,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 		dy /= length;
 
 		// Apply speed
-		double moveDistance = (AntPlugin.SPEED_M_PER_S * AntWorldPlugin.SIM_STEP_MS) / 1000;
+		double moveDistance = (AntPlugin.SPEED_M_PER_S * AbstractAntWorldPlugin.SIM_STEP_MS) / 1000;
 		dx *= moveDistance;
 		dy *= moveDistance;
 
@@ -329,25 +282,8 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 		FinalLog log = new FinalLog(this);
 		JAXB.marshal(log, out);
 	}
-
-	private void maintainFoodSourcePopulation() {
-		// Add new food sources
-		if (foodSources.size() < SOURCE_COUNT) {
-			addFoodSource(new FoodSource(PosUtils.getRandomPosition(rand, antHill, FOOD_SOURCE_SPAWN_DIAMETER_M),
-					FOOD_SOURCE_CAPACITY));
-		}
-
-		// Remove food sources
-		List<FoodSource> toRemove = new LinkedList<>();
-		for (FoodSource source : foodSources) {
-			if (rand.nextDouble() < PER_SOURCE_REMOVE_PROBABILITY_PER_S / (1000 / SIM_STEP_MS)) {
-				toRemove.add(source);
-			}
-		}
-		for (FoodSource source : toRemove) {
-			removeFoodSource(source);
-		}
-	}
+	
+	protected abstract void maintainFoodSourcePopulation();
 
 	/**
 	 * Move free ants
@@ -390,7 +326,7 @@ public class AntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 		moveFoodAndPullers();
 
 		// Log current state
-		if (time % config.logIntervalMs == 0) {
+		if(config.logIntervalMs != 0 && time % config.logIntervalMs == 0) {
 			log(time);
 		}
 	}

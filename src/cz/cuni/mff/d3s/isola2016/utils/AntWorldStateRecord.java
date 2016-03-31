@@ -4,10 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import cz.cuni.mff.d3s.deeco.runtimelog.RuntimeLogRecord;
-import cz.cuni.mff.d3s.isola2016.antsim.AntWorldPlugin;
+import cz.cuni.mff.d3s.isola2016.antsim.AbstractAntWorldPlugin;
 
 public class AntWorldStateRecord extends RuntimeLogRecord {
-	public static AntWorldStateRecord create(AntWorldPlugin world) {
+	public static AntWorldStateRecord create(AbstractAntWorldPlugin world) {
 		Map<String, Object> values = new HashMap<>();
 		
 		

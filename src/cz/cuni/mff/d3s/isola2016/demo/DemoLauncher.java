@@ -8,9 +8,10 @@ import cz.cuni.mff.d3s.deeco.runners.DEECoSimulation;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoNode;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoPlugin;
 import cz.cuni.mff.d3s.deeco.timer.DiscreteEventTimer;
-import cz.cuni.mff.d3s.isola2016.antsim.AntWorldPlugin;
+import cz.cuni.mff.d3s.isola2016.antsim.AbstractAntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.BigAntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.SmallAntPlugin;
+import cz.cuni.mff.d3s.isola2016.antsim.StandardAntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.ensemble.AntAssignmetSolver;
 import cz.cuni.mff.d3s.isola2016.ensemble.HeuristicSolver;
 import cz.cuni.mff.d3s.isola2016.ensemble.IntelligentAntPlanning;
@@ -44,7 +45,7 @@ public class DemoLauncher {
 		DEECoSimulation realm = new DEECoSimulation(discreteTimer);
 
 		Random rand = new Random(cfg.seed);
-		AntWorldPlugin antWorld = new AntWorldPlugin(ANT_HILL_POS, new Random(rand.nextLong()), cfg);
+		AbstractAntWorldPlugin antWorld = new StandardAntWorldPlugin(ANT_HILL_POS, new Random(rand.nextLong()), cfg);
 
 		// Add plugins
 		// realm.addPlugin(omnetSim);

@@ -24,7 +24,7 @@ import cz.cuni.mff.d3s.jdeeco.position.PositionProvider;
 public class AntPlugin implements DEECoPlugin, PositionProvider {
 	public static double SPEED_M_PER_S = 0.5;
 
-	protected AntWorldPlugin world;
+	protected AbstractAntWorldPlugin world;
 	protected DEECoContainer container;
 
 	public Position position;
@@ -33,14 +33,14 @@ public class AntPlugin implements DEECoPlugin, PositionProvider {
 	
 	@Override
 	public List<Class<? extends DEECoPlugin>> getDependencies() {
-		return Arrays.asList(AntWorldPlugin.class, PositionPlugin.class);
+		return Arrays.asList(AbstractAntWorldPlugin.class, PositionPlugin.class);
 	}
 
 	@Override
 	public void init(DEECoContainer container) throws PluginInitFailedException {
 		this.container = container;
 		// Get world plugin reference
-		world = container.getPluginInstance(AntWorldPlugin.class);
+		world = container.getPluginInstance(AbstractAntWorldPlugin.class);
 		
 		// Set initial position and provide current position
 		PositionPlugin positionPlugin = container.getPluginInstance(PositionPlugin.class);
