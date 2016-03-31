@@ -21,6 +21,7 @@ public class Config {
 	public Boolean useRebroadcasting;
 	public Double rebroadcastRangeM;
 	public Long rebroadcastDelayMs;
+	public String mode;
 
 	Config(String[] args) throws ParseException {
 		Options options = new Options();
@@ -50,6 +51,10 @@ public class Config {
 				value = Double.parseDouble(stringValue);
 			} else {
 				throw new DEECoRuntimeException("Config parsing not defined for type " + field.getType().getName());
+			}
+			
+			if(value == null) {
+				throw new RuntimeException("Missing parameter \"" + field.getName() + "\"");
 			}
 						
 			try {

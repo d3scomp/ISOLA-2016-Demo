@@ -1,5 +1,6 @@
 package cz.cuni.mff.d3s.isola2016.demo;
 
+import java.rmi.UnexpectedException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -10,6 +11,7 @@ import cz.cuni.mff.d3s.deeco.runtime.DEECoPlugin;
 import cz.cuni.mff.d3s.deeco.timer.DiscreteEventTimer;
 import cz.cuni.mff.d3s.isola2016.antsim.AbstractAntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.BigAntPlugin;
+import cz.cuni.mff.d3s.isola2016.antsim.QuantumAntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.SmallAntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.StandardAntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.ensemble.AntAssignmetSolver;
@@ -45,7 +47,13 @@ public class DemoLauncher {
 		DEECoSimulation realm = new DEECoSimulation(discreteTimer);
 
 		Random rand = new Random(cfg.seed);
-		AbstractAntWorldPlugin antWorld = new StandardAntWorldPlugin(ANT_HILL_POS, new Random(rand.nextLong()), cfg);
+		AbstractAntWorldPlugin antWorld;
+		switch(cfg.mode) {
+		case "standard": antWorld = new StandardAntWorldPlugin(ANT_HILL_POS, new Random(rand.nextLong()), cfg); break;
+		case "quantum": antWorld = new QuantumAntWorldPlugin(ANT_HILL_POS, new Random(rand.nextLong()), cfg); break;
+		default:
+			throw new UnexpectedException("Mode \"" + cfg.mode + "\" not defined");
+		}
 
 		// Add plugins
 		// realm.addPlugin(omnetSim);
@@ -78,7 +86,16 @@ public class DemoLauncher {
 			
 			DEECoNode node = realm.createNode(nodeCnt, plugins.toArray(new DEECoPlugin[]{}));
 			
-			node.deployComponent(new BigAntComponent(nodeCnt, new Random(rand.nextLong()), node, ANT_HILL_POS));
+			switch(cfg.mode) {
+			case "standard":
+				node.deployComponent(new BigAntComponent(nodeCnt, new Random(rand.nextLong()), node, ANT_HILL_POS));
+			break;
+			case "quantum":
+				node.deployComponent(new BigAntComponent(nodeCnt, new Random(rand.nextLong()), node, ANT_HILL_POS));
+			break;
+			default:
+				throw new UnexpectedException("Mode \"" + cfg.mode + "\" not defined");
+			}			
 			
 			node.deployEnsemble(AntPosExchangeEnsemble.class);
 			node.deployEnsemble(FoodSourceExchangeEnsemble.class);
