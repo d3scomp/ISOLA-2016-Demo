@@ -20,13 +20,13 @@ public class FoodSourceExchangeEnsemble {
 	}
 
 	@KnowledgeExchange
-	public static void exchange(@In("coord.foods") List<TimestampedFoodSource> coordFoods,
-			@InOut("member.foods") ParamHolder<List<TimestampedFoodSource>> memberFoods) {
+	public static void exchange(@In("coord.foods") List<FoodSource> coordFoods,
+			@InOut("member.foods") ParamHolder<List<FoodSource>> memberFoods) {
 		// Mapping coord foods -> member foods
-		for (TimestampedFoodSource coord : coordFoods) {
+		for (FoodSource coord : coordFoods) {
 			// Try to update age
 			boolean updated = false;
-			for (TimestampedFoodSource member : memberFoods.value) {
+			for (FoodSource member : memberFoods.value) {
 				if (PosUtils.isSame(member.position, coord.position)) {
 					updated = true;
 					if (member.timestamp < coord.timestamp) {

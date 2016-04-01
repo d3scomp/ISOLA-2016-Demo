@@ -2,7 +2,7 @@ package cz.cuni.mff.d3s.isola2016.ensemble;
 
 import java.util.Collection;
 
-import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
+import cz.cuni.mff.d3s.isola2016.demo.FoodSource;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 public class ProactiveSolver implements AntAssignmetSolver {

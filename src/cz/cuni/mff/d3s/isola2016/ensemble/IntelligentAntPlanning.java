@@ -20,9 +20,8 @@ import cz.cuni.mff.d3s.deeco.runtime.PluginInitFailedException;
 import cz.cuni.mff.d3s.deeco.scheduler.Scheduler;
 import cz.cuni.mff.d3s.deeco.task.TimerTask;
 import cz.cuni.mff.d3s.deeco.task.TimerTaskListener;
-import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
 import cz.cuni.mff.d3s.isola2016.demo.DemoLauncher;
-import cz.cuni.mff.d3s.isola2016.demo.TimestampedFoodSource;
+import cz.cuni.mff.d3s.isola2016.demo.FoodSource;
 import cz.cuni.mff.d3s.isola2016.ensemble.AntAssignmetSolver.Result;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
@@ -118,15 +117,15 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 		}
 
 		// Collect all foods, prefer up-to-date information
-		Collection<TimestampedFoodSource> foods = new LinkedHashSet<>();
+		Collection<FoodSource> foods = new LinkedHashSet<>();
 		for (AntInfo ant : ants) {
-			for (TimestampedFoodSource source : ant.foods) {
+			for (FoodSource source : ant.foods) {
 				if (!foods.contains(source)) {
 					foods.add(source);
 				} else {
 					// Contained, add only when newer
 					boolean add = false;
-					for (TimestampedFoodSource s : foods) {
+					for (FoodSource s : foods) {
 						if (s.equals(source)) {
 							if (source.timestamp > s.timestamp) {
 								add = true;

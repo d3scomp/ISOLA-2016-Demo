@@ -7,6 +7,7 @@ import java.util.Set;
 
 import cz.cuni.mff.d3s.isola2016.antsim.BigAntPlugin.State;
 import cz.cuni.mff.d3s.isola2016.demo.Config;
+import cz.cuni.mff.d3s.isola2016.demo.FoodSource;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 

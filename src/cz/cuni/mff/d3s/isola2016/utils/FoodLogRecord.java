@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 import cz.cuni.mff.d3s.deeco.runtimelog.RuntimeLogRecord;
 import cz.cuni.mff.d3s.deeco.runtimelog.RuntimeLogger;
-import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
+import cz.cuni.mff.d3s.isola2016.demo.FoodSource;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 public final class FoodLogRecord extends RuntimeLogRecord {

@@ -22,7 +22,6 @@ import cz.cuni.mff.d3s.deeco.task.ProcessContext;
 import cz.cuni.mff.d3s.deeco.timer.CurrentTimeProvider;
 import cz.cuni.mff.d3s.isola2016.antsim.BigAntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.BigAntPlugin.State;
-import cz.cuni.mff.d3s.isola2016.antsim.FoodSource;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
@@ -35,7 +34,7 @@ public class BigAntComponent {
 
 	public String id;
 	public Position position;
-	public List<TimestampedFoodSource> foods;
+	public List<FoodSource> foods;
 	public Position assignedFood;
 	public Mode mode;
 	public Long time;
@@ -96,10 +95,10 @@ public class BigAntComponent {
 	@Process
 	@PeriodicScheduling(period = 500, order = 3)
 	public static void senseFood(@In("ant") BigAntPlugin ant, @In("clock") CurrentTimeProvider clock,
-			@InOut("foods") ParamHolder<List<TimestampedFoodSource>> foods, @In("position") Position position) {
+			@InOut("foods") ParamHolder<List<FoodSource>> foods, @In("position") Position position) {
 		// Remove old food
-		Set<TimestampedFoodSource> toRemove = new LinkedHashSet<>();
-		for (TimestampedFoodSource source : foods.value) {
+		Set<FoodSource> toRemove = new LinkedHashSet<>();
+		for (FoodSource source : foods.value) {
 			// Remove too old source data
 			if (clock.getCurrentMilliseconds() - source.timestamp > MAX_FOOD_AGE_MS && source.portions != 0) {
 				toRemove.add(source);
@@ -127,7 +126,7 @@ public class BigAntComponent {
 		for (FoodSource newSource : ant.getSensedFood()) {
 			// Try to update existing one
 			boolean updated = false;
-			for (TimestampedFoodSource oldSource : foods.value) {
+			for (FoodSource oldSource : foods.value) {
 				if (PosUtils.isSame(oldSource.position, newSource.position)) {
 					oldSource.timestamp = clock.getCurrentMilliseconds();
 					oldSource.portions = newSource.portions;
@@ -142,7 +141,7 @@ public class BigAntComponent {
 
 			// Add new source
 			if (newSource.portions > 0) {
-				foods.value.add(new TimestampedFoodSource(newSource, clock.getCurrentMilliseconds()));
+				foods.value.add(newSource.cloneWithTimestamp(clock.getCurrentMilliseconds()));
 			}
 		}
 	}
@@ -162,7 +161,7 @@ public class BigAntComponent {
 	@PeriodicScheduling(period = 1000, order = 5)
 	public static void printStatus(@In("clock") CurrentTimeProvider clock, @In("id") String id,
 			@In("position") Position position, @In("state") State state, @In("mode") Mode mode,
-			@In("foods") List<TimestampedFoodSource> foods, @In("assignedFood") Position assignedFood) {
+			@In("foods") List<FoodSource> foods, @In("assignedFood") Position assignedFood) {
 		if (position == null) {
 			return;
 		}
@@ -170,7 +169,7 @@ public class BigAntComponent {
 		System.out.format("%06d: Ant %s, %s, %s, %s, foods: ", clock.getCurrentMilliseconds(), id, position, state,
 				mode);
 
-		for (TimestampedFoodSource source : foods) {
+		for (FoodSource source : foods) {
 			System.out.format("%f, ", source.position.euclidDistanceTo(position));
 		}
 

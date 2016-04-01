@@ -9,6 +9,7 @@ import cz.cuni.mff.d3s.deeco.logging.Log;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoContainer;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoRuntimeException;
 import cz.cuni.mff.d3s.deeco.runtime.PluginInitFailedException;
+import cz.cuni.mff.d3s.isola2016.demo.FoodSource;
 import cz.cuni.mff.d3s.isola2016.ensemble.AntInfo;
 
 /**

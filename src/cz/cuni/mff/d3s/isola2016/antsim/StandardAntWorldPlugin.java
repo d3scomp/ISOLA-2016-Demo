@@ -8,6 +8,7 @@ import java.util.Random;
 
 import cz.cuni.mff.d3s.isola2016.antsim.BigAntPlugin.State;
 import cz.cuni.mff.d3s.isola2016.demo.Config;
+import cz.cuni.mff.d3s.isola2016.demo.FoodSource;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
@@ -56,7 +57,7 @@ public class StandardAntWorldPlugin extends AbstractAntWorldPlugin {
 		// Add new food sources
 		if (foodSources.size() < SOURCE_COUNT) {
 			addFoodSource(new FoodSource(PosUtils.getRandomPosition(rand, antHill, FOOD_SOURCE_SPAWN_DIAMETER_M),
-					FOOD_SOURCE_CAPACITY));
+					FOOD_SOURCE_CAPACITY, 0));
 		}
 
 		// Remove food sources

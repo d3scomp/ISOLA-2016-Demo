@@ -17,6 +17,7 @@ import cz.cuni.mff.d3s.isola2016.antsim.StandardAntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.ensemble.AntAssignmetSolver;
 import cz.cuni.mff.d3s.isola2016.ensemble.HeuristicSolver;
 import cz.cuni.mff.d3s.isola2016.ensemble.IntelligentAntPlanning;
+import cz.cuni.mff.d3s.isola2016.ensemble.QuantumHeuristicSolver;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.network.Network;
 import cz.cuni.mff.d3s.jdeeco.network.device.SimpleBroadcastDevice;
@@ -48,9 +49,18 @@ public class DemoLauncher {
 
 		Random rand = new Random(cfg.seed);
 		AbstractAntWorldPlugin antWorld;
-		switch(cfg.mode) {
-		case "standard": antWorld = new StandardAntWorldPlugin(ANT_HILL_POS, new Random(rand.nextLong()), cfg); break;
-		case "quantum": antWorld = new QuantumAntWorldPlugin(ANT_HILL_POS, new Random(rand.nextLong()), cfg); break;
+		AntAssignmetSolver solver;
+		switch (cfg.mode) {
+		case "standard":
+			antWorld = new StandardAntWorldPlugin(ANT_HILL_POS, new Random(rand.nextLong()), cfg);
+			// solver = new BruteforceSolver();
+			solver = new HeuristicSolver();
+			// solver = new ProactiveSolver();
+			break;
+		case "quantum":
+			antWorld = new QuantumAntWorldPlugin(ANT_HILL_POS, new Random(rand.nextLong()), cfg);
+			solver = new QuantumHeuristicSolver();
+			break;
 		default:
 			throw new UnexpectedException("Mode \"" + cfg.mode + "\" not defined");
 		}
@@ -62,57 +72,52 @@ public class DemoLauncher {
 		realm.addPlugin(antWorld);
 		// realm.addPlugin(OMNeTBroadcastDevice.class);
 		realm.addPlugin(new SimpleBroadcastDevice(25, 10, cfg.radioRangeM, 1024));
-	//	realm.addPlugin(ProabilisticRebroadcastStrategy.class);
-	//	realm.addPlugin(KnowledgeSizeSampler.class);
-
-		// Ensemble solver
-		//AntAssignmetSolver solver = new BruteforceSolver();
-		AntAssignmetSolver solver = new HeuristicSolver();
-		// AntAssignmetSolver solver = new ProactiveSolver();
+		// realm.addPlugin(ProabilisticRebroadcastStrategy.class);
+		// realm.addPlugin(KnowledgeSizeSampler.class);
 
 		// Create big ant nodes
-		int  nodeCnt = 0;
+		int nodeCnt = 0;
 		for (int i = 0; i < cfg.numBigAnts; ++i) {
 			nodeCnt++;
-			
+
 			List<DEECoPlugin> plugins = new LinkedList<>();
 			plugins.add(new DefaultKnowledgePublisher());
 			plugins.add(new BigAntPlugin());
 			plugins.add(new PositionPlugin(PosUtils.getRandomPosition(rand, 0, 0, ANT_SPAWN_DIAMETER_M)));
 			plugins.add(new IntelligentAntPlanning(solver, cfg.maxTimeSkewMs));
-			if(cfg.useRebroadcasting) {
+			if (cfg.useRebroadcasting) {
 				plugins.add(new CachingRebroadcastStrategy(cfg.rebroadcastDelayMs, cfg.rebroadcastRangeM));
 			}
-			
-			DEECoNode node = realm.createNode(nodeCnt, plugins.toArray(new DEECoPlugin[]{}));
-			
-			switch(cfg.mode) {
+
+			DEECoNode node = realm.createNode(nodeCnt, plugins.toArray(new DEECoPlugin[] {}));
+
+			switch (cfg.mode) {
 			case "standard":
 				node.deployComponent(new BigAntComponent(nodeCnt, new Random(rand.nextLong()), node, ANT_HILL_POS));
-			break;
+				break;
 			case "quantum":
 				node.deployComponent(new BigAntComponent(nodeCnt, new Random(rand.nextLong()), node, ANT_HILL_POS));
-			break;
+				break;
 			default:
 				throw new UnexpectedException("Mode \"" + cfg.mode + "\" not defined");
-			}			
-			
+			}
+
 			node.deployEnsemble(AntPosExchangeEnsemble.class);
 			node.deployEnsemble(FoodSourceExchangeEnsemble.class);
 		}
 
 		// Create small ant nodes
-		if(cfg.useRebroadcasting) {
+		if (cfg.useRebroadcasting) {
 			for (int i = 0; i < cfg.numSmallAnts; ++i) {
 				nodeCnt++;
-				
+
 				List<DEECoPlugin> plugins = new LinkedList<>();
 				plugins.add(new SmallAntPlugin());
 				plugins.add(new PositionPlugin(PosUtils.getRandomPosition(rand, 0, 0, ANT_SPAWN_DIAMETER_M)));
 				plugins.add(new CachingRebroadcastStrategy(cfg.rebroadcastDelayMs, cfg.rebroadcastRangeM));
-				
-				DEECoNode node = realm.createNode(nodeCnt, plugins.toArray(new DEECoPlugin[]{}));
-				
+
+				DEECoNode node = realm.createNode(nodeCnt, plugins.toArray(new DEECoPlugin[] {}));
+
 				node.deployComponent(new SmallAntComponent(nodeCnt, new Random(rand.nextLong()), node));
 			}
 		}
