@@ -56,8 +56,6 @@ public abstract class AbstractAntWorldPlugin implements DEECoPlugin, TimerTaskLi
 	public static final long SIM_STEP_MS = 100;
 	public static final double FOOD_SOURCE_SPAWN_DIAMETER_M = 15;
 	public static final int FOOD_SOURCE_CAPACITY = 1;
-	public static final int SOURCE_COUNT = 4;
-	public static final double PER_SOURCE_REMOVE_PROBABILITY_PER_S = 1.0 / 10;
 	public static final int HELPERS_NEEDED = 1;
 
 	public Position antHill;
@@ -75,7 +73,7 @@ public abstract class AbstractAntWorldPlugin implements DEECoPlugin, TimerTaskLi
 	private Set<Network> networks = new LinkedHashSet<>();
 
 	// Configuration object
-	private final Config config;
+	protected final Config config;
 
 	public AbstractAntWorldPlugin(Position antHill, Random rand, Config config) {
 		this.antHill = antHill;

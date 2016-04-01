@@ -75,7 +75,7 @@ public class QuantumAntWorldPlugin extends AbstractAntWorldPlugin {
 	@Override
 	protected void maintainFoodSourcePopulation() {
 		// Add new food sources
-		if (foodSources.size() < SOURCE_COUNT) {
+		if (foodSources.size() < config.sourceCount) {
 			Set<QuantumFoodSource> sources = QuantumFoodSource.createQuantumFoodPair(
 					PosUtils.getRandomPosition(rand, antHill, FOOD_SOURCE_SPAWN_DIAMETER_M),
 					PosUtils.getRandomPosition(rand, antHill, FOOD_SOURCE_SPAWN_DIAMETER_M), FOOD_SOURCE_CAPACITY);
@@ -88,7 +88,7 @@ public class QuantumAntWorldPlugin extends AbstractAntWorldPlugin {
 		List<FoodSource> toRemove = new LinkedList<>();
 		for (FoodSource source : foodSources) {
 			QuantumFoodSource qsource = (QuantumFoodSource)source;
-			if (rand.nextDouble() < PER_SOURCE_REMOVE_PROBABILITY_PER_S / (1000 / SIM_STEP_MS)) {
+			if (rand.nextDouble() < config.perSourceRemoveProbabilityPerS / (1000 / SIM_STEP_MS)) {
 				toRemove.add(qsource);
 				toRemove.add(qsource.other);
 			}
