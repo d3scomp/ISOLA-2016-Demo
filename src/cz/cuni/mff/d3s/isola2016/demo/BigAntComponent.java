@@ -29,7 +29,7 @@ import cz.cuni.mff.d3s.jdeeco.position.Position;
 public class BigAntComponent {
 	public static final long MAX_FOOD_AGE_MS = 30000;
 	public static final double RANDOM_WALK_DIAMETER_M = 15;
-	public static final double RANDOM_WALK_DIFF_M = 1;
+	public static final double RANDOM_WALK_DIFF_M = 10;
 	public static final double RANDOM_WALK_NOFEAR_M = 15;
 
 	public String id;
