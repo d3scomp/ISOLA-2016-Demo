@@ -24,7 +24,7 @@ public class QuantumAntWorldPlugin extends AbstractAntWorldPlugin {
 	
 	private BigAntPlugin getHelper(QuantumFoodSource source) {
 		for (BigAntPlugin ant : bigAnts) {
-			if(PosUtils.isSame(ant.position, source.position)) {
+			if(PosUtils.isSame(ant.position, source.position) && ant.state == State.Locked) {
 				return ant;
 			}
 		}
