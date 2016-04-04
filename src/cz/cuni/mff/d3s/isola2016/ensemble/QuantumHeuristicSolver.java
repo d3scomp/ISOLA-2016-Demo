@@ -15,13 +15,13 @@ public class QuantumHeuristicSolver implements AntAssignmetSolver {
 		public QuantumFoodSource a;
 		public QuantumFoodSource b;
 
-		public void add(QuantumFoodSource src) {
+		void add(QuantumFoodSource src) {
 			if(a == null) {
 				a = src;
 			} else {
 				if(b == null) {
-					if(a.quantumId != src.quantumId) {
-						throw new UnsupportedOperationException("Adding quantum source to pair, but the id is not matching");
+					if(!a.quantumId.equals(src.quantumId)) {
+						throw new UnsupportedOperationException("Adding quantum source to pair, but the id is not matching: " + a.quantumId + " != " + src.quantumId);
 					}
 					b = src;
 				} else {
@@ -58,8 +58,8 @@ public class QuantumHeuristicSolver implements AntAssignmetSolver {
 			this.antB = antB;
 			
 			quantumId = srcA.quantumId;
-			if(srcB.quantumId != quantumId) {
-				throw new UnsupportedOperationException("Quantum food pair ids do not match");
+			if(!srcB.quantumId.equals(quantumId)) {
+				throw new UnsupportedOperationException("Quantum food pair ids do not match: " + quantumId + " != " + srcB.quantumId);
 			}
 			
 			double straightPrice = antA.position.euclidDistanceTo(srcA.position) + antB.position.euclidDistanceTo(srcB.position);
