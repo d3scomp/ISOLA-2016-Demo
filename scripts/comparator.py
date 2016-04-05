@@ -1,5 +1,6 @@
 import simloader
 import os
+import sys
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plot
@@ -110,7 +111,12 @@ def processDimension(dimension, filter):
     print("Data end")
     
     boxplot(data, msgdata, name = dimension)
+
+if len(sys.argv) == 2:
+    logsDir = sys.argv[1];
     
+print("Using logsdir: " + logsDir);
+      
 for dimension in dimensions:
     processDimension(dimension, dimensions[dimension])
 
