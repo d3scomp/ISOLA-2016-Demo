@@ -146,17 +146,6 @@ public class BigAntComponent {
 		}
 	}
 
-	/*
-	 * @Process
-	 * 
-	 * @PeriodicScheduling(period = 1000, order = 4) public static void log(@In("id") String id, @In("position")
-	 * Position position, @In("foods") List<TimestampedFoodSource> foods) { if (position == null) { return; }
-	 * 
-	 * try { ProcessContext.getRuntimeLogger().log(new AntLogRecord(id, position));
-	 * FoodLogRecord.logAll(ProcessContext.getRuntimeLogger(), foods); } catch (Exception e) { throw new
-	 * DEECoRuntimeException("Ant log failed with exception", e); } }
-	 */
-
 	@Process
 	@PeriodicScheduling(period = 1000, order = 5)
 	public static void printStatus(@In("clock") CurrentTimeProvider clock, @In("id") String id,
