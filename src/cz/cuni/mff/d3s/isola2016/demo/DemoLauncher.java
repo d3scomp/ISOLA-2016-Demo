@@ -40,6 +40,7 @@ public class DemoLauncher {
 	}
 
 	public static void run(Config cfg) throws Exception {
+		System.out.println("JAVA library path: " + System.getProperty("java.library.path"));
 		System.out.println("Ant food picking simulation demo");
 		
 		// Pseudo random number generator
