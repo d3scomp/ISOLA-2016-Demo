@@ -8,6 +8,7 @@ import java.util.Random;
 import cz.cuni.mff.d3s.deeco.runners.DEECoSimulation;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoNode;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoPlugin;
+import cz.cuni.mff.d3s.deeco.simulation.omnet.OMNeTUtils;
 import cz.cuni.mff.d3s.deeco.timer.DiscreteEventTimer;
 import cz.cuni.mff.d3s.isola2016.antsim.AbstractAntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.BigAntPlugin;
@@ -22,6 +23,8 @@ import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.network.Network;
 import cz.cuni.mff.d3s.jdeeco.network.device.SimpleBroadcastDevice;
 import cz.cuni.mff.d3s.jdeeco.network.l2.strategy.KnowledgeInsertingStrategy;
+import cz.cuni.mff.d3s.jdeeco.network.omnet.OMNeTBroadcastDevice;
+import cz.cuni.mff.d3s.jdeeco.network.omnet.OMNeTSimulation;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 import cz.cuni.mff.d3s.jdeeco.position.PositionPlugin;
 import cz.cuni.mff.d3s.jdeeco.publishing.DefaultKnowledgePublisher;
@@ -38,16 +41,12 @@ public class DemoLauncher {
 
 	public static void run(Config cfg) throws Exception {
 		System.out.println("Ant food picking simulation demo");
-
-		DiscreteEventTimer discreteTimer = new DiscreteEventTimer();
-
-		// OMNeTSimulation omnetSim = new OMNeTSimulation();
-		// omnetSim.set80154txPower(OMNeTUtils.RangeToPower_802_15_4(cfg.radioRangeM));
-
-		// DEECoSimulation realm = new DEECoSimulation(omnetSim.getTimer());
-		DEECoSimulation realm = new DEECoSimulation(discreteTimer);
-
+		
+		// Pseudo random number generator
+		// If passing this to components, just use this to generate seed for new generator
 		Random rand = new Random(cfg.seed);
+		
+		// Define ant world
 		AbstractAntWorldPlugin antWorld;
 		AntAssignmetSolver solver;
 		switch (cfg.mode) {
@@ -65,13 +64,28 @@ public class DemoLauncher {
 			throw new UnexpectedException("Mode \"" + cfg.mode + "\" not defined");
 		}
 
-		// Add plugins
-		// realm.addPlugin(omnetSim);
+		// Define simulation
+		DEECoSimulation realm;
+		switch(cfg.networkModel) {
+			case "simple":
+				realm = new DEECoSimulation(new DiscreteEventTimer());
+				realm.addPlugin(new SimpleBroadcastDevice(25, 10, cfg.radioRangeM, 1024));
+			break;
+			case "omnet":
+				OMNeTSimulation omnetSim = new OMNeTSimulation();
+				omnetSim.set80154txPower(OMNeTUtils.RangeToPower_802_15_4(cfg.radioRangeM));
+				realm = new DEECoSimulation(omnetSim.getTimer());
+				realm.addPlugin(omnetSim);
+				realm.addPlugin(OMNeTBroadcastDevice.class);
+			break;
+			default:
+				throw new UnsupportedOperationException("Network model " + cfg.networkModel + " not defined");
+		}
+		
+		// Add common plugins
 		realm.addPlugin(Network.class);
 		realm.addPlugin(KnowledgeInsertingStrategy.class);
 		realm.addPlugin(antWorld);
-		// realm.addPlugin(OMNeTBroadcastDevice.class);
-		realm.addPlugin(new SimpleBroadcastDevice(25, 10, cfg.radioRangeM, 1024));
 		// realm.addPlugin(ProabilisticRebroadcastStrategy.class);
 		// realm.addPlugin(KnowledgeSizeSampler.class);
 

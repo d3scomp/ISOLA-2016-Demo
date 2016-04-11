@@ -23,7 +23,8 @@ public class Config {
 	public Long rebroadcastDelayMs;
 	public String mode;
 	public Integer sourceCount;
-	public Double perSourceRemoveProbabilityPerS; 
+	public Double perSourceRemoveProbabilityPerS;
+	public String networkModel;
 
 	Config(String[] args) throws ParseException {
 		Options options = new Options();
