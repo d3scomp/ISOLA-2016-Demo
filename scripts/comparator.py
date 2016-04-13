@@ -15,40 +15,56 @@ logsDir = "logs"
 def cfgGuard(log, dim):
     if not hasattr(log.config, "mode"):
         log.config.mode = "standard"
-    return log.config.mode == dim['mode'] and log.config.radioRangeM == dim['radiorange']
+    if not hasattr(log.config, "networkModel"):
+        log.config.networkModel = "simple"
+        
+    if log.config.mode != dim['mode']:
+        return False
+    if float(log.config.radioRangeM) != float(dim['radiorange']):
+        #print(str(log.config.radioRangeM) + " != " + str(dim['radiorange']))
+        return False
+    if log.config.networkModel != dim['networkModel']:
+        #print(log.config.networkModel + " != " + dim['networkModel'])
+        return False
+    
+    return True
 
 dimensions = []
-for mode in ['standard', 'quantum']:
-    for radiorange in [3, 5, 7]:
-        dimensions.append({
-        'headline': "Rebroadcast range influence on " + mode + " mode with " + str(radiorange) + "m radio range",
-        'xaxisText': "Rebroadcast range in meters",
-        'xaxisTransform': lambda val: str(val),
-        'value': "rebroadcastRangeM",
-        'mode': mode,
-        'radiorange': radiorange,
-        'filter': lambda log, dim: cfgGuard(log, dim) and log.config.rebroadcastDelayMs < 5000,
-        })
-        
-        dimensions.append({
-        'headline': "Rebroadcast delay influence on " + mode + " mode with " + str(radiorange) + "m radio range",
-        'xaxisText': "Rebroadcast period in seconds",
-        'xaxisTransform': lambda val: str(val / 1000),
-        'value': "rebroadcastDelayMs",
-        'mode': mode,
-        'radiorange': radiorange,
-        'filter': lambda log, dim: cfgGuard(log, dim) and log.config.rebroadcastRangeM >= 5 and log.config.maxTimeSkewMs > 10000
-        })
-        
-        dimensions.append({
-        'headline': "Old knowledge removal influence on " + mode + " mode with " + str(radiorange) + "m radio range",
-        'xaxisText': "Maximal allowed knowledge age in seconds",
-        'xaxisTransform': lambda val: str(val / 1000),
-        'value': "maxTimeSkewMs",
-        'mode': mode,
-        'radiorange': radiorange,
-        'filter': lambda log, dim: cfgGuard(log, dim) and log.config.rebroadcastRangeM > 5 and log.config.rebroadcastDelayMs > 5000
-        })
+for networkModel in ['simple', 'omnet']:
+    for mode in ['standard', 'quantum']:
+        for radiorange in [3, 5, 7]:
+            dimensions.append({
+            'headline': "Rebroadcast range influence on " + mode + " mode with " + str(radiorange) + "m radio range (" + networkModel + ")",
+            'xaxisText': "Rebroadcast range in meters",
+            'xaxisTransform': lambda val: str(val),
+            'value': "rebroadcastRangeM",
+            'mode': mode,
+            'networkModel': networkModel,
+            'radiorange': radiorange,
+            'filter': lambda log, dim: cfgGuard(log, dim) and log.config.rebroadcastDelayMs < 5000,
+            })
+            
+            dimensions.append({
+            'headline': "Rebroadcast delay influence on " + mode + " mode with " + str(radiorange) + "m radio range (" + networkModel + ")",
+            'xaxisText': "Rebroadcast period in seconds",
+            'xaxisTransform': lambda val: str(val / 1000),
+            'value': "rebroadcastDelayMs",
+            'mode': mode,
+            'networkModel': networkModel,
+            'radiorange': radiorange,
+            'filter': lambda log, dim: cfgGuard(log, dim) and log.config.rebroadcastRangeM >= 5 and log.config.maxTimeSkewMs > 10000
+            })
+            
+            dimensions.append({
+            'headline': "Old knowledge removal influence on " + mode + " mode with " + str(radiorange) + "m radio range (" + networkModel + ")",
+            'xaxisText': "Maximal allowed knowledge age in seconds",
+            'xaxisTransform': lambda val: str(val / 1000),
+            'value': "maxTimeSkewMs",
+            'mode': mode,
+            'networkModel': networkModel,
+            'radiorange': radiorange,
+            'filter': lambda log, dim: cfgGuard(log, dim) and log.config.rebroadcastRangeM > 5 and log.config.rebroadcastDelayMs > 5000
+            })
 
 def boxplot(data, msgdata, name="comparison", xaxisText="value", xaxisTransform=lambda x: x):
     print ("NAME " + name)
@@ -155,6 +171,7 @@ def processDimension(dimension, logs):
         boxplot(data, msgdata, name=dimension['headline'], xaxisText=dimension['xaxisText'], xaxisTransform=dimension['xaxisTransform'])
     else:
         print("No data for this comparison dimension")
+        print(dimension['headline'])
 
 if len(sys.argv) == 2:
     logsDir = sys.argv[1];
