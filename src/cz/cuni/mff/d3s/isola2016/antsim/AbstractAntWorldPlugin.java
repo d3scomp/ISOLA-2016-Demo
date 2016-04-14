@@ -25,22 +25,18 @@ import cz.cuni.mff.d3s.isola2016.antsim.BigAntPlugin.State;
 import cz.cuni.mff.d3s.isola2016.demo.Config;
 import cz.cuni.mff.d3s.isola2016.demo.FoodSource;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
-import cz.cuni.mff.d3s.jdeeco.network.Network;
+import cz.cuni.mff.d3s.jdeeco.network.l1.strategy.L2PacketCounter;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 public abstract class AbstractAntWorldPlugin implements DEECoPlugin, TimerTaskListener {
 	static class FinalLog {
 		static class Report {
-			public final long numMessages;
+			public final L2PacketCounter msgCounter;
 			public final int collected;
 			
 			Report(AbstractAntWorldPlugin world) {
 				this.collected = world.collectedFoodPieces;
-				long msgCounter = 0;
-				for (Network network : world.networks) {
-					msgCounter += network.getL1().getTotalL2Packets();
-				}
-				this.numMessages = msgCounter;
+				this.msgCounter = world.counter;
 			}
 		}
 		
@@ -70,7 +66,7 @@ public abstract class AbstractAntWorldPlugin implements DEECoPlugin, TimerTaskLi
 	private boolean initialized = false;
 	private final long startTime;
 	protected final Random rand;
-	private Set<Network> networks = new LinkedHashSet<>();
+	private L2PacketCounter counter;
 
 	// Configuration object
 	protected final Config config;
@@ -84,14 +80,14 @@ public abstract class AbstractAntWorldPlugin implements DEECoPlugin, TimerTaskLi
 
 	@Override
 	public List<Class<? extends DEECoPlugin>> getDependencies() {
-		return Arrays.asList(Network.class);
+		return Arrays.asList(L2PacketCounter.class);
 	}
 
 	@Override
 	public void init(DEECoContainer container) throws PluginInitFailedException {
-		networks.add(container.getPluginInstance(Network.class));
 		if (!initialized) {
 			initialized = true;
+			counter = container.getPluginInstance(L2PacketCounter.class);
 			Scheduler scheduler = container.getRuntimeFramework().getScheduler();
 			new TimerTask(scheduler, this, "AntWorldSimStep", 0, SIM_STEP_MS).schedule();
 			

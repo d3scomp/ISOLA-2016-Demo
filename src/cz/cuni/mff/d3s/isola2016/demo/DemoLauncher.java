@@ -22,6 +22,7 @@ import cz.cuni.mff.d3s.isola2016.ensemble.QuantumHeuristicSolver;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.network.Network;
 import cz.cuni.mff.d3s.jdeeco.network.device.SimpleBroadcastDevice;
+import cz.cuni.mff.d3s.jdeeco.network.l1.strategy.L2PacketCounter;
 import cz.cuni.mff.d3s.jdeeco.network.l2.strategy.KnowledgeInsertingStrategy;
 import cz.cuni.mff.d3s.jdeeco.network.omnet.OMNeTBroadcastDevice;
 import cz.cuni.mff.d3s.jdeeco.network.omnet.OMNeTSimulation;
@@ -87,6 +88,8 @@ public class DemoLauncher {
 		realm.addPlugin(Network.class);
 		realm.addPlugin(KnowledgeInsertingStrategy.class);
 		realm.addPlugin(antWorld);
+		L2PacketCounter counter = new L2PacketCounter();
+		realm.addPlugin(counter);
 		// realm.addPlugin(ProabilisticRebroadcastStrategy.class);
 		// realm.addPlugin(KnowledgeSizeSampler.class);
 
@@ -143,5 +146,6 @@ public class DemoLauncher {
 		System.out.println("All done.");
 
 		System.out.println("Total food pieces delivered: " + antWorld.collectedFoodPieces);
+		System.out.println("Total packets: " + counter.toString());
 	}
 }
