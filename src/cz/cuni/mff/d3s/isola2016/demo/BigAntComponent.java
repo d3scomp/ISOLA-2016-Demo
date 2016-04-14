@@ -32,12 +32,19 @@ public class BigAntComponent {
 	public static final double RANDOM_WALK_DIFF_M = 10;
 	public static final double RANDOM_WALK_NOFEAR_M = 15;
 
+	// True local data
 	public String id;
 	public Position position;
 	public List<FoodSource> foods;
-	public Position assignedFood;
 	public Mode mode;
+
+	// Knowledge time-stamp (for ensemble evaluation and old data filtering)
 	public Long time;
+
+	// Intelligent ensemble originated data
+	public Position assignedFood;
+	public Long assignedFoodTime;
+	public Double accumulatedFitness;
 
 	@Local
 	public Map<String, Position> otherPos;
@@ -56,8 +63,6 @@ public class BigAntComponent {
 
 	@Local
 	public Position antHill;
-
-	public Position assistantPos;
 
 	/// Initial knowledge
 	public BigAntComponent(int id, Random rand, DEECoNode node, Position antHill) {
@@ -196,8 +201,8 @@ public class BigAntComponent {
 						mode.value = Mode.Grip;
 					}
 				}
-				
-				if(mode.value != Mode.Grip) {
+
+				if (mode.value != Mode.Grip) {
 					System.err.println("NOT SURE");
 				}
 			}
