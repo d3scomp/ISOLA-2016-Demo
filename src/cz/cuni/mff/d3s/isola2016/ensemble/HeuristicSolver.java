@@ -1,110 +1,221 @@
 package cz.cuni.mff.d3s.isola2016.ensemble;
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import cz.cuni.mff.d3s.isola2016.demo.BigAnt;
 import cz.cuni.mff.d3s.isola2016.demo.FoodSource;
+import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 public class HeuristicSolver implements AntAssignmetSolver {
-	static class AntAntSource {
-		public AntInfo a;
-		public AntInfo b;
-		public FoodSource nearestFoodSource;
-		public double nearestFoodSourcePrice = Double.POSITIVE_INFINITY;
-		
-		private double getAntAntSourceDistance(AntInfo a, AntInfo b, FoodSource s, Position antHill) {
-			double distance = s.position.euclidDistanceTo(antHill);
-			distance += a.position.euclidDistanceTo(s.position);
-			distance += b.position.euclidDistanceTo(s.position);
-			return distance;
+	public static final double MAX_DISTANCE_M = 30;
+	public static final long MAX_LATENCY_MS = 30000;
+	
+	class Ensemble {
+		public Set<BigAnt> ants = new LinkedHashSet<>();
+		public FoodSource source;
+		public double distFitness;
+		public double latFitness;
+		final long curTime;
+
+		public Ensemble(Collection<BigAnt> ants, FoodSource source, long curTime) {
+			if (ants.size() != 2) {
+				throw new UnsupportedOperationException("Num of ants in ensemble must be 2, but is " + ants.size());
+			}
+
+			this.ants.addAll(ants);
+			this.source = source;
+			this.curTime = curTime;
+
+			updateFitness();
 		}
 
-		public AntAntSource(AntInfo a, AntInfo b, Collection<FoodSource> foods, Position antHill) {
-			this.a = a;
-			this.b = b;
+		public Ensemble(BigAnt antA, BigAnt antB, FoodSource source, long curTime) {
+			this(Arrays.asList(antA, antB), source, curTime);
+		}
 
-			for (FoodSource source : foods) {
-				double price = getAntAntSourceDistance(a, b, source, antHill);
-				if (nearestFoodSourcePrice > price) {
-					nearestFoodSourcePrice = price;
-					nearestFoodSource = source;
-				}
+		public void commit() {
+			for (BigAnt ant : ants) {
+				ant.assignedFood = source.position;
 			}
 		}
-	}
+		
+		private void updateFitness() {
+			updateDistFitness();
+			updateLatFitness();
+		}
 
-	static class AntFood {
-		public AntInfo ant;
-		public FoodSource assignedFoodSource;
+		private void updateDistFitness() {
+			double totalDistance = ants.stream()
+					.mapToDouble(ant -> ant.position.euclidDistanceTo(source.position))
+					.average()
+					.getAsDouble();
 
-		public AntFood(AntInfo ant, FoodSource source) {
-			this.ant = ant;
-			this.assignedFoodSource = source;
+			switch (mode) {
+			case PreferMinimumTravelDistance:
+				distFitness = Math.max(1, MAX_DISTANCE_M / totalDistance);
+				break;
+			case PreferMaximumTravelDistance:
+				distFitness = Math.max(1, totalDistance / MAX_DISTANCE_M);
+				break;
+			default:
+				throw new UnsupportedOperationException("Fitness calculation not defined for mode: " + mode);
+			}
+		}
+		
+		private void updateLatFitness() {
+			double totalLatency = ants.stream()
+					.map(ant -> ant.time)
+					.reduce(0l, (sum, time) -> sum += curTime - time);
+			latFitness =  Math.max(1, totalLatency / MAX_LATENCY_MS);
 		}
 	}
 
-	@Override
-	public Result solve(Collection<AntInfo> ants, Collection<FoodSource> foods, AntInfo localAnt, Position antHill) {
-		LinkedHashSet<AntInfo> remaing = new LinkedHashSet<>(ants);
-		Map<AntInfo, FoodSource> done = new HashMap<>();
-		Map<AntInfo, AntInfo> donePairs = new HashMap<>();
-		
-	/*	for(FoodSource source: foods) {
-			System.out.println("Food: " + source.position);
+	class PersistentEnsemble {
+		Collection<String> antIds;
+		Position sourcePosition;
+
+		LinkedList<Ensemble> instances;
+
+		public PersistentEnsemble(Ensemble ensemble) {
+			antIds = ensemble.ants.stream().map(ant -> ant.id).collect(Collectors.toSet());
+			sourcePosition = ensemble.source.position;
+			instances.add(ensemble);
 		}
-		for(AntInfo ant: ants) {
-			System.out.println("Ant: " + ant.id);
-		}*/
 		
-		while (!remaing.isEmpty()) {
-			// Assign nearest foods to pairs
-			LinkedHashSet<AntAntSource> antDistances = new LinkedHashSet<>();
-			for (AntInfo antA : remaing) {
-				for (AntInfo antB : remaing) {
-					if(antA != antB) {
-						antDistances.add(new AntAntSource(antA, antB, foods, antHill));
+		public Ensemble tryMaintain(Collection<BigAnt> ants, List<FoodSource> foods, long curTime) {
+			Set<BigAnt> matchedAnts = new LinkedHashSet<>();
+			FoodSource matchedSource = null;
+			
+			// Match ants
+			assert(!antIds.isEmpty());
+			Iterator<String> antIdIt = antIds.iterator();
+			String curId = antIdIt.next();
+			for(BigAnt ant: ants) {
+				if(ant.id.equals(curId)) {
+					matchedAnts.add(ant);
+					if(antIdIt.hasNext()) {
+						curId = antIdIt.next();
+					} else {
+						break;
 					}
 				}
 			}
 			
-			// Get optimal pair ant add it to result
-			double optimalPairDistance = Double.POSITIVE_INFINITY;
-			AntAntSource optimalPair = null;
-			
-			for(AntAntSource aas: antDistances) {
-				if(aas.nearestFoodSourcePrice < optimalPairDistance) {
-					optimalPairDistance = aas.nearestFoodSourcePrice;
-					optimalPair = aas;
+			// Match source
+			for(FoodSource source: foods) {
+				if(PosUtils.isSame(source.position, sourcePosition)) {
+					matchedSource = source;
+					break;
 				}
 			}
 			
-			if(optimalPair != null) {
-			//	System.out.println("Optimal pair: " + optimalPair.a.id + " " + optimalPair.b.id + " " + optimalPair.nearestFoodSource.position + " " + optimalPair.nearestFoodSource.portions);
-				done.put(optimalPair.a, optimalPair.nearestFoodSource);
-				done.put(optimalPair.b, optimalPair.nearestFoodSource);
-				donePairs.put(optimalPair.a, optimalPair.b);
-				donePairs.put(optimalPair.b, optimalPair.a);
-			
-				remaing.remove(optimalPair.a);
-				remaing.remove(optimalPair.b);
-				foods.remove(optimalPair.nearestFoodSource);
-			} else {
-				remaing.clear();
-				break;
+			// Ensemble cannot be maintained as we do not have ants and food to maintain it
+			if(matchedAnts.size() != antIds.size() || matchedSource == null) {
+				return null;
 			}
+			
+			Ensemble ensemble = new Ensemble(matchedAnts, matchedSource, curTime);
+			
+			// Ensemble cannot be maintained, fitness condition prevents it
+			instances.add(ensemble);
+			
+			if(!checkPerisitanceCondition()) {
+				return null;
+			}
+			
+			return ensemble;
 		}
-				
-		System.out.println("Local ant: " + localAnt.id);
-		FoodSource assignedFood = done.get(localAnt);
-		AntInfo assistant = donePairs.get(localAnt);
-		if(assignedFood == null) {
-			return new Result(null, null);
-		} else {
-			return new Result(assignedFood, assistant);
+		
+		public boolean checkPerisitanceCondition() {
+			double avgDistFitness = instances.stream()
+					.mapToDouble(ens -> ens.distFitness)
+					.average()
+					.getAsDouble();
+			double avgLatFitness = instances.stream()
+					.mapToDouble(ens -> ens.latFitness)
+					.average()
+					.getAsDouble();
+			
+			return avgLatFitness > 0.5 && avgDistFitness > 0.5;
 		}
 	}
 
+	final FitnessMode mode;
+	final Set<PersistentEnsemble> persistentEnsembles = new LinkedHashSet<>();
+
+	public HeuristicSolver(FitnessMode mode) {
+		this.mode = mode;
+	}
+
+	private Collection<Ensemble> generateOptions(List<BigAnt> ants, List<FoodSource> foods, long curTime) {
+		Set<Ensemble> options = new LinkedHashSet<>();
+
+		// Generate all triplet with unique unsorted ant pairs
+		for (ListIterator<BigAnt> antAIt = ants.listIterator(); antAIt.hasNext();) {
+			BigAnt antA = antAIt.next();
+			for (ListIterator<BigAnt> antBIt = ants.listIterator(antAIt.nextIndex()); antBIt.hasNext();) {
+				BigAnt antB = antBIt.next();
+				for (FoodSource source : foods) {
+					options.add(new Ensemble(antA, antB, source, curTime));
+				}
+			}
+		}
+
+		return options;
+	}
+
+	@Override
+	public void solve(Collection<BigAnt> ants, Collection<FoodSource> foods, Position antHill, long curTime) {
+		List<BigAnt> remainingAnts = new LinkedList<>(ants);
+		List<FoodSource> remainingFoods = new LinkedList<>(foods);
+
+		// Try to maintain persistent ensembles
+		for(Iterator<PersistentEnsemble> it = persistentEnsembles.iterator(); it.hasNext();) {
+			PersistentEnsemble persistentEnsemble = it.next();
+			Ensemble ensemble = persistentEnsemble.tryMaintain(remainingAnts, remainingFoods, curTime);
+			if(ensemble == null) {
+				// Maintenance failed, drop persistent ensemble
+				it.remove();
+			} else {
+				// Prolong ensemble
+				ensemble.commit();
+				remainingAnts.removeAll(ensemble.ants);
+				remainingFoods.remove(ensemble.source);
+			}
+		}
+
+		// Create new ensembles
+		while (!remainingAnts.isEmpty() && !remainingFoods.isEmpty()) {
+			// Generate all options, break when no options
+			Collection<Ensemble> options = generateOptions(remainingAnts, remainingFoods, curTime);
+			if (options.isEmpty()) {
+				break;
+			}
+
+			// Find best option
+			Ensemble best = null;
+			for (Ensemble ensemble : options) {
+				if (best == null || ensemble.distFitness > best.distFitness) {
+					best = ensemble;
+				}
+			}
+
+			// Do "knowledge exchange" for best
+			best.commit();
+			persistentEnsembles.add(new PersistentEnsemble(best));
+
+			// Remove best from remaining
+			remainingAnts.removeAll(best.ants);
+			remainingFoods.remove(best.source);
+		}
+	}
 }

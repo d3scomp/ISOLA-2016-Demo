@@ -16,6 +16,7 @@ import cz.cuni.mff.d3s.isola2016.antsim.QuantumAntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.SmallAntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.StandardAntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.ensemble.AntAssignmetSolver;
+import cz.cuni.mff.d3s.isola2016.ensemble.FitnessMode;
 import cz.cuni.mff.d3s.isola2016.ensemble.HeuristicSolver;
 import cz.cuni.mff.d3s.isola2016.ensemble.IntelligentAntPlanning;
 import cz.cuni.mff.d3s.isola2016.ensemble.QuantumHeuristicSolver;
@@ -55,7 +56,7 @@ public class DemoLauncher {
 		case "standard":
 			antWorld = new StandardAntWorldPlugin(ANT_HILL_POS, new Random(rand.nextLong()), cfg);
 			// solver = new BruteforceSolver();
-			solver = new HeuristicSolver();
+			solver = new HeuristicSolver(FitnessMode.PreferMinimumTravelDistance);
 			// solver = new ProactiveSolver();
 			break;
 		case "quantum":

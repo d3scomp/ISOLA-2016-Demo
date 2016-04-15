@@ -10,7 +10,7 @@ import java.util.Stack;
 import cz.cuni.mff.d3s.isola2016.demo.FoodSource;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
-public class BruteforceSolver implements AntAssignmetSolver {
+public class BruteforceSolver {
 	static class Pair {
 		AntInfo a;
 		AntInfo b;
@@ -168,7 +168,7 @@ public class BruteforceSolver implements AntAssignmetSolver {
 		return badness;
 	}
 
-	public Result solve(Collection<AntInfo> ants, Collection<FoodSource> foods, AntInfo localAnt, Position antHill) {
+	public void solve(Collection<AntInfo> ants, Collection<FoodSource> foods, AntInfo localAnt, Position antHill) {
 		// Generate all possible solutions
 		System.out.print("Fake intelligence: Ants: " + ants.size() + " foods: " + foods.size() + " >>> ");
 		System.out.flush();
@@ -213,9 +213,9 @@ public class BruteforceSolver implements AntAssignmetSolver {
 
 		// Set assigned food source local knowledge
 		if (sourceAssignedToLocalAnt != null) {
-			return new Result(sourceAssignedToLocalAnt, assistant);
+//			return new Result(sourceAssignedToLocalAnt, assistant);
 		} else {
-			return new Result(null, null);
+//			return new Result(null, null);
 		}
 	}
 }
