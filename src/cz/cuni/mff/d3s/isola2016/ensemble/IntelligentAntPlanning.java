@@ -94,11 +94,12 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 		TrackingKnowledgeContainer trackingContainer = new TrackingKnowledgeContainer(localWrapper, remoteWrappers);
 
 		Collection<BigAnt> ants = trackingContainer.getTrackedKnowledgeForRole(BigAnt.class);
+		long curTime = runtime.getScheduler().getTimer().getCurrentMilliseconds();
 		
 		// Filter-out too old ant data
 		for(Iterator<BigAnt> it = ants.iterator(); it.hasNext();) {
 			BigAnt ant = it.next();
-			if(runtime.getScheduler().getTimer().getCurrentMilliseconds() - ant.time > maxTimeSkew) {
+			if(curTime - ant.time > maxTimeSkew) {
 				it.remove();
 			}
 			
@@ -107,7 +108,7 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 		Collection<FoodSource> sources = extractSources(ants);
 		
 		// Solve the problem
-		solver.solve(ants, sources, DemoLauncher.ANT_HILL_POS);
+		solver.solve(ants, sources, DemoLauncher.ANT_HILL_POS, curTime);
 		
 		trackingContainer.commitChanges();
 	}
