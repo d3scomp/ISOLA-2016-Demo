@@ -10,7 +10,7 @@ import cz.cuni.mff.d3s.isola2016.antsim.QuantumFoodSource;
 import cz.cuni.mff.d3s.isola2016.demo.FoodSource;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
-public class QuantumHeuristicSolver implements AntAssignmetSolver {
+public class QuantumHeuristicSolver {
 	private static class QuantumFoodPair {
 		public QuantumFoodSource a;
 		public QuantumFoodSource b;
@@ -77,8 +77,7 @@ public class QuantumHeuristicSolver implements AntAssignmetSolver {
 		}
 	}
 
-	@Override
-	public Result solve(Collection<AntInfo> ants, Collection<FoodSource> foods, AntInfo localAnt, Position antHill) {
+	public void solve(Collection<AntInfo> ants, Collection<FoodSource> foods, AntInfo localAnt, Position antHill) {
 		LinkedHashSet<AntInfo> remaingAnts = new LinkedHashSet<>(ants);
 		
 		Map<Integer, QuantumFoodPair> qIdToFoods = buildQIdToSourceMap(foods);
@@ -115,10 +114,10 @@ public class QuantumHeuristicSolver implements AntAssignmetSolver {
 			
 			// We should remember all best options, but we are interested only in the local one
 			if(best.antA == localAnt) {
-				return new Result(best.srcA, best.antB); 
+	//			return new Result(best.srcA, best.antB); 
 			}
 			if(best.antB == localAnt) {
-				return new Result(best.srcB, best.antA); 
+	//			return new Result(best.srcB, best.antA); 
 			}
 			
 			// Remove best option from remaining
@@ -127,6 +126,6 @@ public class QuantumHeuristicSolver implements AntAssignmetSolver {
 			qIdToFoods.remove(best.quantumId);
 		}
 		
-		return new Result(null, null);
+	//	return new Result(null, null);
 	}
 }

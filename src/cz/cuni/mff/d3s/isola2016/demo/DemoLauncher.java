@@ -59,10 +59,10 @@ public class DemoLauncher {
 			solver = new HeuristicSolver(FitnessMode.PreferMinimumTravelDistance);
 			// solver = new ProactiveSolver();
 			break;
-		case "quantum":
+	/*	case "quantum":
 			antWorld = new QuantumAntWorldPlugin(ANT_HILL_POS, new Random(rand.nextLong()), cfg);
 			solver = new QuantumHeuristicSolver();
-			break;
+			break;*/
 		default:
 			throw new UnexpectedException("Mode \"" + cfg.mode + "\" not defined");
 		}
