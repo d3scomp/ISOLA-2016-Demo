@@ -5,10 +5,14 @@ import java.util.LinkedHashSet;
 
 import cz.cuni.mff.d3s.deeco.knowledge.KnowledgeNotFoundException;
 import cz.cuni.mff.d3s.deeco.knowledge.ReadOnlyKnowledgeManager;
+import cz.cuni.mff.d3s.deeco.knowledge.container.KnowledgeAccessException;
+import cz.cuni.mff.d3s.deeco.knowledge.container.ReadOnlyKnowledgeWrapper;
+import cz.cuni.mff.d3s.deeco.knowledge.container.RoleClassException;
 import cz.cuni.mff.d3s.deeco.logging.Log;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoContainer;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoRuntimeException;
 import cz.cuni.mff.d3s.deeco.runtime.PluginInitFailedException;
+import cz.cuni.mff.d3s.isola2016.demo.BigAnt;
 import cz.cuni.mff.d3s.isola2016.demo.FoodSource;
 import cz.cuni.mff.d3s.isola2016.ensemble.AntInfo;
 
@@ -34,7 +38,7 @@ public class BigAntPlugin extends AntPlugin {
 
 	public State state;
 	public FoodPiece pulledFoodPiece;
-	public AntInfo antInfo;
+	public BigAnt antInfo;
 	public LinkedHashSet<AntInfo> otherAntInfo;
 	
 	@Override
@@ -78,7 +82,12 @@ public class BigAntPlugin extends AntPlugin {
 	
 	public void updateAntInfo() {
 		try {
-			antInfo = new AntInfo(container.getRuntimeFramework().getContainer().getLocals().iterator().next());
+			ReadOnlyKnowledgeWrapper knowledgeWrapper = new ReadOnlyKnowledgeWrapper(container.getRuntimeFramework().getContainer().getLocals().iterator().next());
+			try {
+				antInfo = knowledgeWrapper.getUntrackedRoleKnowledge(BigAnt.class);
+			} catch (Exception e) {
+				throw new DEECoRuntimeException("Ant info knowledge extraction failed", e);
+			}
 			otherAntInfo = new LinkedHashSet<>();
 			for (ReadOnlyKnowledgeManager remote : container.getRuntimeFramework().getContainer().getReplicas()) {
 				otherAntInfo.add(new AntInfo(remote));
