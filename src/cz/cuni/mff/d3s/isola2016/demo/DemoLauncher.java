@@ -56,7 +56,7 @@ public class DemoLauncher {
 		case "standard":
 			antWorld = new StandardAntWorldPlugin(ANT_HILL_POS, new Random(rand.nextLong()), cfg);
 			// solver = new BruteforceSolver();
-			solver = new HeuristicSolver(FitnessMode.PreferMinimumTravelDistance);
+			solver = new HeuristicSolver(FitnessMode.PreferMinimumTravelDistance, cfg);
 			// solver = new ProactiveSolver();
 			break;
 	/*	case "quantum":

@@ -11,13 +11,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import cz.cuni.mff.d3s.isola2016.demo.BigAnt;
+import cz.cuni.mff.d3s.isola2016.demo.Config;
 import cz.cuni.mff.d3s.isola2016.demo.FoodSource;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 public class HeuristicSolver implements AntAssignmetSolver {
 	public static final double MAX_DISTANCE_M = 30;
-	public static final long MAX_LATENCY_MS = 30000;
+	public final Config config;
 	
 	class Ensemble {
 		public Set<BigAnt> ants = new LinkedHashSet<>();
@@ -75,7 +76,7 @@ public class HeuristicSolver implements AntAssignmetSolver {
 			double totalLatency = ants.stream()
 					.map(ant -> ant.time)
 					.reduce(0l, (sum, time) -> sum += curTime - time);
-			latFitness =  1 - Math.min(1, totalLatency / MAX_LATENCY_MS);
+			latFitness =  1 - Math.min(1, totalLatency / config.maxTimeSkewMs);
 		}
 	}
 
@@ -109,8 +110,6 @@ public class HeuristicSolver implements AntAssignmetSolver {
 					}
 				}
 			}
-			
-			System.err.println(instances.size());
 			
 			// Match source
 			for(FoodSource source: foods) {
@@ -154,8 +153,9 @@ public class HeuristicSolver implements AntAssignmetSolver {
 	final FitnessMode mode;
 	final Set<PersistentEnsemble> persistentEnsembles = new LinkedHashSet<>();
 
-	public HeuristicSolver(FitnessMode mode) {
+	public HeuristicSolver(FitnessMode mode, Config config) {
 		this.mode = mode;
+		this.config = config;
 	}
 
 	private Collection<Ensemble> generateOptions(List<BigAnt> ants, List<FoodSource> foods, long curTime) {
@@ -187,13 +187,11 @@ public class HeuristicSolver implements AntAssignmetSolver {
 			if(ensemble == null) {
 				// Maintenance failed, drop persistent ensemble
 				it.remove();
-				System.err.println("------------- Killing persistent ensemble");
 			} else {
 				// Prolong ensemble
 				ensemble.commit();
 				remainingAnts.removeAll(ensemble.ants);
 				remainingFoods.remove(ensemble.source);
-				System.err.println("+++++++++++++ Keeping persistent ensemble");
 			}
 		}
 
