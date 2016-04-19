@@ -22,7 +22,7 @@ public class HeuristicSolver implements AntAssignmetSolver {
 	class Ensemble {
 		public Set<BigAnt> ants = new LinkedHashSet<>();
 		public FoodSource source;
-		public double distFitness;
+		public double appFitness;
 		public double latFitness;
 		final long curTime;
 
@@ -61,10 +61,10 @@ public class HeuristicSolver implements AntAssignmetSolver {
 
 			switch (mode) {
 			case PreferMinimumTravelDistance:
-				distFitness = Math.max(1, MAX_DISTANCE_M / totalDistance);
+				appFitness = 1 - Math.min(1, totalDistance / MAX_DISTANCE_M);
 				break;
 			case PreferMaximumTravelDistance:
-				distFitness = Math.max(1, totalDistance / MAX_DISTANCE_M);
+				appFitness = Math.min(1, totalDistance / MAX_DISTANCE_M);
 				break;
 			default:
 				throw new UnsupportedOperationException("Fitness calculation not defined for mode: " + mode);
@@ -75,7 +75,7 @@ public class HeuristicSolver implements AntAssignmetSolver {
 			double totalLatency = ants.stream()
 					.map(ant -> ant.time)
 					.reduce(0l, (sum, time) -> sum += curTime - time);
-			latFitness =  Math.max(1, totalLatency / MAX_LATENCY_MS);
+			latFitness =  1 - Math.min(1, totalLatency / MAX_LATENCY_MS);
 		}
 	}
 
@@ -110,6 +110,8 @@ public class HeuristicSolver implements AntAssignmetSolver {
 				}
 			}
 			
+			System.err.println(instances.size());
+			
 			// Match source
 			for(FoodSource source: foods) {
 				if(PosUtils.isSame(source.position, sourcePosition)) {
@@ -136,16 +138,16 @@ public class HeuristicSolver implements AntAssignmetSolver {
 		}
 		
 		public boolean checkPerisitanceCondition() {
-			double avgDistFitness = instances.stream()
-					.mapToDouble(ens -> ens.distFitness)
+			double avgAppFitness = instances.stream()
+					.mapToDouble(ens -> ens.appFitness)
 					.average()
 					.getAsDouble();
 			double avgLatFitness = instances.stream()
 					.mapToDouble(ens -> ens.latFitness)
 					.average()
 					.getAsDouble();
-			
-			return avgLatFitness > 0.5 && avgDistFitness > 0.5;
+			System.err.println(avgLatFitness + " " + avgAppFitness);
+			return avgLatFitness > 0.5 && avgAppFitness > 0.5;
 		}
 	}
 
@@ -185,11 +187,13 @@ public class HeuristicSolver implements AntAssignmetSolver {
 			if(ensemble == null) {
 				// Maintenance failed, drop persistent ensemble
 				it.remove();
+				System.err.println("------------- Killing persistent ensemble");
 			} else {
 				// Prolong ensemble
 				ensemble.commit();
 				remainingAnts.removeAll(ensemble.ants);
 				remainingFoods.remove(ensemble.source);
+				System.err.println("+++++++++++++ Keeping persistent ensemble");
 			}
 		}
 
@@ -204,7 +208,7 @@ public class HeuristicSolver implements AntAssignmetSolver {
 			// Find best option
 			Ensemble best = null;
 			for (Ensemble ensemble : options) {
-				if (best == null || ensemble.distFitness > best.distFitness) {
+				if (best == null || ensemble.appFitness > best.appFitness) {
 					best = ensemble;
 				}
 			}
