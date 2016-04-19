@@ -60,6 +60,8 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 	 */
 	private Collection<FoodSource> extractSources(Collection<BigAnt> ants) {
 		Set<FoodSource> foods = new LinkedHashSet<>();
+		
+		// Extract up to date source information
 		for (BigAnt ant : ants) {
 			for (FoodSource source : ant.foods) {
 				if (!foods.contains(source)) {
@@ -75,6 +77,14 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 				}
 			}
 		}
+		
+		// Filter out empty/removed sources
+		for(Iterator<FoodSource> it = foods.iterator(); it.hasNext();) {
+			if(it.next().portions == 0) {
+				it.remove();
+			}
+		}
+		
 		return foods;
 	}
 

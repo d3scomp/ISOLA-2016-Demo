@@ -83,7 +83,7 @@ public class HeuristicSolver implements AntAssignmetSolver {
 		Collection<String> antIds;
 		Position sourcePosition;
 
-		LinkedList<Ensemble> instances;
+		List<Ensemble> instances = new LinkedList<>();
 
 		public PersistentEnsemble(Ensemble ensemble) {
 			antIds = ensemble.ants.stream().map(ant -> ant.id).collect(Collectors.toSet());
@@ -216,6 +216,12 @@ public class HeuristicSolver implements AntAssignmetSolver {
 			// Remove best from remaining
 			remainingAnts.removeAll(best.ants);
 			remainingFoods.remove(best.source);
+		}
+		
+		// Set no food position to remaining ants
+		for(BigAnt ant: remainingAnts) {
+			ant.assignedFood = null;
+			ant.assignedFoodTime = curTime;
 		}
 	}
 }
