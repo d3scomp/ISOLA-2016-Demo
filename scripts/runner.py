@@ -2,8 +2,11 @@ import os
 import threading
 from time import sleep
 
+MAX_THREADS = 48
+TOTAL_MEM_MB = 128000
+
 class Cfg(threading.Thread):
-    def __init__(self, seed, limit, maxtimeskew, numbigants, numsmallants, radiorange, rebroadcastrangem, rebrodcastdelay):
+    def __init__(self, seed, limit, maxtimeskew, numbigants, numsmallants, radiorange, rebroadcastrangem, rebrodcastdelay, networkModel):
         super().__init__()
         self.seed = seed
         self.limit = limit
@@ -14,6 +17,8 @@ class Cfg(threading.Thread):
         self.rebroadcastrangem = rebroadcastrangem
         self.rebroadcastdelay = rebroadcastdelay
         self.userebroadcasting = True
+        self.networkModel = networkModel
+        
         self.running = False
         
     def run(self):
@@ -32,13 +37,13 @@ class Cfg(threading.Thread):
         args += '--useRebroadcasting ' + str(self.userebroadcasting) + ' '
         args += '--logIntervalMs 0 '
         args += '--mode standard '
-        args += '--sourceCount 4 '
+        args += '--sourceCount 8 '
 #        args += '--perSourceRemoveProbabilityPerS 0.02 '
         args += '--perSourceRemoveProbabilityPerS 0.1 '
-        args += '--networkModel omnet '
+        args += '--networkModel ' + str(self.networkModel) + ' '
 
 #        print(args)
-        cmd = 'LD_LIBRARY_PATH=omnet java -Djava.library.path=/home/matena/ants/omnet -Xmx4500m -jar experiment.jar ' + args + ' > /dev/null 2>&1';
+        cmd = 'LD_LIBRARY_PATH=omnet java -Djava.library.path=/home/matena/ants/omnet -Xmx' + str(int(TOTAL_MEM_MB / MAX_THREADS)) + 'm -jar experiment.jar ' + args + ' > /dev/null 2>&1';
         print(cmd)
         os.system(cmd)
         print("Execution done")
@@ -57,22 +62,21 @@ class MetaCfg:
         self.networkModels = networkModels
         self.modes = modes
 
-MAX_THREADS = 24
 metaCfgs = [];
 cfgs = [];
 
 # Define meta configurations
-for mode in ['standard', 'quantum']:
-    for networkModel in ['simple', 'omnet']:
+for mode in ['standard']:#['standard', 'quantum']:
+    for networkModel in ['simple']:#['simple', 'omnet']:
         metaCfgs.append(MetaCfg(
                     numbigantss = [6],
                     numsmallantss = [40],
-                    radioranges = [7],
+                    radioranges = [5, 7],
                     limits = [1800000],
                     seeds = range(0, 10),
-                    rebroadcatDelays = [5000], #[1000, 5000, 10000, 15000, 30000]
+                    rebroadcatDelays = [1000, 5000, 10000, 15000, 30000],
                     rebroadcastRanges = [0, 5, 10, 15],
-                    maxtimeskews = [30000],#[5000, 10000, 30000, 60000]
+                    maxtimeskews = [1000, 5000, 10000, 30000, 60000],
                     networkModels = [networkModel],
                     modes = [mode]
                     ))
@@ -98,7 +102,8 @@ for metaCfg in metaCfgs:
                                                 maxtimeskew=maxtimeskew,
                                                 radiorange=radiorange,
                                                 rebroadcastrangem=rebroadcastrange,
-                                                rebrodcastdelay=rebroadcastdelay)
+                                                rebrodcastdelay=rebroadcastdelay,
+                                                networkModel=networkModel)
                                             )
     
 print("Running " + str(len(cfgs)) + " configurations")
