@@ -25,6 +25,7 @@ public class Config {
 	public Integer sourceCount;
 	public Double perSourceRemoveProbabilityPerS;
 	public String networkModel;
+	public String fitnessType;
 
 	Config(String[] args) throws ParseException {
 		Options options = new Options();

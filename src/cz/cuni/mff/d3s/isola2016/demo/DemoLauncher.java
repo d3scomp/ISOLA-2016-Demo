@@ -56,7 +56,17 @@ public class DemoLauncher {
 		case "standard":
 			antWorld = new StandardAntWorldPlugin(ANT_HILL_POS, new Random(rand.nextLong()), cfg);
 			// solver = new BruteforceSolver();
-			solver = new HeuristicSolver(FitnessMode.PreferMinimumTravelDistance, cfg);
+			switch(cfg.fitnessType) {
+			case "PreferClose":
+				solver = new HeuristicSolver(FitnessMode.PreferMinimumTravelDistance, cfg);
+			break;
+			case "PreferDistant":
+				solver = new HeuristicSolver(FitnessMode.PreferMaximumTravelDistance, cfg);
+			break;
+			default:
+				throw new UnsupportedOperationException("Unknown fitness type \"" + cfg.fitnessType + "\"");
+			}
+			
 			// solver = new ProactiveSolver();
 			break;
 	/*	case "quantum":

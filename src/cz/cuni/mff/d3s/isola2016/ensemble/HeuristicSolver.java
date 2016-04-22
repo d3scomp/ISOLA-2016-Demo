@@ -145,7 +145,6 @@ public class HeuristicSolver implements AntAssignmetSolver {
 					.mapToDouble(ens -> ens.latFitness)
 					.average()
 					.getAsDouble();
-			System.err.println(avgLatFitness + " " + avgAppFitness);
 			return avgLatFitness > 0.5 && avgAppFitness > 0.5;
 		}
 	}
