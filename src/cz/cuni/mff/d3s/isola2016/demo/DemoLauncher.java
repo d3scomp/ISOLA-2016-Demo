@@ -14,12 +14,14 @@ import cz.cuni.mff.d3s.deeco.simulation.omnet.OMNeTUtils;
 import cz.cuni.mff.d3s.deeco.timer.DiscreteEventTimer;
 import cz.cuni.mff.d3s.isola2016.antsim.AbstractAntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.BigAntPlugin;
+import cz.cuni.mff.d3s.isola2016.antsim.QuantumAntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.SmallAntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.StandardAntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.ensemble.AntAssignmetSolver;
 import cz.cuni.mff.d3s.isola2016.ensemble.FitnessMode;
 import cz.cuni.mff.d3s.isola2016.ensemble.HeuristicSolver;
 import cz.cuni.mff.d3s.isola2016.ensemble.IntelligentAntPlanning;
+import cz.cuni.mff.d3s.isola2016.ensemble.PairedHeuristicSolver;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.network.Network;
 import cz.cuni.mff.d3s.jdeeco.network.device.SimpleBroadcastDevice;
@@ -44,11 +46,11 @@ public class DemoLauncher {
 	public static void run(Config cfg) throws Exception {
 		System.out.println("JAVA library path: " + System.getProperty("java.library.path"));
 		System.out.println("Ant food picking simulation demo");
-		
+
 		// Pseudo random number generator
 		// If passing this to components, just use this to generate seed for new generator
 		Random rand = new Random(cfg.seed);
-		
+
 		// Define ant world
 		AbstractAntWorldPlugin antWorld;
 		AntAssignmetSolver solver;
@@ -56,45 +58,53 @@ public class DemoLauncher {
 		case "standard":
 			antWorld = new StandardAntWorldPlugin(ANT_HILL_POS, new Random(rand.nextLong()), cfg);
 			// solver = new BruteforceSolver();
-			switch(cfg.fitnessType) {
+			// solver = new ProactiveSolver();
+			switch (cfg.fitnessType) {
 			case "PreferClose":
 				solver = new HeuristicSolver(FitnessMode.PreferMinimumTravelDistance, cfg);
-			break;
+				break;
 			case "PreferDistant":
 				solver = new HeuristicSolver(FitnessMode.PreferMaximumTravelDistance, cfg);
-			break;
+				break;
 			default:
 				throw new UnsupportedOperationException("Unknown fitness type \"" + cfg.fitnessType + "\"");
 			}
-			
-			// solver = new ProactiveSolver();
 			break;
-	/*	case "quantum":
+		case "quantum":
 			antWorld = new QuantumAntWorldPlugin(ANT_HILL_POS, new Random(rand.nextLong()), cfg);
-			solver = new QuantumHeuristicSolver();
-			break;*/
+			switch (cfg.fitnessType) {
+			case "PreferClose":
+				solver = new PairedHeuristicSolver(FitnessMode.PreferMinimumTravelDistance, cfg);
+				break;
+			case "PreferDistant":
+				solver = new PairedHeuristicSolver(FitnessMode.PreferMaximumTravelDistance, cfg);
+				break;
+			default:
+				throw new UnsupportedOperationException("Unknown fitness type \"" + cfg.fitnessType + "\"");
+			}
+			break;
 		default:
 			throw new UnexpectedException("Mode \"" + cfg.mode + "\" not defined");
 		}
 
 		// Define simulation
 		DEECoSimulation realm;
-		switch(cfg.networkModel) {
-			case "simple":
-				realm = new DEECoSimulation(new DiscreteEventTimer());
-				realm.addPlugin(new SimpleBroadcastDevice(25, 10, cfg.radioRangeM, 1024));
+		switch (cfg.networkModel) {
+		case "simple":
+			realm = new DEECoSimulation(new DiscreteEventTimer());
+			realm.addPlugin(new SimpleBroadcastDevice(25, 10, cfg.radioRangeM, 1024));
 			break;
-			case "omnet":
-				OMNeTSimulation omnetSim = new OMNeTSimulation();
-				omnetSim.set80154txPower(OMNeTUtils.RangeToPower_802_15_4(cfg.radioRangeM));
-				realm = new DEECoSimulation(omnetSim.getTimer());
-				realm.addPlugin(omnetSim);
-				realm.addPlugin(OMNeTBroadcastDevice.class);
+		case "omnet":
+			OMNeTSimulation omnetSim = new OMNeTSimulation();
+			omnetSim.set80154txPower(OMNeTUtils.RangeToPower_802_15_4(cfg.radioRangeM));
+			realm = new DEECoSimulation(omnetSim.getTimer());
+			realm.addPlugin(omnetSim);
+			realm.addPlugin(OMNeTBroadcastDevice.class);
 			break;
-			default:
-				throw new UnsupportedOperationException("Network model " + cfg.networkModel + " not defined");
+		default:
+			throw new UnsupportedOperationException("Network model " + cfg.networkModel + " not defined");
 		}
-		
+
 		// Add common plugins
 		realm.addPlugin(Network.class);
 		realm.addPlugin(KnowledgeInsertingStrategy.class);
