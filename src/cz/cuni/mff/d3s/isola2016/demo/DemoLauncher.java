@@ -36,7 +36,6 @@ import cz.cuni.mff.d3s.jdeeco.publishing.DefaultKnowledgePublisher;
 public class DemoLauncher {
 	public static final double ANT_SPAWN_DIAMETER_M = 10;
 	public static final Position ANT_HILL_POS = new Position(0, 0);
-	public static final String LOG_PATH = "logs/runtime";
 
 	public static void main(String[] args) throws Exception {
 		Config cfg = new Config(args);
