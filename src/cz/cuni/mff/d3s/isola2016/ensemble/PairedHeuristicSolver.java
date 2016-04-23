@@ -63,37 +63,49 @@ public class PairedHeuristicSolver implements AntAssignmetSolver {
 		}
 
 		private void updateFitness() {
-			updateDistFitness();
-			updateLatFitness();
+			appFitness = getAppFitness();
+			latFitness = getLatFitness();
 		}
 
-		private void updateDistFitness() {
+		private double getAppFitness() {
+			return getAntFitness() + getSourceFitness();
+		}
+		
+		private double getAntFitness() {
 			double totalDistance = antToSource.entrySet().stream()
 					.mapToDouble(entry -> entry.getKey().position.euclidDistanceTo(entry.getValue().position)).average()
 					.getAsDouble();
 
+			return 1 - Math.min(1, totalDistance / MAX_DISTANCE_M);
+		}
+		
+		private double getSourceFitness() {
+			final Position center = new Position(
+					getSources().stream().mapToDouble(src -> src.position.x).average().getAsDouble(),
+					getSources().stream().mapToDouble(src -> src.position.y).average().getAsDouble());
+			final double totalDistance = getSources().stream()
+					.mapToDouble(src -> src.position.euclidDistanceTo(center)).sum();
+
 			switch (mode) {
-			case PreferMinimumTravelDistance:
-				appFitness = 1 - Math.min(1, totalDistance / MAX_DISTANCE_M);
-				break;
-			case PreferMaximumTravelDistance:
-				appFitness = Math.min(1, totalDistance / MAX_DISTANCE_M);
-				break;
+			case PreferCloseFoods:
+				return Math.pow(1 - Math.min(1, totalDistance / MAX_DISTANCE_M), 1/2);
+			case PreferDistantFoods:
+				return Math.pow(Math.min(1, totalDistance / MAX_DISTANCE_M), 1/2);
 			default:
 				throw new UnsupportedOperationException("Fitness calculation not defined for mode: " + mode);
 			}
 		}
 
-		private void updateLatFitness() {
-			double totalLatency = antToSource.keySet().stream().map(ant -> ant.time).reduce(0l,
+		private double getLatFitness() {
+			double totalLatency = getAnts().stream().map(ant -> ant.time).reduce(0l,
 					(sum, time) -> sum += curTime - time);
-			latFitness = 1 - Math.min(1, totalLatency / config.maxTimeSkewMs);
+			return 1 - Math.min(1, totalLatency / config.maxTimeSkewMs);
 		}
-		
+
 		public Set<BigAnt> getAnts() {
 			return antToSource.keySet();
 		}
-		
+
 		public Set<QuantumFoodSource> getSources() {
 			return new LinkedHashSet<>(antToSource.values());
 		}
@@ -181,24 +193,24 @@ public class PairedHeuristicSolver implements AntAssignmetSolver {
 		Set<Ensemble> options = new LinkedHashSet<>();
 
 		// Generate all quartets ant, ant, food, food
-		// Where ants are different, foods are different and share quantum id 
-		for(BigAnt antA: ants) {
-			for(BigAnt antB: ants) {
-				if(antB == antA) {
+		// Where ants are different, foods are different and share quantum id
+		for (BigAnt antA : ants) {
+			for (BigAnt antB : ants) {
+				if (antB == antA) {
 					continue;
 				}
-				for(QuantumFoodSource srcA: foods) {
-					for(QuantumFoodSource srcB: foods) {
-						if(srcA == srcB || srcA.quantumId != srcB.quantumId) {
+				for (QuantumFoodSource srcA : foods) {
+					for (QuantumFoodSource srcB : foods) {
+						if (srcA == srcB || srcA.quantumId != srcB.quantumId) {
 							continue;
 						}
-						
+
 						options.add(new Ensemble(antA, antB, srcA, srcB, curTime));
 					}
 				}
 			}
 		}
-		
+
 		return options;
 	}
 
@@ -206,7 +218,7 @@ public class PairedHeuristicSolver implements AntAssignmetSolver {
 	public void solve(Collection<BigAnt> ants, Collection<FoodSource> foods, Position antHill, long curTime) {
 		List<BigAnt> remainingAnts = new LinkedList<>(ants);
 		List<QuantumFoodSource> remainingFoods = new LinkedList<>();
-		for(FoodSource source: foods) {
+		for (FoodSource source : foods) {
 			remainingFoods.add((QuantumFoodSource) source);
 		}
 

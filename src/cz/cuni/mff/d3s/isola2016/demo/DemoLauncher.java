@@ -61,10 +61,10 @@ public class DemoLauncher {
 			// solver = new ProactiveSolver();
 			switch (cfg.fitnessType) {
 			case "PreferClose":
-				solver = new HeuristicSolver(FitnessMode.PreferMinimumTravelDistance, cfg);
+				solver = new HeuristicSolver(FitnessMode.PreferCloseFoods, cfg);
 				break;
 			case "PreferDistant":
-				solver = new HeuristicSolver(FitnessMode.PreferMaximumTravelDistance, cfg);
+				solver = new HeuristicSolver(FitnessMode.PreferDistantFoods, cfg);
 				break;
 			default:
 				throw new UnsupportedOperationException("Unknown fitness type \"" + cfg.fitnessType + "\"");
@@ -74,10 +74,10 @@ public class DemoLauncher {
 			antWorld = new QuantumAntWorldPlugin(ANT_HILL_POS, new Random(rand.nextLong()), cfg);
 			switch (cfg.fitnessType) {
 			case "PreferClose":
-				solver = new PairedHeuristicSolver(FitnessMode.PreferMinimumTravelDistance, cfg);
+				solver = new PairedHeuristicSolver(FitnessMode.PreferCloseFoods, cfg);
 				break;
 			case "PreferDistant":
-				solver = new PairedHeuristicSolver(FitnessMode.PreferMaximumTravelDistance, cfg);
+				solver = new PairedHeuristicSolver(FitnessMode.PreferDistantFoods, cfg);
 				break;
 			default:
 				throw new UnsupportedOperationException("Unknown fitness type \"" + cfg.fitnessType + "\"");

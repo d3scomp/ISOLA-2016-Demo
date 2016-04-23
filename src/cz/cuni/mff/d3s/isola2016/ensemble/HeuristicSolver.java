@@ -62,10 +62,10 @@ public class HeuristicSolver implements AntAssignmetSolver {
 					.getAsDouble();
 
 			switch (mode) {
-			case PreferMinimumTravelDistance:
+			case PreferCloseFoods:
 				appFitness = 1 - Math.min(1, totalDistance / MAX_DISTANCE_M);
 				break;
-			case PreferMaximumTravelDistance:
+			case PreferDistantFoods:
 				appFitness = Math.min(1, totalDistance / MAX_DISTANCE_M);
 				break;
 			default:
