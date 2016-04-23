@@ -1,10 +1,13 @@
 package cz.cuni.mff.d3s.isola2016.demo;
 
 import java.rmi.UnexpectedException;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
+import cz.cuni.mff.d3s.deeco.knowledge.container.ReadOnlyKnowledgeWrapper;
 import cz.cuni.mff.d3s.deeco.runners.DEECoSimulation;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoNode;
 import cz.cuni.mff.d3s.deeco.runtime.DEECoPlugin;
@@ -12,14 +15,12 @@ import cz.cuni.mff.d3s.deeco.simulation.omnet.OMNeTUtils;
 import cz.cuni.mff.d3s.deeco.timer.DiscreteEventTimer;
 import cz.cuni.mff.d3s.isola2016.antsim.AbstractAntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.BigAntPlugin;
-import cz.cuni.mff.d3s.isola2016.antsim.QuantumAntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.SmallAntPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.StandardAntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.ensemble.AntAssignmetSolver;
 import cz.cuni.mff.d3s.isola2016.ensemble.FitnessMode;
 import cz.cuni.mff.d3s.isola2016.ensemble.HeuristicSolver;
 import cz.cuni.mff.d3s.isola2016.ensemble.IntelligentAntPlanning;
-import cz.cuni.mff.d3s.isola2016.ensemble.QuantumHeuristicSolver;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.network.Network;
 import cz.cuni.mff.d3s.jdeeco.network.device.SimpleBroadcastDevice;
@@ -106,6 +107,7 @@ public class DemoLauncher {
 
 		// Create big ant nodes
 		int nodeCnt = 0;
+		Set<DEECoNode> bigAnts = new LinkedHashSet<>();
 		for (int i = 0; i < cfg.numBigAnts; ++i) {
 			nodeCnt++;
 
@@ -133,6 +135,7 @@ public class DemoLauncher {
 
 			node.deployEnsemble(AntPosExchangeEnsemble.class);
 			node.deployEnsemble(FoodSourceExchangeEnsemble.class);
+			bigAnts.add(node);
 		}
 
 		// Create small ant nodes

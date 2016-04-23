@@ -46,6 +46,7 @@ public class HeuristicSolver implements AntAssignmetSolver {
 		public void commit() {
 			for (BigAnt ant : ants) {
 				ant.assignedFood = source.position;
+				ant.currentGoalUtility = appFitness;
 			}
 		}
 		
@@ -222,7 +223,7 @@ public class HeuristicSolver implements AntAssignmetSolver {
 		// Set no food position to remaining ants
 		for(BigAnt ant: remainingAnts) {
 			ant.assignedFood = null;
-			ant.assignedFoodTime = curTime;
+			ant.currentGoalUtility = 0.0;
 		}
 	}
 }

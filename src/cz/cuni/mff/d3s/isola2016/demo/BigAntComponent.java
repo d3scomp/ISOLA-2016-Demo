@@ -48,6 +48,10 @@ public class BigAntComponent {
 	public Long assignedFoodTime;
 	public Double accumulatedFitness;
 
+	// Utility collection
+	public Double currentGoalUtility = 0.0;
+	public Double totalUtility = 0.0;
+
 	@Local
 	public Map<String, Position> otherPos;
 
@@ -183,7 +187,8 @@ public class BigAntComponent {
 	@PeriodicScheduling(period = 500, order = 6)
 	public static void modeSwitch(@In("ant") BigAntPlugin ant, @InOut("mode") ParamHolder<Mode> mode,
 			@In("assignedFood") Position assignedFood, @In("position") Position position,
-			@In("clock") CurrentTimeProvider clock) {
+			@In("clock") CurrentTimeProvider clock, @In("currentGoalUtility") Double currentGoalUtility,
+			@InOut("totalUtility") ParamHolder<Double> totalUtility) {
 		switch (mode.value) {
 		case Searching:
 			if (assignedFood != null) {
@@ -231,6 +236,7 @@ public class BigAntComponent {
 			// Cancel pull
 			if (ant.getState() == State.Free) {
 				mode.value = Mode.Searching;
+				totalUtility.value += currentGoalUtility;
 			}
 			break;
 		}

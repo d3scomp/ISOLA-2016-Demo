@@ -16,4 +16,7 @@ public class BigAnt {
 	public Position assignedFood;
 	public Long assignedFoodTime;
 	public Double accumulatedFitness;
+	
+	public Double currentGoalUtility;
+	public Double totalUtility;
 }

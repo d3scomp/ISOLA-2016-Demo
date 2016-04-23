@@ -33,10 +33,17 @@ public abstract class AbstractAntWorldPlugin implements DEECoPlugin, TimerTaskLi
 		static class Report {
 			public final L2PacketCounter msgCounter;
 			public final int collected;
+			public final double utility;
 			
 			Report(AbstractAntWorldPlugin world) {
 				this.collected = world.collectedFoodPieces;
 				this.msgCounter = world.counter;
+				
+				Double utility = 0.0;
+				for(BigAntPlugin ant: world.bigAnts) {
+					utility += ant.antInfo.totalUtility;
+				}
+				this.utility = utility;
 			}
 		}
 		
@@ -45,7 +52,7 @@ public abstract class AbstractAntWorldPlugin implements DEECoPlugin, TimerTaskLi
 		
 		public FinalLog(AbstractAntWorldPlugin world) {
 			this.config = world.config;
-			this.report = new Report(world); 
+			this.report = new Report(world);
 		}
 	}
 
@@ -56,6 +63,7 @@ public abstract class AbstractAntWorldPlugin implements DEECoPlugin, TimerTaskLi
 
 	public Position antHill;
 	public int collectedFoodPieces = 0;
+	public double utility = 0;
 	public Collection<BigAntPlugin> bigAnts = new LinkedHashSet<>();
 	public Collection<SmallAntPlugin> smallAnts = new LinkedHashSet<>();
 	public Collection<FoodSource> foodSources = new LinkedHashSet<>();
