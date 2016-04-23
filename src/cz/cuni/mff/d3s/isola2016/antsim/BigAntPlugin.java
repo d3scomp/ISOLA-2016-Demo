@@ -3,7 +3,6 @@ package cz.cuni.mff.d3s.isola2016.antsim;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
-import cz.cuni.mff.d3s.deeco.knowledge.KnowledgeNotFoundException;
 import cz.cuni.mff.d3s.deeco.knowledge.ReadOnlyKnowledgeManager;
 import cz.cuni.mff.d3s.deeco.knowledge.container.ReadOnlyKnowledgeWrapper;
 import cz.cuni.mff.d3s.deeco.logging.Log;
@@ -12,7 +11,6 @@ import cz.cuni.mff.d3s.deeco.runtime.DEECoRuntimeException;
 import cz.cuni.mff.d3s.deeco.runtime.PluginInitFailedException;
 import cz.cuni.mff.d3s.isola2016.demo.BigAnt;
 import cz.cuni.mff.d3s.isola2016.demo.FoodSource;
-import cz.cuni.mff.d3s.isola2016.ensemble.AntInfo;
 
 /**
  * Represents one ant in simulation
@@ -37,7 +35,7 @@ public class BigAntPlugin extends AntPlugin {
 	public State state;
 	public FoodPiece pulledFoodPiece;
 	public BigAnt antInfo;
-	public LinkedHashSet<AntInfo> otherAntInfo;
+	public LinkedHashSet<BigAnt> otherAntInfo;
 	
 	@Override
 	public void init(DEECoContainer container) throws PluginInitFailedException {
@@ -88,10 +86,11 @@ public class BigAntPlugin extends AntPlugin {
 			}
 			otherAntInfo = new LinkedHashSet<>();
 			for (ReadOnlyKnowledgeManager remote : container.getRuntimeFramework().getContainer().getReplicas()) {
-				otherAntInfo.add(new AntInfo(remote));
+				ReadOnlyKnowledgeWrapper wrapper = new ReadOnlyKnowledgeWrapper(remote);
+				otherAntInfo.add(wrapper.getUntrackedRoleKnowledge(BigAnt.class));
 			}
-		} catch (KnowledgeNotFoundException e) {
-			new DEECoRuntimeException("Knowledge exstraction for simulation dump failed");
+		} catch (Exception e) {
+			new DEECoRuntimeException("Knowledge exstraction for simulation dump failed", e);
 		}
 	}
 }

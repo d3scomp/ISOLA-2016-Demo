@@ -7,15 +7,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
+import cz.cuni.mff.d3s.isola2016.demo.BigAnt;
 import cz.cuni.mff.d3s.isola2016.demo.FoodSource;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
 public class BruteforceSolver {
 	static class Pair {
-		AntInfo a;
-		AntInfo b;
+		BigAnt a;
+		BigAnt b;
 
-		public Pair(AntInfo a, AntInfo b) {
+		public Pair(BigAnt a, BigAnt b) {
 			this.a = a;
 			this.b = b;
 		}
@@ -27,8 +28,8 @@ public class BruteforceSolver {
 	}
 
 	static class Triplet {
-		AntInfo a;
-		AntInfo b;
+		BigAnt a;
+		BigAnt b;
 		FoodSource c;
 
 		public Triplet(Pair p, FoodSource c) {
@@ -46,10 +47,10 @@ public class BruteforceSolver {
 	static class C {
 		Stack<Pair> pairs = new Stack<>();
 		Stack<Triplet> triplets = new Stack<>();
-		Stack<AntInfo> toPair = new Stack<>();
+		Stack<BigAnt> toPair = new Stack<>();
 		Stack<FoodSource> toTriplet = new Stack<>();
 
-		public C(Collection<Triplet> triplets, Collection<Pair> pairs, Collection<AntInfo> toPair,
+		public C(Collection<Triplet> triplets, Collection<Pair> pairs, Collection<BigAnt> toPair,
 				Collection<FoodSource> toTriplet) {
 			this.pairs.addAll(pairs);
 			this.triplets.addAll(triplets);
@@ -76,7 +77,7 @@ public class BruteforceSolver {
 		}
 	}
 
-	public static Collection<Collection<Triplet>> combine(Collection<AntInfo> ants, Collection<FoodSource> foods) {
+	public static Collection<Collection<Triplet>> combine(Collection<BigAnt> ants, Collection<FoodSource> foods) {
 		if (foods.isEmpty()) {
 			return new ArrayList<>();
 		}
@@ -96,9 +97,9 @@ public class BruteforceSolver {
 				continue;
 			}
 
-			AntInfo i = c.toPair.pop();
+			BigAnt i = c.toPair.pop();
 
-			for (AntInfo j : c.toPair) {
+			for (BigAnt j : c.toPair) {
 				if (i == j) {
 					continue;
 				}
@@ -156,7 +157,7 @@ public class BruteforceSolver {
 		return ret;
 	}
 
-	private static double getBadnessAntAntFood(AntInfo a, AntInfo b, FoodSource f) {
+	private static double getBadnessAntAntFood(BigAnt a, BigAnt b, FoodSource f) {
 		return a.position.euclidDistanceTo(f.position) + b.position.euclidDistanceTo(f.position);
 	}
 
@@ -168,7 +169,7 @@ public class BruteforceSolver {
 		return badness;
 	}
 
-	public void solve(Collection<AntInfo> ants, Collection<FoodSource> foods, AntInfo localAnt, Position antHill) {
+	public void solve(Collection<BigAnt> ants, Collection<FoodSource> foods, BigAnt localAnt, Position antHill) {
 		// Generate all possible solutions
 		System.out.print("Fake intelligence: Ants: " + ants.size() + " foods: " + foods.size() + " >>> ");
 		System.out.flush();
@@ -186,7 +187,7 @@ public class BruteforceSolver {
 			}
 		}
 
-		AntInfo assistant = null;
+		BigAnt assistant = null;
 		
 		// Get food assigned to local ant
 		FoodSource sourceAssignedToLocalAnt = null;

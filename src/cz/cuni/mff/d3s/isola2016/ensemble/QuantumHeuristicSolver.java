@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import cz.cuni.mff.d3s.isola2016.antsim.QuantumFoodSource;
+import cz.cuni.mff.d3s.isola2016.demo.BigAnt;
 import cz.cuni.mff.d3s.isola2016.demo.FoodSource;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
@@ -46,14 +47,14 @@ public class QuantumHeuristicSolver {
 	}
 	
 	private static class AntAntQFood {
-		public final AntInfo antA;
-		public final AntInfo antB;
+		public final BigAnt antA;
+		public final BigAnt antB;
 		public final QuantumFoodSource srcA;
 		public final QuantumFoodSource srcB;
 		public final int quantumId;
 		public final double price;
 		
-		public AntAntQFood(AntInfo antA, AntInfo antB, QuantumFoodSource srcA, QuantumFoodSource srcB) {
+		public AntAntQFood(BigAnt antA, BigAnt antB, QuantumFoodSource srcA, QuantumFoodSource srcB) {
 			this.antA = antA;
 			this.antB = antB;
 			
@@ -77,8 +78,8 @@ public class QuantumHeuristicSolver {
 		}
 	}
 
-	public void solve(Collection<AntInfo> ants, Collection<FoodSource> foods, AntInfo localAnt, Position antHill) {
-		LinkedHashSet<AntInfo> remaingAnts = new LinkedHashSet<>(ants);
+	public void solve(Collection<BigAnt> ants, Collection<FoodSource> foods, BigAnt localAnt, Position antHill) {
+		LinkedHashSet<BigAnt> remaingAnts = new LinkedHashSet<>(ants);
 		
 		Map<Integer, QuantumFoodPair> qIdToFoods = buildQIdToSourceMap(foods);
 		
@@ -86,8 +87,8 @@ public class QuantumHeuristicSolver {
 			Set<AntAntQFood> options = new LinkedHashSet<>();
 			
 			// Generate all ant pairs
-			for(AntInfo a: remaingAnts) {
-				for(AntInfo b: remaingAnts) {
+			for(BigAnt a: remaingAnts) {
+				for(BigAnt b: remaingAnts) {
 					if(a.equals(b)) {
 						continue;
 					}
