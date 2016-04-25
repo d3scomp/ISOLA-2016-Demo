@@ -32,39 +32,40 @@ def cfgGuard(log, dim):
 dimensions = []
 for networkModel in ['simple', 'omnet']:
     for mode in ['standard', 'quantum']:
-        for radiorange in [3, 5, 7]:
-            dimensions.append({
-            'headline': "Rebroadcast range influence on " + mode + " mode with " + str(radiorange) + "m radio range (" + networkModel + ")",
-            'xaxisText': "Rebroadcast range in meters",
-            'xaxisTransform': lambda val: str(val),
-            'value': "rebroadcastRangeM",
-            'mode': mode,
-            'networkModel': networkModel,
-            'radiorange': radiorange,
-            'filter': lambda log, dim: cfgGuard(log, dim) and log.config.rebroadcastDelayMs < 5000,
-            })
-            
-            dimensions.append({
-            'headline': "Rebroadcast delay influence on " + mode + " mode with " + str(radiorange) + "m radio range (" + networkModel + ")",
-            'xaxisText': "Rebroadcast period in seconds",
-            'xaxisTransform': lambda val: str(val / 1000),
-            'value': "rebroadcastDelayMs",
-            'mode': mode,
-            'networkModel': networkModel,
-            'radiorange': radiorange,
-            'filter': lambda log, dim: cfgGuard(log, dim) and log.config.rebroadcastRangeM >= 5 and log.config.maxTimeSkewMs > 10000
-            })
-            
-            dimensions.append({
-            'headline': "Old knowledge removal influence on " + mode + " mode with " + str(radiorange) + "m radio range (" + networkModel + ")",
-            'xaxisText': "Maximal allowed knowledge age in seconds",
-            'xaxisTransform': lambda val: str(val / 1000),
-            'value': "maxTimeSkewMs",
-            'mode': mode,
-            'networkModel': networkModel,
-            'radiorange': radiorange,
-            'filter': lambda log, dim: cfgGuard(log, dim) and log.config.rebroadcastRangeM > 5 and log.config.rebroadcastDelayMs > 5000
-            })
+        for fitness in ["PreferClose", "PreferDistant", "PreferNeutral"]:
+            for radiorange in [3, 5, 7]:
+                dimensions.append({
+                'headline': fitness + "- rebroadcast range on " + mode + " " + str(radiorange) + "m radio range (" + networkModel + ")",
+                'xaxisText': "Rebroadcast range in meters",
+                'xaxisTransform': lambda val: str(val),
+                'value': "rebroadcastRangeM",
+                'mode': mode,
+                'networkModel': networkModel,
+                'radiorange': radiorange,
+                'filter': lambda log, dim: cfgGuard(log, dim) and log.config.rebroadcastDelayMs == 5000 and log.config.maxTimeSkewMs == 5000,
+                })
+                
+                dimensions.append({
+                'headline': fitness + "- rebroadcast delay on " + mode + " " + str(radiorange) + "m radio range (" + networkModel + ")",
+                'xaxisText': "Rebroadcast period in seconds",
+                'xaxisTransform': lambda val: str(val / 1000),
+                'value': "rebroadcastDelayMs",
+                'mode': mode,
+                'networkModel': networkModel,
+                'radiorange': radiorange,
+                'filter': lambda log, dim: cfgGuard(log, dim) and log.config.rebroadcastRangeM == 10 and log.config.maxTimeSkewMs == 30000
+                })
+                
+                dimensions.append({
+                'headline': fitness + "- old knowledge removal on " + mode + " " + str(radiorange) + "m radio range (" + networkModel + ")",
+                'xaxisText': "Maximal allowed knowledge age in seconds",
+                'xaxisTransform': lambda val: str(val / 1000),
+                'value': "maxTimeSkewMs",
+                'mode': mode,
+                'networkModel': networkModel,
+                'radiorange': radiorange,
+                'filter': lambda log, dim: cfgGuard(log, dim) and log.config.rebroadcastRangeM == 10 and log.config.rebroadcastDelayMs == 10000
+                })
 
 def boxplot(data, msgdata, name="comparison", xaxisText="value", xaxisTransform=lambda x: x):
     print ("NAME " + name)
