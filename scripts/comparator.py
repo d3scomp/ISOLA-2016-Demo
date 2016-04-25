@@ -33,9 +33,9 @@ dimensions = []
 for networkModel in ['simple', 'omnet']:
     for mode in ['standard', 'quantum']:
         for fitness in ["PreferClose", "PreferDistant", "PreferNeutral"]:
-            for radiorange in [3, 5, 7]:
+            for radiorange in [5]:#[3, 5, 7]:
                 dimensions.append({
-                'headline': fitness + "- rebroadcast range on " + mode + " " + str(radiorange) + "m radio range (" + networkModel + ")",
+                'headline': fitness + " - rebroadcast range on " + mode + " " + str(radiorange) + "m radio range (" + networkModel + ")",
                 'xaxisText': "Rebroadcast range in meters",
                 'xaxisTransform': lambda val: str(val),
                 'value': "rebroadcastRangeM",
@@ -46,7 +46,7 @@ for networkModel in ['simple', 'omnet']:
                 })
                 
                 dimensions.append({
-                'headline': fitness + "- rebroadcast delay on " + mode + " " + str(radiorange) + "m radio range (" + networkModel + ")",
+                'headline': fitness + " - rebroadcast delay on " + mode + " " + str(radiorange) + "m radio range (" + networkModel + ")",
                 'xaxisText': "Rebroadcast period in seconds",
                 'xaxisTransform': lambda val: str(val / 1000),
                 'value': "rebroadcastDelayMs",
@@ -57,7 +57,7 @@ for networkModel in ['simple', 'omnet']:
                 })
                 
                 dimensions.append({
-                'headline': fitness + "- old knowledge removal on " + mode + " " + str(radiorange) + "m radio range (" + networkModel + ")",
+                'headline': fitness + " - old knowledge removal on " + mode + " " + str(radiorange) + "m radio range (" + networkModel + ")",
                 'xaxisText': "Maximal allowed knowledge age in seconds",
                 'xaxisTransform': lambda val: str(val / 1000),
                 'value': "maxTimeSkewMs",
@@ -152,13 +152,14 @@ def processDimension(dimension, logs):
         
         key = log.config[dimension['value']];
         collected = log.report.collected
-        messages = log.report.numMessages
+        utility = log.report.utility
+        messages = log.report.msgCounter.sendCounter
         
         # Add collected record to data to process      
         if not key in data:
             data[key] = []
             msgdata[key] = []
-        data[key].append(int(collected))
+        data[key].append(int(utility))
         msgdata[key].append(int(messages))
 
     print("")
