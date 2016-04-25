@@ -64,22 +64,52 @@ class MetaCfg:
 
 metaCfgs = [];
 cfgs = [];
+limit_ms = 1800000
 
 # Define meta configurations
 for mode in ['quantum']:#['standard', 'quantum']:
     for networkModel in ['simple']:#['simple', 'omnet']:
+        # Rebroadcast range comparison
         metaCfgs.append(MetaCfg(
                     numbigantss = [6],
                     numsmallantss = [40],
-                    radioranges = [3, 5, 7],
-                    limits = [1800000],
-                    seeds = range(0, 30),
-                    rebroadcatDelays = [1000, 5000, 10000, 15000, 30000],
+                    radioranges = [5],#[3, 5, 7],
+                    limits = [limit_ms],
+                    seeds = range(0, 10),
+                    rebroadcatDelays = [5000],
                     rebroadcastRanges = [0, 5, 10, 15],
+                    maxtimeskews = [5000],
+                    networkModels = [networkModel],
+                    modes = [mode],
+                    fitnessTypes = ["PreferClose", "PreferDistant", "PreferNeutral"]
+                    ))
+        # Rebroadcast delay
+        metaCfgs.append(MetaCfg(
+                    numbigantss = [6],
+                    numsmallantss = [40],
+                    radioranges = [5],#[3, 5, 7],
+                    limits = [limit_ms],
+                    seeds = range(0, 10),
+                    rebroadcatDelays = [1000, 5000, 10000, 15000],
+                    rebroadcastRanges = [10],
+                    maxtimeskews = [30000],
+                    networkModels = [networkModel],
+                    modes = [mode],
+                    fitnessTypes = ["PreferClose", "PreferDistant", "PreferNeutral"]
+                    ))
+        # Knowledge age preference 
+        metaCfgs.append(MetaCfg(
+                    numbigantss = [6],
+                    numsmallantss = [40],
+                    radioranges = [5],#[3, 5, 7],
+                    limits = [limit_ms],
+                    seeds = range(0, 10),
+                    rebroadcatDelays = [10000],
+                    rebroadcastRanges = [10],
                     maxtimeskews = [1000, 5000, 10000, 30000, 60000],
                     networkModels = [networkModel],
                     modes = [mode],
-                    fitnessTypes = ["PreferClose", "PreferDistant"]
+                    fitnessTypes = ["PreferClose", "PreferDistant", "PreferNeutral"]
                     ))
 
 print("Generating using " + str(len(metaCfgs)) + " meta configurations")
