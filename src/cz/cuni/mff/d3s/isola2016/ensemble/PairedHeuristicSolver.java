@@ -25,8 +25,9 @@ public class PairedHeuristicSolver implements AntAssignmetSolver {
 
 	class Ensemble {
 		public Map<BigAnt, QuantumFoodSource> antToSource = new LinkedHashMap<>();
-		public double appFitness;
-		public double latFitness;
+		private Double appFitnessCache;
+		private Double latFitnessCache;
+		private Double sourceFitnessCache;
 		final long curTime;
 
 		public Ensemble(List<BigAnt> ants, List<QuantumFoodSource> sources, long curTime) {
@@ -48,8 +49,6 @@ public class PairedHeuristicSolver implements AntAssignmetSolver {
 			}
 
 			this.curTime = curTime;
-
-			updateFitness();
 		}
 
 		public Ensemble(BigAnt antA, BigAnt antB, QuantumFoodSource sourceA, QuantumFoodSource sourceB, long curTime) {
@@ -59,19 +58,17 @@ public class PairedHeuristicSolver implements AntAssignmetSolver {
 		public void commit() {
 			for (Entry<BigAnt, QuantumFoodSource> entry : antToSource.entrySet()) {
 				entry.getKey().assignedFood = entry.getValue().position;
-				entry.getKey().currentGoalUtility = appFitness;
+				entry.getKey().currentGoalUtility = getSourceFitness();
 			}
 		}
 
-		private void updateFitness() {
-			appFitness = getAppFitness();
-			latFitness = getLatFitness();
+		public double getAppFitness() {
+			if (appFitnessCache == null) {
+				appFitnessCache = getAntFitness() + getSourceFitness();
+			}
+			return appFitnessCache;
 		}
 
-		private double getAppFitness() {
-			return getAntFitness() + getSourceFitness();
-		}
-		
 		private double getAntFitness() {
 			double totalDistance = antToSource.entrySet().stream()
 					.mapToDouble(entry -> entry.getKey().position.euclidDistanceTo(entry.getValue().position)).average()
@@ -79,30 +76,39 @@ public class PairedHeuristicSolver implements AntAssignmetSolver {
 
 			return 1 - Math.min(1, totalDistance / MAX_DISTANCE_M);
 		}
-		
-		private double getSourceFitness() {
-			final Position center = new Position(
-					getSources().stream().mapToDouble(src -> src.position.x).average().getAsDouble(),
-					getSources().stream().mapToDouble(src -> src.position.y).average().getAsDouble());
-			final double totalDistance = getSources().stream()
-					.mapToDouble(src -> src.position.euclidDistanceTo(center)).sum();
 
-			switch (mode) {
-			case PreferCloseFoods:
-				return Math.pow(1 - Math.min(1, totalDistance / MAX_DISTANCE_M), 1/2);
-			case PreferDistantFoods:
-				return Math.pow(Math.min(1, totalDistance / MAX_DISTANCE_M), 1/2);
-			case PreferNeutral:
-				return new Random(getSources().iterator().next().quantumId).nextDouble();
-			default:
-				throw new UnsupportedOperationException("Fitness calculation not defined for mode: " + mode);
+		private double getSourceFitness() {
+			if (sourceFitnessCache == null) {
+				final Position center = new Position(
+						getSources().stream().mapToDouble(src -> src.position.x).average().getAsDouble(),
+						getSources().stream().mapToDouble(src -> src.position.y).average().getAsDouble());
+				final double totalDistance = getSources().stream()
+						.mapToDouble(src -> src.position.euclidDistanceTo(center)).sum();
+
+				switch (mode) {
+				case PreferCloseFoods:
+					sourceFitnessCache = Math.pow(1 - Math.min(1, totalDistance / MAX_DISTANCE_M), 1 / 2);
+					break;
+				case PreferDistantFoods:
+					sourceFitnessCache = Math.pow(Math.min(1, totalDistance / MAX_DISTANCE_M), 1 / 2);
+					break;
+				case PreferNeutral:
+					sourceFitnessCache = new Random(getSources().iterator().next().quantumId).nextDouble();
+					break;
+				default:
+					throw new UnsupportedOperationException("Fitness calculation not defined for mode: " + mode);
+				}
 			}
+			return sourceFitnessCache;
 		}
 
-		private double getLatFitness() {
-			double totalLatency = getAnts().stream().map(ant -> ant.time).reduce(0l,
-					(sum, time) -> sum += curTime - time);
-			return 1 - Math.min(1, totalLatency / config.maxTimeSkewMs);
+		public double getLatFitness() {
+			if (latFitnessCache == null) {
+				double totalLatency = getAnts().stream().map(ant -> ant.time).reduce(0l,
+						(sum, time) -> sum += curTime - time);
+				return 1 - Math.min(1, totalLatency / config.maxTimeSkewMs);
+			}
+			return latFitnessCache;
 		}
 
 		public Set<BigAnt> getAnts() {
@@ -178,8 +184,8 @@ public class PairedHeuristicSolver implements AntAssignmetSolver {
 		}
 
 		public boolean checkPerisitanceCondition() {
-			double avgAppFitness = instances.stream().mapToDouble(ens -> ens.appFitness).average().getAsDouble();
-			double avgLatFitness = instances.stream().mapToDouble(ens -> ens.latFitness).average().getAsDouble();
+			double avgAppFitness = instances.stream().mapToDouble(ens -> ens.getAppFitness()).average().getAsDouble();
+			double avgLatFitness = instances.stream().mapToDouble(ens -> ens.getLatFitness()).average().getAsDouble();
 			return avgLatFitness > 0.5 && avgAppFitness > 0.5;
 		}
 	}
@@ -251,7 +257,7 @@ public class PairedHeuristicSolver implements AntAssignmetSolver {
 			// Find best option
 			Ensemble best = null;
 			for (Ensemble ensemble : options) {
-				if (best == null || ensemble.appFitness > best.appFitness) {
+				if (best == null || ensemble.getAppFitness() > best.getAppFitness()) {
 					best = ensemble;
 				}
 			}
