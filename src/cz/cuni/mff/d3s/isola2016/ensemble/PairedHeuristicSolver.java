@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
 
 import cz.cuni.mff.d3s.isola2016.antsim.QuantumFoodSource;
@@ -91,6 +92,8 @@ public class PairedHeuristicSolver implements AntAssignmetSolver {
 				return Math.pow(1 - Math.min(1, totalDistance / MAX_DISTANCE_M), 1/2);
 			case PreferDistantFoods:
 				return Math.pow(Math.min(1, totalDistance / MAX_DISTANCE_M), 1/2);
+			case PreferNeutral:
+				return new Random(getSources().iterator().next().quantumId).nextDouble();
 			default:
 				throw new UnsupportedOperationException("Fitness calculation not defined for mode: " + mode);
 			}
