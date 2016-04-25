@@ -30,8 +30,8 @@ def cfgGuard(log, dim):
     return True
 
 dimensions = []
-for networkModel in ['simple', 'omnet']:
-    for mode in ['standard', 'quantum']:
+for networkModel in ['simple']:#['simple', 'omnet']:
+    for mode in ['quantum']:#['standard', 'quantum']:
         for fitness in ["PreferClose", "PreferDistant", "PreferNeutral"]:
             for radiorange in [5]:#[3, 5, 7]:
                 dimensions.append({
