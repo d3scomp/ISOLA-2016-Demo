@@ -99,7 +99,6 @@ public class PairedHeuristicSolver implements AntAssignmetSolver {
 					throw new UnsupportedOperationException("Fitness calculation not defined for mode: " + mode);
 				}
 			}
-			System.err.println(sourceFitnessCache);
 			return sourceFitnessCache;
 		}
 
