@@ -38,7 +38,6 @@ class Cfg(threading.Thread):
         args += '--mode ' + str(self.mode) + ' '
         args += '--sourceCount 8 '
         args += '--perSourceRemoveProbabilityPerS 0.02 '
-#        args += '--perSourceRemoveProbabilityPerS 0.1 '
         args += '--networkModel ' + str(self.networkModel) + ' '
         args += '--fitnessType ' + str(self.fitnessType) + ' '
 
@@ -93,7 +92,7 @@ for mode in ['standard']:#['quantum']:#['standard', 'quantum']:
                     radioranges = [5],#[3, 5, 7],
                     limits = [limit_ms],
                     seeds = seed_range,
-                    rebroadcatDelays = [1000, 5000, 10000, 15000, 20000, 25000, 30000],
+                    rebroadcatDelays = [1000, 5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000, 50000, 55000, 60000],
                     rebroadcastRanges = [10],
                     maxtimeskews = [30000],
                     networkModels = [networkModel],
