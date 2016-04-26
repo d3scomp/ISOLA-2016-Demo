@@ -137,9 +137,8 @@ public class HeuristicSolver implements AntAssignmetSolver {
 		}
 
 		public boolean checkPerisitanceCondition() {
-			double avgAppFitness = instances.stream().mapToDouble(ens -> ens.getAppFitness()).average().getAsDouble();
 			double avgLatFitness = instances.stream().mapToDouble(ens -> ens.getLatFitness()).average().getAsDouble();
-			return avgLatFitness > 0.5 && avgAppFitness > 0.5;
+			return avgLatFitness > 0.5;
 		}
 	}
 
