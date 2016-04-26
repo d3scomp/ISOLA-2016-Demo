@@ -67,9 +67,10 @@ cfgs = [];
 
 limit_ms = 600000
 seed_range = range(0, 10)
+fitness_types = ["PreferClose"]#, "PreferDistant", "PreferNeutral"]
 
 # Define meta configurations
-for mode in ['quantum']:#['standard', 'quantum']:
+for mode in ['standard']:#['quantum']:#['standard', 'quantum']:
     for networkModel in ['simple']:#['simple', 'omnet']:
         # Rebroadcast range comparison
         metaCfgs.append(MetaCfg(
@@ -83,7 +84,7 @@ for mode in ['quantum']:#['standard', 'quantum']:
                     maxtimeskews = [30000],
                     networkModels = [networkModel],
                     modes = [mode],
-                    fitnessTypes = ["PreferClose", "PreferDistant", "PreferNeutral"]
+                    fitnessTypes = fitness_types
                     ))
         # Rebroadcast delay
         metaCfgs.append(MetaCfg(
@@ -97,7 +98,7 @@ for mode in ['quantum']:#['standard', 'quantum']:
                     maxtimeskews = [30000],
                     networkModels = [networkModel],
                     modes = [mode],
-                    fitnessTypes = ["PreferClose", "PreferDistant", "PreferNeutral"]
+                    fitnessTypes = fitness_types
                     ))
         # Knowledge age preference 
         metaCfgs.append(MetaCfg(
@@ -111,7 +112,7 @@ for mode in ['quantum']:#['standard', 'quantum']:
                     maxtimeskews = [1000, 5000, 10000, 30000, 60000, 120000],
                     networkModels = [networkModel],
                     modes = [mode],
-                    fitnessTypes = ["PreferClose", "PreferDistant", "PreferNeutral"]
+                    fitnessTypes = fitness_types
                     ))
 
 print("Generating using " + str(len(metaCfgs)) + " meta configurations")

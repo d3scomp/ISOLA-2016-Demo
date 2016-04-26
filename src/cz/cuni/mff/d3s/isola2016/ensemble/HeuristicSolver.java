@@ -67,6 +67,9 @@ public class HeuristicSolver implements AntAssignmetSolver {
 					throw new UnsupportedOperationException("Fitness calculation not defined for mode: " + mode);
 				}
 			}
+			if (appFitnessCache < 0.5) {
+				appFitnessCache = 0.0;
+			}
 			return appFitnessCache;
 		}
 
@@ -198,7 +201,7 @@ public class HeuristicSolver implements AntAssignmetSolver {
 			// Find best option
 			Ensemble best = null;
 			for (Ensemble ensemble : options) {
-				if (best == null || ensemble.getAppFitness() > best.getAppFitness()) {
+				if (best == null || (ensemble.getAppFitness() > 0 && ensemble.getAppFitness() > best.getAppFitness())) {
 					best = ensemble;
 				}
 			}
@@ -206,6 +209,8 @@ public class HeuristicSolver implements AntAssignmetSolver {
 			// Do "knowledge exchange" for best
 			best.commit();
 			persistentEnsembles.add(new PersistentEnsemble(best));
+
+			System.err.println(best.getAppFitness());
 
 			// Remove best from remaining
 			remainingAnts.removeAll(best.ants);
