@@ -272,6 +272,7 @@ public abstract class AbstractAntWorldPlugin implements DEECoPlugin, TimerTaskLi
 	}
 
 	public void log(long time) {
+		updateAllAntInfo();
 		File dir = new File(String.format("logs/world-%d/%09d", startTime, time / 60000));
 		dir.mkdirs();
 		File out = new File(String.format("%s/%09d.xml", dir.getAbsolutePath(), time));
@@ -279,6 +280,7 @@ public abstract class AbstractAntWorldPlugin implements DEECoPlugin, TimerTaskLi
 	}
 
 	public void finalLog() {
+		updateAllAntInfo();
 		File dir = new File(String.format("logs/world-%d/", startTime));
 		dir.mkdirs();
 		File out = new File(String.format("%s/final.xml", dir.getAbsolutePath()));
@@ -287,6 +289,12 @@ public abstract class AbstractAntWorldPlugin implements DEECoPlugin, TimerTaskLi
 	}
 	
 	protected abstract void maintainFoodSourcePopulation();
+	
+	private void updateAllAntInfo() {
+		for (BigAntPlugin ant : bigAnts) {
+			ant.updateAntInfo();
+		}
+	}
 
 	/**
 	 * Move free ants
@@ -296,7 +304,6 @@ public abstract class AbstractAntWorldPlugin implements DEECoPlugin, TimerTaskLi
 			if (ant.state == State.Free) {
 				moveAnt(ant);
 			}
-			ant.updateAntInfo();
 		}
 	}
 
