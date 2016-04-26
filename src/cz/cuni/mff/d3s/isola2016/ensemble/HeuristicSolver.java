@@ -7,6 +7,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,12 +20,12 @@ import cz.cuni.mff.d3s.jdeeco.position.Position;
 public class HeuristicSolver implements AntAssignmetSolver {
 	public static final double MAX_DISTANCE_M = 30;
 	public final Config config;
-	
+
 	class Ensemble {
 		public Set<BigAnt> ants = new LinkedHashSet<>();
 		public FoodSource source;
-		public double appFitness;
-		public double latFitness;
+		private Double appFitnessCache;
+		private Double latFitnessCache;
 		final long curTime;
 
 		public Ensemble(Collection<BigAnt> ants, FoodSource source, long curTime) {
@@ -35,8 +36,6 @@ public class HeuristicSolver implements AntAssignmetSolver {
 			this.ants.addAll(ants);
 			this.source = source;
 			this.curTime = curTime;
-
-			updateFitness();
 		}
 
 		public Ensemble(BigAnt antA, BigAnt antB, FoodSource source, long curTime) {
@@ -46,38 +45,38 @@ public class HeuristicSolver implements AntAssignmetSolver {
 		public void commit() {
 			for (BigAnt ant : ants) {
 				ant.assignedFood = source.position;
-				ant.currentGoalUtility = appFitness;
+				ant.currentGoalUtility = getAppFitness();
 			}
 		}
-		
-		private void updateFitness() {
-			updateDistFitness();
-			updateLatFitness();
-		}
 
-		private void updateDistFitness() {
-			double totalDistance = ants.stream()
-					.mapToDouble(ant -> ant.position.euclidDistanceTo(source.position))
-					.average()
-					.getAsDouble();
+		private double getAppFitness() {
+			if (appFitnessCache == null) {
+				double totalDistance = ants.stream().mapToDouble(ant -> ant.position.euclidDistanceTo(source.position))
+						.average().getAsDouble();
 
-			switch (mode) {
-			case PreferCloseFoods:
-				appFitness = 1 - Math.min(1, totalDistance / MAX_DISTANCE_M);
-				break;
-			case PreferDistantFoods:
-				appFitness = Math.min(1, totalDistance / MAX_DISTANCE_M);
-				break;
-			default:
-				throw new UnsupportedOperationException("Fitness calculation not defined for mode: " + mode);
+				switch (mode) {
+				case PreferCloseFoods:
+					appFitnessCache = 1 - Math.min(1, totalDistance / MAX_DISTANCE_M);
+					break;
+				case PreferDistantFoods:
+					appFitnessCache = Math.min(1, totalDistance / MAX_DISTANCE_M);
+					break;
+				case PreferNeutral:
+					appFitnessCache = new Random(source.position.hashCode()).nextDouble();
+				default:
+					throw new UnsupportedOperationException("Fitness calculation not defined for mode: " + mode);
+				}
 			}
+			return appFitnessCache;
 		}
-		
-		private void updateLatFitness() {
-			double totalLatency = ants.stream()
-					.map(ant -> ant.time)
-					.reduce(0l, (sum, time) -> sum += curTime - time);
-			latFitness =  1 - Math.min(1, totalLatency / config.maxTimeSkewMs);
+
+		private double getLatFitness() {
+			if (latFitnessCache == null) {
+				double totalLatency = ants.stream().map(ant -> ant.time).reduce(0l,
+						(sum, time) -> sum += curTime - time);
+				latFitnessCache = 1 - Math.min(1, totalLatency / config.maxTimeSkewMs);
+			}
+			return latFitnessCache;
 		}
 	}
 
@@ -92,60 +91,54 @@ public class HeuristicSolver implements AntAssignmetSolver {
 			sourcePosition = ensemble.source.position;
 			instances.add(ensemble);
 		}
-		
+
 		public Ensemble tryMaintain(Collection<BigAnt> ants, List<FoodSource> foods, long curTime) {
 			Set<BigAnt> matchedAnts = new LinkedHashSet<>();
 			FoodSource matchedSource = null;
-			
+
 			// Match ants
-			assert(!antIds.isEmpty());
+			assert (!antIds.isEmpty());
 			Iterator<String> antIdIt = antIds.iterator();
 			String curId = antIdIt.next();
-			for(BigAnt ant: ants) {
-				if(ant.id.equals(curId)) {
+			for (BigAnt ant : ants) {
+				if (ant.id.equals(curId)) {
 					matchedAnts.add(ant);
-					if(antIdIt.hasNext()) {
+					if (antIdIt.hasNext()) {
 						curId = antIdIt.next();
 					} else {
 						break;
 					}
 				}
 			}
-			
+
 			// Match source
-			for(FoodSource source: foods) {
-				if(PosUtils.isSame(source.position, sourcePosition)) {
+			for (FoodSource source : foods) {
+				if (PosUtils.isSame(source.position, sourcePosition)) {
 					matchedSource = source;
 					break;
 				}
 			}
-			
+
 			// Ensemble cannot be maintained as we do not have ants and food to maintain it
-			if(matchedAnts.size() != antIds.size() || matchedSource == null) {
+			if (matchedAnts.size() != antIds.size() || matchedSource == null) {
 				return null;
 			}
-			
+
 			Ensemble ensemble = new Ensemble(matchedAnts, matchedSource, curTime);
-			
+
 			// Ensemble cannot be maintained, fitness condition prevents it
 			instances.add(ensemble);
-			
-			if(!checkPerisitanceCondition()) {
+
+			if (!checkPerisitanceCondition()) {
 				return null;
 			}
-			
+
 			return ensemble;
 		}
-		
+
 		public boolean checkPerisitanceCondition() {
-			double avgAppFitness = instances.stream()
-					.mapToDouble(ens -> ens.appFitness)
-					.average()
-					.getAsDouble();
-			double avgLatFitness = instances.stream()
-					.mapToDouble(ens -> ens.latFitness)
-					.average()
-					.getAsDouble();
+			double avgAppFitness = instances.stream().mapToDouble(ens -> ens.getAppFitness()).average().getAsDouble();
+			double avgLatFitness = instances.stream().mapToDouble(ens -> ens.getLatFitness()).average().getAsDouble();
 			return avgLatFitness > 0.5 && avgAppFitness > 0.5;
 		}
 	}
@@ -181,10 +174,10 @@ public class HeuristicSolver implements AntAssignmetSolver {
 		List<FoodSource> remainingFoods = new LinkedList<>(foods);
 
 		// Try to maintain persistent ensembles
-		for(Iterator<PersistentEnsemble> it = persistentEnsembles.iterator(); it.hasNext();) {
+		for (Iterator<PersistentEnsemble> it = persistentEnsembles.iterator(); it.hasNext();) {
 			PersistentEnsemble persistentEnsemble = it.next();
 			Ensemble ensemble = persistentEnsemble.tryMaintain(remainingAnts, remainingFoods, curTime);
-			if(ensemble == null) {
+			if (ensemble == null) {
 				// Maintenance failed, drop persistent ensemble
 				it.remove();
 			} else {
@@ -206,7 +199,7 @@ public class HeuristicSolver implements AntAssignmetSolver {
 			// Find best option
 			Ensemble best = null;
 			for (Ensemble ensemble : options) {
-				if (best == null || ensemble.appFitness > best.appFitness) {
+				if (best == null || ensemble.getAppFitness() > best.getAppFitness()) {
 					best = ensemble;
 				}
 			}
@@ -219,9 +212,9 @@ public class HeuristicSolver implements AntAssignmetSolver {
 			remainingAnts.removeAll(best.ants);
 			remainingFoods.remove(best.source);
 		}
-		
+
 		// Set no food position to remaining ants
-		for(BigAnt ant: remainingAnts) {
+		for (BigAnt ant : remainingAnts) {
 			ant.assignedFood = null;
 			ant.currentGoalUtility = 0.0;
 		}
