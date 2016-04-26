@@ -195,16 +195,18 @@ public class HeuristicSolver implements AntAssignmetSolver {
 		while (!remainingAnts.isEmpty() && !remainingFoods.isEmpty()) {
 			// Generate all options, break when no options
 			Collection<Ensemble> options = generateOptions(remainingAnts, remainingFoods, curTime);
-			if (options.isEmpty()) {
-				break;
-			}
-
+			
 			// Find best option
 			Ensemble best = null;
 			for (Ensemble ensemble : options) {
 				if (best == null || (ensemble.getAppFitness() > 0 && ensemble.getAppFitness() > best.getAppFitness())) {
 					best = ensemble;
 				}
+			}
+			
+			// Nothing to choose from
+			if (best == null) {
+				break;
 			}
 
 			// Do "knowledge exchange" for best
