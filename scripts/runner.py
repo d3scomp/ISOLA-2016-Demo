@@ -67,7 +67,7 @@ cfgs = [];
 
 limit_ms = 600000
 seed_range = range(0, 10)
-fitness_types = ["PreferClose"]#, "PreferDistant", "PreferNeutral"]
+fitness_types = ["PreferClose", "PreferDistant", "PreferNeutral"]
 
 # Define meta configurations
 for mode in ['standard']:#['quantum']:#['standard', 'quantum']:
