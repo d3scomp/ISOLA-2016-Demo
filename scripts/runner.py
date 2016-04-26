@@ -64,7 +64,7 @@ class MetaCfg:
 metaCfgs = [];
 cfgs = [];
 
-limit_ms = 600000
+limit_ms = 1800000
 seed_range = range(0, 10)
 fitness_types = ["PreferClose", "PreferDistant", "PreferNeutral"]
 
