@@ -64,7 +64,7 @@ public class PairedHeuristicSolver implements AntAssignmetSolver {
 
 		public double getAppFitness() {
 			if (appFitnessCache == null) {
-				appFitnessCache = getAntFitness() + getSourceFitness();
+				appFitnessCache = getAntFitness() + 2 * getSourceFitness();
 			}
 			return appFitnessCache;
 		}
@@ -87,10 +87,10 @@ public class PairedHeuristicSolver implements AntAssignmetSolver {
 
 				switch (mode) {
 				case PreferCloseFoods:
-					sourceFitnessCache = Math.pow(1 - Math.min(1, totalDistance / MAX_DISTANCE_M), 1 / 2);
+					sourceFitnessCache = Math.pow(1 - Math.min(1, totalDistance / MAX_DISTANCE_M), 0.5);
 					break;
 				case PreferDistantFoods:
-					sourceFitnessCache = Math.pow(Math.min(1, totalDistance / MAX_DISTANCE_M), 1 / 2);
+					sourceFitnessCache = Math.pow(Math.min(1, totalDistance / MAX_DISTANCE_M), 0.5);
 					break;
 				case PreferNeutral:
 					sourceFitnessCache = new Random(getSources().iterator().next().quantumId).nextDouble();
@@ -99,6 +99,7 @@ public class PairedHeuristicSolver implements AntAssignmetSolver {
 					throw new UnsupportedOperationException("Fitness calculation not defined for mode: " + mode);
 				}
 			}
+			System.err.println(sourceFitnessCache);
 			return sourceFitnessCache;
 		}
 
