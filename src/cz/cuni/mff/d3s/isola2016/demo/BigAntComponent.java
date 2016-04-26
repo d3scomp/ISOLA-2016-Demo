@@ -169,9 +169,9 @@ public class BigAntComponent {
 		System.out.format("%06d: Ant %s, %s, %s, %s, foods: ", clock.getCurrentMilliseconds(), id, position, state,
 				mode);
 
-		for (FoodSource source : foods) {
+	/*	for (FoodSource source : foods) {
 			System.out.format("%f, ", source.position.euclidDistanceTo(position));
-		}
+		}*/
 
 		System.out.print("assigned food: ");
 		if (assignedFood != null) {

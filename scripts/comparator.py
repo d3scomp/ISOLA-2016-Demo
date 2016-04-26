@@ -45,7 +45,7 @@ for networkModel in ['simple']:#['simple', 'omnet']:
                 'networkModel': networkModel,
                 'radiorange': radiorange,
                 'fitness': fitness,
-                'filter': lambda log, dim: cfgGuard(log, dim) and log.config.rebroadcastDelayMs == 5000 and log.config.maxTimeSkewMs == 5000,
+                'filter': lambda log, dim: cfgGuard(log, dim) and log.config.rebroadcastDelayMs == 30000 and log.config.maxTimeSkewMs == 5000,
                 })
                 
                 dimensions.append({

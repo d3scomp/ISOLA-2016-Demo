@@ -64,7 +64,7 @@ public class PairedHeuristicSolver implements AntAssignmetSolver {
 
 		public double getAppFitness() {
 			if (appFitnessCache == null) {
-				appFitnessCache = getAntFitness() + 2 * getSourceFitness();
+				appFitnessCache = getAntFitness() + getSourceFitness();
 			}
 			return appFitnessCache;
 		}
@@ -90,7 +90,7 @@ public class PairedHeuristicSolver implements AntAssignmetSolver {
 					sourceFitnessCache = Math.pow(1 - Math.min(1, totalDistance / MAX_DISTANCE_M), 0.5);
 					break;
 				case PreferDistantFoods:
-					sourceFitnessCache = Math.pow(Math.min(1, totalDistance / MAX_DISTANCE_M), 0.5);
+					sourceFitnessCache = 100 * Math.pow(Math.min(1, totalDistance / MAX_DISTANCE_M), 0.5);
 					break;
 				case PreferNeutral:
 					sourceFitnessCache = new Random(getSources().iterator().next().quantumId).nextDouble();
@@ -186,7 +186,7 @@ public class PairedHeuristicSolver implements AntAssignmetSolver {
 		public boolean checkPerisitanceCondition() {
 			double avgAppFitness = instances.stream().mapToDouble(ens -> ens.getAppFitness()).average().getAsDouble();
 			double avgLatFitness = instances.stream().mapToDouble(ens -> ens.getLatFitness()).average().getAsDouble();
-			return avgLatFitness > 0.5 && avgAppFitness > 0.5;
+			return avgLatFitness > 0.5;
 		}
 	}
 
@@ -269,6 +269,7 @@ public class PairedHeuristicSolver implements AntAssignmetSolver {
 			// Remove best from remaining
 			remainingAnts.removeAll(best.getAnts());
 			remainingFoods.remove(best.getSources());
+//			System.err.println(best.getSourceFitness() + " " + best.getAntFitness());
 		}
 
 		// Set no food position to remaining ants
