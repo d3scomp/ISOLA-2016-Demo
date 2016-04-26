@@ -63,6 +63,7 @@ public class HeuristicSolver implements AntAssignmetSolver {
 					break;
 				case PreferNeutral:
 					appFitnessCache = new Random(source.position.hashCode()).nextDouble();
+					break;
 				default:
 					throw new UnsupportedOperationException("Fitness calculation not defined for mode: " + mode);
 				}

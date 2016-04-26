@@ -65,6 +65,9 @@ public class DemoLauncher {
 			case "PreferDistant":
 				solver = new HeuristicSolver(FitnessMode.PreferDistantFoods, cfg);
 				break;
+			case "PreferNeutral":
+				solver = new HeuristicSolver(FitnessMode.PreferNeutral, cfg);
+				break;
 			default:
 				throw new UnsupportedOperationException("Unknown fitness type \"" + cfg.fitnessType + "\"");
 			}
