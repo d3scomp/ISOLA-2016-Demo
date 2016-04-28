@@ -33,6 +33,43 @@ import cz.cuni.mff.d3s.jdeeco.position.Position;
 import cz.cuni.mff.d3s.jdeeco.position.PositionPlugin;
 import cz.cuni.mff.d3s.jdeeco.publishing.DefaultKnowledgePublisher;
 
+class SolverFactory {
+	final Config cfg;
+
+	public SolverFactory(Config cfg) {
+		this.cfg = cfg;
+	}
+
+	public AntAssignmetSolver getSolver() {
+		switch (cfg.mode) {
+		case "standard":
+			switch (cfg.fitnessType) {
+			case "PreferClose":
+				return new HeuristicSolver(FitnessMode.PreferCloseFoods, cfg);
+			case "PreferDistant":
+				return new HeuristicSolver(FitnessMode.PreferDistantFoods, cfg);
+			case "PreferNeutral":
+				return new HeuristicSolver(FitnessMode.PreferNeutral, cfg);
+			default:
+				throw new UnsupportedOperationException("Unknown fitness type \"" + cfg.fitnessType + "\"");
+			}
+		case "quantum":
+			switch (cfg.fitnessType) {
+			case "PreferClose":
+				return new PairedHeuristicSolver(FitnessMode.PreferCloseFoods, cfg);
+			case "PreferDistant":
+				return new PairedHeuristicSolver(FitnessMode.PreferDistantFoods, cfg);
+			case "PreferNeutral":
+				return new PairedHeuristicSolver(FitnessMode.PreferNeutral, cfg);
+			default:
+				throw new UnsupportedOperationException("Unknown fitness type \"" + cfg.fitnessType + "\"");
+			}
+		default:
+			throw new UnsupportedOperationException("Mode \"" + cfg.mode + "\" not defined");
+		}
+	}
+}
+
 public class DemoLauncher {
 	public static final double ANT_SPAWN_DIAMETER_M = 10;
 	public static final Position ANT_HILL_POS = new Position(0, 0);
@@ -52,46 +89,19 @@ public class DemoLauncher {
 
 		// Define ant world
 		AbstractAntWorldPlugin antWorld;
-		AntAssignmetSolver solver;
 		switch (cfg.mode) {
 		case "standard":
 			antWorld = new StandardAntWorldPlugin(ANT_HILL_POS, new Random(rand.nextLong()), cfg);
-			// solver = new BruteforceSolver();
-			// solver = new ProactiveSolver();
-			switch (cfg.fitnessType) {
-			case "PreferClose":
-				solver = new HeuristicSolver(FitnessMode.PreferCloseFoods, cfg);
-				break;
-			case "PreferDistant":
-				solver = new HeuristicSolver(FitnessMode.PreferDistantFoods, cfg);
-				break;
-			case "PreferNeutral":
-				solver = new HeuristicSolver(FitnessMode.PreferNeutral, cfg);
-				break;
-			default:
-				throw new UnsupportedOperationException("Unknown fitness type \"" + cfg.fitnessType + "\"");
-			}
 			break;
 		case "quantum":
 			antWorld = new QuantumAntWorldPlugin(ANT_HILL_POS, new Random(rand.nextLong()), cfg);
-			switch (cfg.fitnessType) {
-			case "PreferClose":
-				solver = new PairedHeuristicSolver(FitnessMode.PreferCloseFoods, cfg);
-				break;
-			case "PreferDistant":
-				solver = new PairedHeuristicSolver(FitnessMode.PreferDistantFoods, cfg);
-				break;
-			case "PreferNeutral":
-				solver = new PairedHeuristicSolver(FitnessMode.PreferNeutral, cfg);
-				break;
-			default:
-				throw new UnsupportedOperationException("Unknown fitness type \"" + cfg.fitnessType + "\"");
-			}
-			break;
 		default:
 			throw new UnexpectedException("Mode \"" + cfg.mode + "\" not defined");
 		}
-
+		
+		// Create solver factory
+		SolverFactory solverFactory = new SolverFactory(cfg);
+		
 		// Define simulation
 		DEECoSimulation realm;
 		switch (cfg.networkModel) {
@@ -129,7 +139,7 @@ public class DemoLauncher {
 			plugins.add(new DefaultKnowledgePublisher());
 			plugins.add(new BigAntPlugin());
 			plugins.add(new PositionPlugin(PosUtils.getRandomPosition(rand, 0, 0, ANT_SPAWN_DIAMETER_M)));
-			plugins.add(new IntelligentAntPlanning(solver, cfg.maxTimeSkewMs));
+			plugins.add(new IntelligentAntPlanning(solverFactory.getSolver(), cfg.maxTimeSkewMs));
 			if (cfg.useRebroadcasting) {
 				plugins.add(new CachingRebroadcastStrategy(cfg.rebroadcastDelayMs, cfg.rebroadcastRangeM));
 			}

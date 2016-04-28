@@ -119,6 +119,7 @@ public class HeuristicSolver implements AntAssignmetSolver {
 			// Ensemble cannot be maintained as we do not have ants and food to maintain it
 			if (matchedAnts.size() != antIds.size() || matchedSource == null) {
 				System.err.println("Breaking ensemble - no components:" + instances.size());
+				
 				return null;
 			}
 
@@ -132,7 +133,7 @@ public class HeuristicSolver implements AntAssignmetSolver {
 				return null;
 			}
 
-			System.err.println("Mainting ensmble: " + instances.size());
+			System.err.println("Promoting ensmble: " + instances.size());
 			return ensemble;
 		}
 
@@ -169,6 +170,8 @@ public class HeuristicSolver implements AntAssignmetSolver {
 
 	@Override
 	public void solve(Collection<BigAnt> ants, Collection<FoodSource> foods, Position antHill, long curTime) {
+		System.err.println(ants.stream().map(ant -> ant.id + ", ").reduce("Ant ids: ", (acc, id) -> acc += id));
+		
 		List<BigAnt> remainingAnts = new LinkedList<>(ants);
 		List<FoodSource> remainingFoods = new LinkedList<>(foods);
 
