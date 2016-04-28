@@ -19,20 +19,24 @@ import cz.cuni.mff.d3s.jdeeco.position.PositionPlugin;
 public class CachingRebroadcastStrategy extends RebroadcastStrategy implements TimerTaskListener {
 	public static final long DEFAULT_PUBLISHING_PERIOD_MS = 2000;
 	public static final double DEFAULT_BOUNDARY_RANGE_M = 10;
+	public static final long DEFAULT_BOUNDARY_TIME_MS = 20000;
 	
 	private Map<Byte, L2Packet> cache = new HashMap<>();
 	private PositionPlugin positionPlug;
 	private final long publishingPeriodMs;
-	private final double boudaryRangeM;
+	private final double boundaryRangeM;
+	private final long boundaryLatencyMs;
 	
 	public CachingRebroadcastStrategy() {
 		publishingPeriodMs = DEFAULT_PUBLISHING_PERIOD_MS;
-		boudaryRangeM = DEFAULT_BOUNDARY_RANGE_M;
+		boundaryRangeM = DEFAULT_BOUNDARY_RANGE_M;
+		boundaryLatencyMs = DEFAULT_BOUNDARY_TIME_MS;
 	}
 	
-	public CachingRebroadcastStrategy(long publishingPeriodMs, double boudaryRangeM) {
+	public CachingRebroadcastStrategy(long publishingPeriodMs, double boudaryRangeM, long boundaryTimeMs) {
 		this.publishingPeriodMs = publishingPeriodMs;
-		this.boudaryRangeM = boudaryRangeM;
+		this.boundaryRangeM = boudaryRangeM;
+		this.boundaryLatencyMs = boundaryTimeMs;
 	}
 	
 	@Override
@@ -61,7 +65,7 @@ public class CachingRebroadcastStrategy extends RebroadcastStrategy implements T
 			Byte key = i.next();
 			L2Packet packet = cache.get(key);
 			
-			if(isBounded(packet) || customBounded(packet)) {
+			if(isBounded(packet) || customBounded(packet, time)) {
 				i.remove();
 			}
 		}
@@ -72,12 +76,13 @@ public class CachingRebroadcastStrategy extends RebroadcastStrategy implements T
 		}
 	}
 	
-	private boolean customBounded(L2Packet packet) {
+	private boolean customBounded(L2Packet packet, long curTime) {
 		KnowledgeData data = (KnowledgeData) packet.getObject();
 		
 		Position remotePosition = (Position) data.getKnowledge().getValue(KnowledgePathExt.createKnowledgePath("position"));
+		Long remoteTime = (Long) data.getKnowledge().getValue(KnowledgePathExt.createKnowledgePath("time"));
 		Position localPosition = positionPlug.getPosition();
 		
-		return localPosition.euclidDistanceTo(remotePosition) > boudaryRangeM;
+		return localPosition.euclidDistanceTo(remotePosition) > boundaryRangeM && curTime - remoteTime < boundaryLatencyMs;
 	}
 }

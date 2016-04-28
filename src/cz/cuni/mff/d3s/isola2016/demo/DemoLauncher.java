@@ -141,7 +141,7 @@ public class DemoLauncher {
 			plugins.add(new PositionPlugin(PosUtils.getRandomPosition(rand, 0, 0, ANT_SPAWN_DIAMETER_M)));
 			plugins.add(new IntelligentAntPlanning(solverFactory.getSolver(), cfg.maxTimeSkewMs));
 			if (cfg.useRebroadcasting) {
-				plugins.add(new CachingRebroadcastStrategy(cfg.rebroadcastDelayMs, cfg.rebroadcastRangeM));
+				plugins.add(new CachingRebroadcastStrategy(cfg.rebroadcastDelayMs, cfg.rebroadcastRangeM, cfg.maxTimeSkewMs));
 			}
 
 			DEECoNode node = realm.createNode(nodeCnt, plugins.toArray(new DEECoPlugin[] {}));
@@ -170,7 +170,7 @@ public class DemoLauncher {
 				List<DEECoPlugin> plugins = new LinkedList<>();
 				plugins.add(new SmallAntPlugin());
 				plugins.add(new PositionPlugin(PosUtils.getRandomPosition(rand, 0, 0, ANT_SPAWN_DIAMETER_M)));
-				plugins.add(new CachingRebroadcastStrategy(cfg.rebroadcastDelayMs, cfg.rebroadcastRangeM));
+				plugins.add(new CachingRebroadcastStrategy(cfg.rebroadcastDelayMs, cfg.rebroadcastRangeM, cfg.maxTimeSkewMs));
 
 				DEECoNode node = realm.createNode(nodeCnt, plugins.toArray(new DEECoPlugin[] {}));
 
