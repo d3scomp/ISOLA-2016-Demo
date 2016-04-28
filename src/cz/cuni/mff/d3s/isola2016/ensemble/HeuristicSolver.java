@@ -102,16 +102,9 @@ public class HeuristicSolver implements AntAssignmetSolver {
 
 			// Match ants
 			assert (!antIds.isEmpty());
-			Iterator<String> antIdIt = antIds.iterator();
-			String curId = antIdIt.next();
 			for (BigAnt ant : ants) {
-				if (ant.id.equals(curId)) {
+				if(antIds.contains(ant.id)) {
 					matchedAnts.add(ant);
-					if (antIdIt.hasNext()) {
-						curId = antIdIt.next();
-					} else {
-						break;
-					}
 				}
 			}
 
@@ -125,6 +118,7 @@ public class HeuristicSolver implements AntAssignmetSolver {
 
 			// Ensemble cannot be maintained as we do not have ants and food to maintain it
 			if (matchedAnts.size() != antIds.size() || matchedSource == null) {
+				System.err.println("Breaking ensemble - no components:" + instances.size());
 				return null;
 			}
 
@@ -134,9 +128,11 @@ public class HeuristicSolver implements AntAssignmetSolver {
 			instances.add(ensemble);
 
 			if (!checkPerisitanceCondition()) {
+				System.err.println("Breaking ensemble - condition failed:"  + instances.size());
 				return null;
 			}
 
+			System.err.println("Mainting ensmble: " + instances.size());
 			return ensemble;
 		}
 
