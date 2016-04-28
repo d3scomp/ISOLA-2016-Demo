@@ -199,7 +199,7 @@ public class HeuristicSolver implements AntAssignmetSolver {
 			// Find best option
 			Ensemble best = null;
 			for (Ensemble ensemble : options) {
-				if (best == null || (ensemble.getAppFitness() > 0 && ensemble.getAppFitness() > best.getAppFitness())) {
+				if (ensemble.getAppFitness() > 0 && (best == null || ensemble.getAppFitness() > best.getAppFitness())) {
 					best = ensemble;
 				}
 			}
@@ -213,7 +213,7 @@ public class HeuristicSolver implements AntAssignmetSolver {
 			best.commit();
 			persistentEnsembles.add(new PersistentEnsemble(best));
 
-			System.err.println(best.getAppFitness());
+			System.err.println("Best fitness: " + best.getAppFitness());
 
 			// Remove best from remaining
 			remainingAnts.removeAll(best.ants);
