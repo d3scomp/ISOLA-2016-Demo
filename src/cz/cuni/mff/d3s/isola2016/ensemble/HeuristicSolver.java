@@ -167,6 +167,21 @@ public class HeuristicSolver implements AntAssignmetSolver {
 
 		return options;
 	}
+	
+	private Ensemble getBestOption(List<BigAnt> ants, List<FoodSource> foods, long curTime) {
+		// Generate all options, break when no options
+		Collection<Ensemble> options = generateOptions(ants, foods, curTime);
+		
+		// Find best option
+		Ensemble best = null;
+		for (Ensemble ensemble : options) {
+			if (ensemble.getAppFitness() > 0 && (best == null || ensemble.getAppFitness() > best.getAppFitness())) {
+				best = ensemble;
+			}
+		}
+		
+		return best;
+	}
 
 	@Override
 	public void solve(Collection<BigAnt> ants, Collection<FoodSource> foods, Position antHill, long curTime) {
@@ -192,16 +207,7 @@ public class HeuristicSolver implements AntAssignmetSolver {
 
 		// Create new ensembles
 		while (!remainingAnts.isEmpty() && !remainingFoods.isEmpty()) {
-			// Generate all options, break when no options
-			Collection<Ensemble> options = generateOptions(remainingAnts, remainingFoods, curTime);
-			
-			// Find best option
-			Ensemble best = null;
-			for (Ensemble ensemble : options) {
-				if (ensemble.getAppFitness() > 0 && (best == null || ensemble.getAppFitness() > best.getAppFitness())) {
-					best = ensemble;
-				}
-			}
+			Ensemble best = getBestOption(remainingAnts,remainingFoods, curTime);
 			
 			// Nothing to choose from
 			if (best == null) {

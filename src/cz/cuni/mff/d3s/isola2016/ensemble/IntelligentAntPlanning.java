@@ -112,7 +112,6 @@ public class IntelligentAntPlanning implements DEECoPlugin, TimerTaskListener {
 			if(curTime - ant.time > maxTimeSkew) {
 				it.remove();
 			}
-			
 		}
 		
 		Collection<FoodSource> sources = extractSources(ants);
