@@ -33,8 +33,8 @@ def cfgGuard(log, dim):
 
 dimensions = []
 for networkModel in ['simple']:#['simple', 'omnet']:
-    for mode in ['quantum']:#['standard', 'quantum']:
-        for fitness in ["PreferClose", "PreferDistant", "PreferNeutral"]:
+    for mode in ['standard']:#['standard', 'quantum']:
+        for fitness in ["PreferDistant"]:#["PreferClose", "PreferDistant", "PreferNeutral"]:
             for radiorange in [5]:#[3, 5, 7]:
                 dimensions.append({
                 'headline': fitness + " - rebroadcast range on " + mode + " " + str(radiorange) + "m radio range (" + networkModel + ")",
@@ -45,7 +45,7 @@ for networkModel in ['simple']:#['simple', 'omnet']:
                 'networkModel': networkModel,
                 'radiorange': radiorange,
                 'fitness': fitness,
-                'filter': lambda log, dim: cfgGuard(log, dim) and log.config.rebroadcastDelayMs == 30000 and log.config.maxTimeSkewMs == 5000,
+                'filter': lambda log, dim: cfgGuard(log, dim) and log.config.rebroadcastDelayMs == 5000 and log.config.maxTimeSkewMs == 120000,
                 })
                 
                 dimensions.append({
@@ -57,7 +57,7 @@ for networkModel in ['simple']:#['simple', 'omnet']:
                 'networkModel': networkModel,
                 'radiorange': radiorange,
                 'fitness': fitness,
-                'filter': lambda log, dim: cfgGuard(log, dim) and log.config.rebroadcastRangeM == 10 and log.config.maxTimeSkewMs == 30000
+                'filter': lambda log, dim: cfgGuard(log, dim) and log.config.rebroadcastRangeM == 10 and log.config.maxTimeSkewMs == 120000
                 })
                 
                 dimensions.append({
@@ -96,17 +96,6 @@ def boxplot(data, msgdata, name="comparison", xaxisText="value", xaxisTransform=
     fig, ax1 = plot.subplots()
     ax2 = ax1.twinx()
     
-    
-    # Box-plots
-   
-    databoxes = ax1.boxplot(pdata, positions=range(0, len(pdata) * 2, 2), labels=xtckname)
-    plot.setp(databoxes['boxes'], color='blue')
-    
-    msgboxes = ax2.boxplot(msgpdata, positions=range(1, len(msgpdata) * 2 + 1, 2))
-    plot.setp(msgboxes['boxes'], color='green')
-    
-    plot.xlim(-1, len(pdata) * 2)
-    
     # value dots
     for i in range(len(pdata)):
         y = pdata[i]
@@ -121,6 +110,16 @@ def boxplot(data, msgdata, name="comparison", xaxisText="value", xaxisTransform=
         px = np.random.normal(x, 0.075, size=len(y))
         ax2.plot(px, y, 'go', alpha=0.4)
     
+    # Box-plots
+   
+    databoxes = ax1.boxplot(pdata, positions=range(0, len(pdata) * 2, 2), labels=xtckname)
+    plot.setp(databoxes['boxes'], color='blue')
+    
+    msgboxes = ax2.boxplot(msgpdata, positions=range(1, len(msgpdata) * 2 + 1, 2))
+    plot.setp(msgboxes['boxes'], color='green')
+    
+    plot.xlim(-1, len(pdata) * 2)
+        
     plot.title(name)
     plot.xticks(xtckcnt, xtckname)
     ax1.set_xlabel(xaxisText)
@@ -189,4 +188,5 @@ logs = loadAllLogs()
 
 for dimension in dimensions:
     processDimension(dimension, logs)
+
 
