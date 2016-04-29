@@ -83,6 +83,9 @@ public class CachingRebroadcastStrategy extends RebroadcastStrategy implements T
 		Long remoteTime = (Long) data.getKnowledge().getValue(KnowledgePathExt.createKnowledgePath("time"));
 		Position localPosition = positionPlug.getPosition();
 		
-		return localPosition.euclidDistanceTo(remotePosition) > boundaryRangeM && curTime - remoteTime > boundaryLatencyMs;
+		boolean rangeBounded = localPosition.euclidDistanceTo(remotePosition) > boundaryRangeM;
+		boolean timeBounded = curTime - remoteTime > boundaryLatencyMs;
+		
+		return rangeBounded || timeBounded;
 	}
 }
