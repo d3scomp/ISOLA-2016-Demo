@@ -76,9 +76,7 @@ def boxplot(data, msgdata, name="comparison", xaxisText="value", xaxisTransform=
     print ("NAME " + name)
     pdata = []
     msgpdata = []
-    
-    plot.close()
-    
+        
     # Boxplot names and data aggregation
     cnt = 0
     xtckcnt = []
@@ -93,7 +91,9 @@ def boxplot(data, msgdata, name="comparison", xaxisText="value", xaxisTransform=
         msgpdata.append(msgdata[key])
         
     
-    fig, ax1 = plot.subplots()
+    fig = plot.figure()
+    ax1 = fig.add_subplot(111)
+    
     ax2 = ax1.twinx()
     
 ###### value dots
@@ -113,19 +113,19 @@ def boxplot(data, msgdata, name="comparison", xaxisText="value", xaxisTransform=
     # Box-plots
    
     databoxes = ax1.boxplot(pdata, positions=range(0, len(pdata) * 2, 2), labels=xtckname)
-    plot.setp(databoxes['boxes'], color='green')
+ #   ax1.setp(databoxes['boxes'], color='green')
     
-    msgboxes = ax2.boxplot(msgpdata, positions=range(1, len(msgpdata) * 2 + 1, 2))
-    plot.setp(msgboxes['boxes'], color='red')
+    msgboxes = ax2.boxplot(msgpdata, positions=range(1, len(msgpdata) * 2 + 1, 2), labels=xtckname)
+ #   fig.setp(msgboxes['boxes'], color='red')
     
-    plot.xlim(-1, len(pdata) * 2)
-        
-    plot.title(name)
-    plot.xticks(xtckcnt, xtckname)
+    #fig.xlim(-1, len(pdata) * 2)
+          
+    fig.suptitle(name)
+#    fig.xticks(xtckcnt, xtckname)
     ax1.set_xlabel(xaxisText)
     ax1.set_ylabel("System utility", color="green")
     ax2.set_ylabel("Number of messages", color="red")
-    plot.savefig(name + ".png", dpi=256, width=20, wight=15)
+    fig.savefig(name + ".png", dpi=256, width=20, wight=15)
 
 def loadAllLogs():
     logs = []
