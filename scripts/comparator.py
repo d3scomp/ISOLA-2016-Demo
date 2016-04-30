@@ -78,13 +78,9 @@ def boxplot(data, msgdata, name="comparison", xaxisText="value", xaxisTransform=
     msgpdata = []
         
     # Boxplot names and data aggregation
-    cnt = 0
-    xtckcnt = []
     xtckname = []
     for key in sorted(data.keys()):
         pdata.append(data[key])
-        xtckcnt.append(cnt)
-        cnt = cnt + 2
         xtckname.append(str(xaxisTransform(key)))
         
     for key in sorted(msgdata.keys()):
@@ -112,16 +108,19 @@ def boxplot(data, msgdata, name="comparison", xaxisText="value", xaxisTransform=
     
     # Box-plots
    
-    databoxes = ax1.boxplot(pdata, positions=range(0, len(pdata) * 2, 2), labels=xtckname)
- #   ax1.setp(databoxes['boxes'], color='green')
+    databoxes = ax1.boxplot(pdata, positions=range(0, len(pdata) * 2, 2), labels=xtckname, patch_artist=True)
+    for patch in databoxes['boxes']:
+        patch.set_facecolor('green')
+    for median in databoxes['medians']:
+        median.set_color('black')
     
-    msgboxes = ax2.boxplot(msgpdata, positions=range(1, len(msgpdata) * 2 + 1, 2), labels=xtckname)
- #   fig.setp(msgboxes['boxes'], color='red')
-    
-    #fig.xlim(-1, len(pdata) * 2)
+    msgboxes = ax2.boxplot(msgpdata, positions=range(1, len(msgpdata) * 2 + 1, 2), labels=xtckname, patch_artist=True)
+    for patch in msgboxes['boxes']:
+        patch.set_facecolor('red')
+    for median in msgboxes['medians']:
+        median.set_color('black')
           
     fig.suptitle(name)
-#    fig.xticks(xtckcnt, xtckname)
     ax1.set_xlabel(xaxisText)
     ax1.set_ylabel("System utility", color="green")
     ax2.set_ylabel("Number of messages in thousands", color="red")
