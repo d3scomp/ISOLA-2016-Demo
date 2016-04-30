@@ -96,35 +96,35 @@ def boxplot(data, msgdata, name="comparison", xaxisText="value", xaxisTransform=
     fig, ax1 = plot.subplots()
     ax2 = ax1.twinx()
     
-    # value dots
-    for i in range(len(pdata)):
-        y = pdata[i]
-        x = 2 * i;
-        px = np.random.normal(x, 0.075, size=len(y))
-        ax1.plot(px, y, 'bo', alpha=0.4)
+###### value dots
+#    for i in range(len(pdata)):
+#        y = pdata[i]
+#        x = 2 * i;
+#        px = np.random.normal(x, 0.075, size=len(y))
+#        ax1.plot(px, y, 'bo', alpha=0.4)
         
-    # msg dots
-    for i in range(len(pdata)):
-        y = msgpdata[i]
-        x = 2 * i + 1;
-        px = np.random.normal(x, 0.075, size=len(y))
-        ax2.plot(px, y, 'go', alpha=0.4)
+###### msg dots
+#    for i in range(len(pdata)):
+#        y = msgpdata[i]
+#        x = 2 * i + 1;
+#        px = np.random.normal(x, 0.075, size=len(y))
+#        ax2.plot(px, y, 'go', alpha=0.4)
     
     # Box-plots
    
     databoxes = ax1.boxplot(pdata, positions=range(0, len(pdata) * 2, 2), labels=xtckname)
-    plot.setp(databoxes['boxes'], color='blue')
+    plot.setp(databoxes['boxes'], color='green')
     
     msgboxes = ax2.boxplot(msgpdata, positions=range(1, len(msgpdata) * 2 + 1, 2))
-    plot.setp(msgboxes['boxes'], color='green')
+    plot.setp(msgboxes['boxes'], color='red')
     
     plot.xlim(-1, len(pdata) * 2)
         
     plot.title(name)
     plot.xticks(xtckcnt, xtckname)
     ax1.set_xlabel(xaxisText)
-    ax1.set_ylabel("Solution value in collected foods", color="blue")
-    ax2.set_ylabel("Number of messages", color="green")
+    ax1.set_ylabel("System utility", color="green")
+    ax2.set_ylabel("Number of messages", color="red")
     plot.savefig(name + ".png", dpi=256, width=20, wight=15)
 
 def loadAllLogs():
