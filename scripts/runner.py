@@ -64,8 +64,8 @@ class MetaCfg:
 metaCfgs = [];
 cfgs = [];
 
-limit_ms = 300000
-seed_range = range(1, 10)
+limit_ms = 3600000
+seed_range = range(1, 50)
 fitness_types = ["PreferDistant"]#["PreferClose", "PreferDistant", "PreferNeutral"]
 
 # Define meta configurations
@@ -108,7 +108,7 @@ for mode in ['standard']:#['quantum']:#['standard', 'quantum']:
                     seeds = seed_range,
                     rebroadcatDelays = [10000],
                     rebroadcastRanges = [10],
-                    maxtimeskews = [1000, 5000, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000],
+                    maxtimeskews = [5000, 10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000],
                     networkModels = [networkModel],
                     modes = [mode],
                     fitnessTypes = fitness_types
