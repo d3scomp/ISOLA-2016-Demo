@@ -39,7 +39,7 @@ for networkModel in ['simple']:#['simple', 'omnet']:
                 dimensions.append({
                 'headline': fitness + " - rebroadcast range on " + mode + " " + str(radiorange) + "m radio range (" + networkModel + ")",
                 'xaxisText': "Rebroadcast range in meters",
-                'xaxisTransform': lambda val: str(val),
+                'xaxisTransform': lambda val: str(int(val)),
                 'value': "rebroadcastRangeM",
                 'mode': mode,
                 'networkModel': networkModel,
@@ -51,7 +51,7 @@ for networkModel in ['simple']:#['simple', 'omnet']:
                 dimensions.append({
                 'headline': fitness + " - rebroadcast delay on " + mode + " " + str(radiorange) + "m radio range (" + networkModel + ")",
                 'xaxisText': "Rebroadcast period in seconds",
-                'xaxisTransform': lambda val: str(val / 1000),
+                'xaxisTransform': lambda val: str(int(val / 1000)),
                 'value': "rebroadcastDelayMs",
                 'mode': mode,
                 'networkModel': networkModel,
@@ -63,7 +63,7 @@ for networkModel in ['simple']:#['simple', 'omnet']:
                 dimensions.append({
                 'headline': fitness + " - old knowledge removal on " + mode + " " + str(radiorange) + "m radio range (" + networkModel + ")",
                 'xaxisText': "Maximal allowed knowledge age in seconds",
-                'xaxisTransform': lambda val: str(val / 1000),
+                'xaxisTransform': lambda val: str(int(val / 1000)),
                 'value': "maxTimeSkewMs",
                 'mode': mode,
                 'networkModel': networkModel,
@@ -124,7 +124,7 @@ def boxplot(data, msgdata, name="comparison", xaxisText="value", xaxisTransform=
 #    fig.xticks(xtckcnt, xtckname)
     ax1.set_xlabel(xaxisText)
     ax1.set_ylabel("System utility", color="green")
-    ax2.set_ylabel("Number of messages", color="red")
+    ax2.set_ylabel("Number of messages in thousands", color="red")
     fig.savefig(name + ".png", dpi=256, width=20, wight=15)
 
 def loadAllLogs():
@@ -164,7 +164,7 @@ def processDimension(dimension, logs):
             data[key] = []
             msgdata[key] = []
         data[key].append(float(utility))
-        msgdata[key].append(int(messages))
+        msgdata[key].append(int(messages) / 1000)
 
     print("")
 
