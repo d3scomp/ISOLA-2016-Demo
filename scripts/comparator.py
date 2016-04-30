@@ -37,7 +37,8 @@ for networkModel in ['simple']:#['simple', 'omnet']:
         for fitness in ["PreferDistant"]:#["PreferClose", "PreferDistant", "PreferNeutral"]:
             for radiorange in [5]:#[3, 5, 7]:
                 dimensions.append({
-                'headline': fitness + " - rebroadcast range on " + mode + " " + str(radiorange) + "m radio range (" + networkModel + ")",
+                #'headline': fitness + " - rebroadcast range on " + mode + " " + str(radiorange) + "m radio range (" + networkModel + ")",
+                'headline': "Prefer distant beacons - rebroadcast radius influence",
                 'xaxisText': "Rebroadcast radius in meters",
                 'xaxisTransform': lambda val: str(int(val)),
                 'value': "rebroadcastRangeM",
@@ -49,7 +50,8 @@ for networkModel in ['simple']:#['simple', 'omnet']:
                 })
                 
                 dimensions.append({
-                'headline': fitness + " - rebroadcast delay on " + mode + " " + str(radiorange) + "m radio range (" + networkModel + ")",
+                #'headline': fitness + " - rebroadcast delay on " + mode + " " + str(radiorange) + "m radio range (" + networkModel + ")",
+                'headline': "Prefer distant beacons - rebroadcast period influence",
                 'xaxisText': "Rebroadcast period in seconds",
                 'xaxisTransform': lambda val: str(int(val / 1000)),
                 'value': "rebroadcastDelayMs",
@@ -61,7 +63,8 @@ for networkModel in ['simple']:#['simple', 'omnet']:
                 })
                 
                 dimensions.append({
-                'headline': fitness + " - old knowledge removal on " + mode + " " + str(radiorange) + "m radio range (" + networkModel + ")",
+                #'headline': fitness + " - old knowledge removal on " + mode + " " + str(radiorange) + "m radio range (" + networkModel + ")",
+                'headline': "Prefer distant beacons - max. packet age influence",
                 'xaxisText': "Max. packet age in seconds",
                 'xaxisTransform': lambda val: str(int(val / 1000)),
                 'value': "maxTimeSkewMs",
@@ -69,7 +72,7 @@ for networkModel in ['simple']:#['simple', 'omnet']:
                 'networkModel': networkModel,
                 'radiorange': radiorange,
                 'fitness': fitness,
-                'filter': lambda log, dim: cfgGuard(log, dim) and log.config.rebroadcastRangeM == 10 and log.config.rebroadcastDelayMs == 10000
+                'filter': lambda log, dim: cfgGuard(log, dim) and log.config.rebroadcastRangeM == 10 and log.config.rebroadcastDelayMs == 10000 and log.config.maxTimeSkewMs != 1000
                 })
 
 def boxplot(data, msgdata, name="comparison", xaxisText="value", xaxisTransform=lambda x: x):
@@ -79,13 +82,18 @@ def boxplot(data, msgdata, name="comparison", xaxisText="value", xaxisTransform=
         
     # Boxplot names and data aggregation
     xtckname = []
+    cnt = 0
+    xtckcnt = []
     for key in sorted(data.keys()):
         pdata.append(data[key])
+        xtckcnt.append(cnt)
+        cnt = cnt + 2
         xtckname.append(str(xaxisTransform(key)))
         
     for key in sorted(msgdata.keys()):
         msgpdata.append(msgdata[key])
-        
+    
+    print(str(len(pdata)) + " " + str(len(msgpdata)))
     
     fig = plot.figure()
     ax1 = fig.add_subplot(111)
@@ -107,24 +115,32 @@ def boxplot(data, msgdata, name="comparison", xaxisText="value", xaxisTransform=
 #        ax2.plot(px, y, 'go', alpha=0.4)
     
     # Box-plots
-   
-    databoxes = ax1.boxplot(pdata, positions=range(0, len(pdata) * 2, 2), labels=xtckname, patch_artist=True)
+    plot.xlim(-1, len(pdata) * 2)
+    
+    
+    databoxes = ax1.boxplot(pdata, positions=range(0, len(pdata) * 2, 2), patch_artist=True, manage_xticks = False)
     for patch in databoxes['boxes']:
         patch.set_facecolor('green')
     for median in databoxes['medians']:
         median.set_color('black')
     
-    msgboxes = ax2.boxplot(msgpdata, positions=range(1, len(msgpdata) * 2 + 1, 2), labels=xtckname, patch_artist=True)
+    msgboxes = ax2.boxplot(msgpdata, positions=range(1, len(msgpdata) * 2 + 1, 2), patch_artist=True, manage_xticks = False)
     for patch in msgboxes['boxes']:
         patch.set_facecolor('red')
     for median in msgboxes['medians']:
         median.set_color('black')
-
+    
+    plot.xticks(list(map(lambda x: x + 0.5, range(0, len(pdata) * 2 + 0, 2))), xtckname)
+    
     fig.suptitle(name)
     ax1.set_xlabel(xaxisText)
     ax1.set_ylabel("System utility", color="green")
     ax2.set_ylabel("Number of messages in thousands", color="red")
     fig.savefig(name + ".png", dpi=256, width=20, wight=15)
+    fig.savefig(name + ".eps")
+    fig.savefig(name + ".pdf")
+    fig.savefig(name + ".ps")
+    fig.savefig(name + ".svg")
 
 def loadAllLogs():
     logs = []
@@ -169,7 +185,8 @@ def processDimension(dimension, logs):
 
     print("Data: ")
     for key in data:
-        print(str(key) + ": " + str(data[key]) + " " + str(msgdata[key]))
+        print("Util:" + str(key) + ": " + str(data[key]))
+        print("Msgs:" + str(key) + ": " + str(msgdata[key]))
     print("Data end")
     
     if len(data) > 0:
