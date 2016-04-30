@@ -38,7 +38,7 @@ for networkModel in ['simple']:#['simple', 'omnet']:
             for radiorange in [5]:#[3, 5, 7]:
                 dimensions.append({
                 'headline': fitness + " - rebroadcast range on " + mode + " " + str(radiorange) + "m radio range (" + networkModel + ")",
-                'xaxisText': "Rebroadcast range in meters",
+                'xaxisText': "Rebroadcast radius in meters",
                 'xaxisTransform': lambda val: str(int(val)),
                 'value': "rebroadcastRangeM",
                 'mode': mode,
@@ -62,7 +62,7 @@ for networkModel in ['simple']:#['simple', 'omnet']:
                 
                 dimensions.append({
                 'headline': fitness + " - old knowledge removal on " + mode + " " + str(radiorange) + "m radio range (" + networkModel + ")",
-                'xaxisText': "Maximal allowed knowledge age in seconds",
+                'xaxisText': "Max. packet age in seconds",
                 'xaxisTransform': lambda val: str(int(val / 1000)),
                 'value': "maxTimeSkewMs",
                 'mode': mode,
@@ -119,7 +119,7 @@ def boxplot(data, msgdata, name="comparison", xaxisText="value", xaxisTransform=
         patch.set_facecolor('red')
     for median in msgboxes['medians']:
         median.set_color('black')
-          
+
     fig.suptitle(name)
     ax1.set_xlabel(xaxisText)
     ax1.set_ylabel("System utility", color="green")
