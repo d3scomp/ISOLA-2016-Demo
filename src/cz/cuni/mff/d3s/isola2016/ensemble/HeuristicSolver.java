@@ -11,13 +11,14 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import cz.cuni.mff.d3s.isola2016.antsim.AbstractAntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.demo.BigAnt;
 import cz.cuni.mff.d3s.isola2016.demo.Config;
 import cz.cuni.mff.d3s.isola2016.demo.FoodSource;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
-public class HeuristicSolver implements AntAssignmetSolver {
+public class HeuristicSolver extends AntAssignmetSolver {
 	public static final double MAX_DISTANCE_M = 30;
 	public final Config config;
 
@@ -47,6 +48,7 @@ public class HeuristicSolver implements AntAssignmetSolver {
 				ant.assignedFood = source.position;
 				ant.currentGoalUtility = getAppFitness();
 			}
+			world.totalEnsembleInstances++;
 		}
 
 		private double getAppFitness() {
@@ -146,7 +148,8 @@ public class HeuristicSolver implements AntAssignmetSolver {
 	final FitnessMode mode;
 	final Set<PersistentEnsemble> persistentEnsembles = new LinkedHashSet<>();
 
-	public HeuristicSolver(FitnessMode mode, Config config) {
+	public HeuristicSolver(FitnessMode mode, Config config, AbstractAntWorldPlugin world) {
+		super(world);
 		this.mode = mode;
 		this.config = config;
 	}

@@ -35,9 +35,11 @@ import cz.cuni.mff.d3s.jdeeco.publishing.DefaultKnowledgePublisher;
 
 class SolverFactory {
 	final Config cfg;
+	final AbstractAntWorldPlugin world;
 
-	public SolverFactory(Config cfg) {
+	public SolverFactory(Config cfg, AbstractAntWorldPlugin world) {
 		this.cfg = cfg;
+		this.world = world;
 	}
 
 	public AntAssignmetSolver getSolver() {
@@ -45,22 +47,22 @@ class SolverFactory {
 		case "standard":
 			switch (cfg.fitnessType) {
 			case "PreferClose":
-				return new HeuristicSolver(FitnessMode.PreferCloseFoods, cfg);
+				return new HeuristicSolver(FitnessMode.PreferCloseFoods, cfg, world);
 			case "PreferDistant":
-				return new HeuristicSolver(FitnessMode.PreferDistantFoods, cfg);
+				return new HeuristicSolver(FitnessMode.PreferDistantFoods, cfg, world);
 			case "PreferNeutral":
-				return new HeuristicSolver(FitnessMode.PreferNeutral, cfg);
+				return new HeuristicSolver(FitnessMode.PreferNeutral, cfg, world);
 			default:
 				throw new UnsupportedOperationException("Unknown fitness type \"" + cfg.fitnessType + "\"");
 			}
 		case "quantum":
 			switch (cfg.fitnessType) {
 			case "PreferClose":
-				return new PairedHeuristicSolver(FitnessMode.PreferCloseFoods, cfg);
+				return new PairedHeuristicSolver(FitnessMode.PreferCloseFoods, cfg, world);
 			case "PreferDistant":
-				return new PairedHeuristicSolver(FitnessMode.PreferDistantFoods, cfg);
+				return new PairedHeuristicSolver(FitnessMode.PreferDistantFoods, cfg, world);
 			case "PreferNeutral":
-				return new PairedHeuristicSolver(FitnessMode.PreferNeutral, cfg);
+				return new PairedHeuristicSolver(FitnessMode.PreferNeutral, cfg, world);
 			default:
 				throw new UnsupportedOperationException("Unknown fitness type \"" + cfg.fitnessType + "\"");
 			}
@@ -98,10 +100,10 @@ public class DemoLauncher {
 		default:
 			throw new UnexpectedException("Mode \"" + cfg.mode + "\" not defined");
 		}
-		
+
 		// Create solver factory
-		SolverFactory solverFactory = new SolverFactory(cfg);
-		
+		SolverFactory solverFactory = new SolverFactory(cfg, antWorld);
+
 		// Define simulation
 		DEECoSimulation realm;
 		switch (cfg.networkModel) {
@@ -141,7 +143,8 @@ public class DemoLauncher {
 			plugins.add(new PositionPlugin(PosUtils.getRandomPosition(rand, 0, 0, ANT_SPAWN_DIAMETER_M)));
 			plugins.add(new IntelligentAntPlanning(solverFactory.getSolver(), cfg.maxTimeSkewMs));
 			if (cfg.useRebroadcasting) {
-				plugins.add(new CachingRebroadcastStrategy(cfg.rebroadcastDelayMs, cfg.rebroadcastRangeM, cfg.maxTimeSkewMs));
+				plugins.add(new CachingRebroadcastStrategy(cfg.rebroadcastDelayMs, cfg.rebroadcastRangeM,
+						cfg.maxTimeSkewMs));
 			}
 
 			DEECoNode node = realm.createNode(nodeCnt, plugins.toArray(new DEECoPlugin[] {}));
@@ -170,7 +173,8 @@ public class DemoLauncher {
 				List<DEECoPlugin> plugins = new LinkedList<>();
 				plugins.add(new SmallAntPlugin());
 				plugins.add(new PositionPlugin(PosUtils.getRandomPosition(rand, 0, 0, ANT_SPAWN_DIAMETER_M)));
-				plugins.add(new CachingRebroadcastStrategy(cfg.rebroadcastDelayMs, cfg.rebroadcastRangeM, cfg.maxTimeSkewMs));
+				plugins.add(new CachingRebroadcastStrategy(cfg.rebroadcastDelayMs, cfg.rebroadcastRangeM,
+						cfg.maxTimeSkewMs));
 
 				DEECoNode node = realm.createNode(nodeCnt, plugins.toArray(new DEECoPlugin[] {}));
 

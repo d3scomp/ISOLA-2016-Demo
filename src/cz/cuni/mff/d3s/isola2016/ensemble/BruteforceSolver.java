@@ -187,20 +187,16 @@ public class BruteforceSolver {
 			}
 		}
 
-		BigAnt assistant = null;
-		
 		// Get food assigned to local ant
 		FoodSource sourceAssignedToLocalAnt = null;
 		if (bestSolution != null) {
 			for (Triplet t : bestSolution) {
 				if (t.a == localAnt) {
 					sourceAssignedToLocalAnt = t.c;
-					assistant = t.b;
 				}
-				
-				if(t.b == localAnt) {
+
+				if (t.b == localAnt) {
 					sourceAssignedToLocalAnt = t.c;
-					assistant = t.a;
 				}
 			}
 		}
@@ -214,9 +210,9 @@ public class BruteforceSolver {
 
 		// Set assigned food source local knowledge
 		if (sourceAssignedToLocalAnt != null) {
-//			return new Result(sourceAssignedToLocalAnt, assistant);
+			// return new Result(sourceAssignedToLocalAnt, assistant);
 		} else {
-//			return new Result(null, null);
+			// return new Result(null, null);
 		}
 	}
 }

@@ -34,22 +34,25 @@ public abstract class AbstractAntWorldPlugin implements DEECoPlugin, TimerTaskLi
 			public final L2PacketCounter msgCounter;
 			public final int collected;
 			public final double utility;
-			
+			public final double avgEnsembles;
+
 			Report(AbstractAntWorldPlugin world) {
 				this.collected = world.collectedFoodPieces;
 				this.msgCounter = world.counter;
-				
+				this.avgEnsembles = ((double) world.totalEnsembleInstances) / ((double) world.config.numBigAnts)
+						/ (((double) world.config.limitMs) / 1000.0);
+
 				Double utility = 0.0;
-				for(BigAntPlugin ant: world.bigAnts) {
+				for (BigAntPlugin ant : world.bigAnts) {
 					utility += ant.antInfo.totalUtility;
 				}
 				this.utility = utility;
 			}
 		}
-		
+
 		public final Config config;
 		public final Report report;
-		
+
 		public FinalLog(AbstractAntWorldPlugin world) {
 			this.config = world.config;
 			this.report = new Report(world);
@@ -64,6 +67,7 @@ public abstract class AbstractAntWorldPlugin implements DEECoPlugin, TimerTaskLi
 	public Position antHill;
 	public int collectedFoodPieces = 0;
 	public double utility = 0;
+	public int totalEnsembleInstances = 0;
 	public Collection<BigAntPlugin> bigAnts = new LinkedHashSet<>();
 	public Collection<SmallAntPlugin> smallAnts = new LinkedHashSet<>();
 	public Collection<FoodSource> foodSources = new LinkedHashSet<>();
@@ -98,7 +102,7 @@ public abstract class AbstractAntWorldPlugin implements DEECoPlugin, TimerTaskLi
 			counter = container.getPluginInstance(L2PacketCounter.class);
 			Scheduler scheduler = container.getRuntimeFramework().getScheduler();
 			new TimerTask(scheduler, this, "AntWorldSimStep", 0, SIM_STEP_MS).schedule();
-			
+
 			// Schedule final low write
 			container.addShutdownListener(new ShutdownListener() {
 				@Override
@@ -167,7 +171,7 @@ public abstract class AbstractAntWorldPlugin implements DEECoPlugin, TimerTaskLi
 	}
 
 	protected abstract void resolveLocked();
-	
+
 	private void removeFoodAtHill() {
 		// Remove food at hill
 		Collection<FoodPiece> toRemove = new HashSet<>();
@@ -287,9 +291,9 @@ public abstract class AbstractAntWorldPlugin implements DEECoPlugin, TimerTaskLi
 		FinalLog log = new FinalLog(this);
 		JAXB.marshal(log, out);
 	}
-	
+
 	protected abstract void maintainFoodSourcePopulation();
-	
+
 	private void updateAllAntInfo() {
 		for (BigAntPlugin ant : bigAnts) {
 			ant.updateAntInfo();
@@ -336,7 +340,7 @@ public abstract class AbstractAntWorldPlugin implements DEECoPlugin, TimerTaskLi
 		moveFoodAndPullers();
 
 		// Log current state
-		if(config.logIntervalMs != 0 && time % config.logIntervalMs == 0) {
+		if (config.logIntervalMs != 0 && time % config.logIntervalMs == 0) {
 			log(time);
 		}
 	}

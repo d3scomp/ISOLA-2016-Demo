@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 
+import cz.cuni.mff.d3s.isola2016.antsim.AbstractAntWorldPlugin;
 import cz.cuni.mff.d3s.isola2016.antsim.QuantumFoodSource;
 import cz.cuni.mff.d3s.isola2016.demo.BigAnt;
 import cz.cuni.mff.d3s.isola2016.demo.Config;
@@ -19,7 +20,7 @@ import cz.cuni.mff.d3s.isola2016.demo.FoodSource;
 import cz.cuni.mff.d3s.isola2016.utils.PosUtils;
 import cz.cuni.mff.d3s.jdeeco.position.Position;
 
-public class PairedHeuristicSolver implements AntAssignmetSolver {
+public class PairedHeuristicSolver extends AntAssignmetSolver {
 	public static final double MAX_DISTANCE_M = 30;
 	public final Config config;
 
@@ -184,7 +185,6 @@ public class PairedHeuristicSolver implements AntAssignmetSolver {
 		}
 
 		public boolean checkPerisitanceCondition() {
-			double avgAppFitness = instances.stream().mapToDouble(ens -> ens.getAppFitness()).average().getAsDouble();
 			double avgLatFitness = instances.stream().mapToDouble(ens -> ens.getLatFitness()).average().getAsDouble();
 			return avgLatFitness > 0.5;
 		}
@@ -193,7 +193,8 @@ public class PairedHeuristicSolver implements AntAssignmetSolver {
 	final FitnessMode mode;
 	final Set<PersistentEnsemble> persistentEnsembles = new LinkedHashSet<>();
 
-	public PairedHeuristicSolver(FitnessMode mode, Config config) {
+	public PairedHeuristicSolver(FitnessMode mode, Config config, AbstractAntWorldPlugin world) {
+		super(world);
 		this.mode = mode;
 		this.config = config;
 	}
