@@ -66,7 +66,7 @@ for networkModel in ['simple']:#['simple', 'omnet']:
                 
                 dimensions.append({
                 #'headline': fitness + " - old knowledge removal on " + mode + " " + str(radiorange) + "m radio range (" + networkModel + ")",
-                'headline': "(c) Prefer distant beacons - max. staleness age influence",
+                'headline': "(c) Prefer distant beacons - max. staleness influence",
                 #'headline': "(c)",
                 'xaxisText': "Max. staleness in seconds",
                 'xaxisTransform': lambda val: str(int(val / 1000)),
