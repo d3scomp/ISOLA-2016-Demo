@@ -20,7 +20,7 @@ def load(logDir):
     log = []
     for record in records:
         root = objectify.parse(record).getroot()
-        root.time = int(re.sub(".*/|\.xml", "", record))
+        root.time = int(re.sub(".*[/\\\\]|\.xml", "", record))
         log.append(root)
         #log[root.time] = root
     
