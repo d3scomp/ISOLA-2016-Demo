@@ -8,3 +8,4 @@ omnet/
 /scripts/*.pdf
 /scripts/__pycache__/
 /scripts/*.pyc
+scripts/delays
